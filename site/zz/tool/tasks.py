@@ -87,4 +87,3 @@ def new_job(jobcode):
     # Add heatmap file to Output.
 
 # Mark job as complete.
-

@@ -5,6 +5,8 @@ import pymysql.cursors
 import pandas as pd
 import numpy as np
 
+from zigzag.config import *
+
 # Ensure that Pandas always loads full sequence.
 pd.set_option('max_colwidth', 1000000)
 
@@ -374,12 +376,11 @@ def insert_protease_patterns(protease_patterns):
 
     for protease,patterns in protease_patterns.items():
         for pattern in patterns:
-            pattern_string = ','.join(pattern)
             connection = connect_to_merops_database()
             try:
                 with connection.cursor() as cursor:
                     query = ("INSERT INTO protease_patterns (Protease, pattern)"
-                            + " VALUES ('%s', '%s')") % (protease,pattern_string)
+                            + " VALUES ('%s', '%s')") % (protease, pattern)
                     cursor.execute(query)
                 connection.commit()
             finally:
