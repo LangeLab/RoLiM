@@ -1,9 +1,12 @@
 import os
+import shutil
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.contrib.sessions.models import Session
 from django.dispatch import receiver
+
 
 def unique_filename(instance, filename):
 	"""Generate directory and UUID name for submitted file"""
@@ -74,7 +77,7 @@ class ExtensionDirection(models.Model):
 
 
 @receiver(models.signals.post_delete, sender=Job)
-def delete_data_file(sender, instance, **kwargs):
+def delete_job_data(sender, instance, **kwargs):
 	"""
 	Delete data file from filesystem after file upload object is deleted.
 	
@@ -87,11 +90,8 @@ def delete_data_file(sender, instance, **kwargs):
 		None
 	"""
 	
-	data_files = [
-		instance.foreground_data,
-		instance.context_data,
-	]
-
-	for data_file in data_files:
-		if data_file:
-			os.remove(data_file)
+	job_directory = os.path.join(settings.MEDIA_ROOT, instance.jobcode)
+	try:
+		shutil.rmtree(job_directory)
+	except:
+		print('Error while removing job files.')

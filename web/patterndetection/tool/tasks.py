@@ -193,3 +193,4 @@ def new_job(jobcode):
     # Mark job complete.
 
     # Remove completed job from Job table.
+    job.delete()
