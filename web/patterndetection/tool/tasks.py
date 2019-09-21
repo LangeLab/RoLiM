@@ -159,7 +159,8 @@ def new_job(jobcode):
 
     # Set email login parameters.
     username = 'tsmithdmr@gmail.com'
-    password = 'fzjsjnvfwgqyctfo'
+    with open('gmail_app_password') as app_password:
+        password = app_password.read().strip()
     
     # Generate new email message and specify details.
     msg = MIMEMultipart('alternative')
