@@ -10,7 +10,6 @@ from email import encoders
 
 from patterndetection.tool.models import Job
 from zigzag import sequences, pattern_extraction
-from zigzag.gmail_app_password import app_password
 
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
@@ -160,7 +159,7 @@ def new_job(jobcode):
 
     # Set email login parameters.
     username = 'tsmithdmr@gmail.com'
-    password = app_password
+    password = 'fzjsjnvfwgqyctfo'
     
     # Generate new email message and specify details.
     msg = MIMEMultipart('alternative')
@@ -190,5 +189,6 @@ def new_job(jobcode):
     server.sendmail(username, email, msg.as_string())
     server.quit()
 
+    # Mark job complete.
+
     # Remove completed job from Job table.
-    job.delete()
