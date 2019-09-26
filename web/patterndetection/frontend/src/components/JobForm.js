@@ -12,6 +12,7 @@ class JobForm extends Component {
     description: "",
     email: "",
     foreground_data: "",
+    foregroundformat:"1",
     context_data: "",
     p_value_cutoff: "",
     contextformat: "",
@@ -44,6 +45,7 @@ class JobForm extends Component {
     e.preventDefault();
     let formData = new FormData();
     formData.append('foreground_data', this.state.foreground_data);
+    formData.append('foregroundformat', this.state.foregroundformat);
     formData.append('context_data', this.state.context_data);
     formData.append('title', this.state.title);
     formData.append('description', this.state.description);
@@ -64,6 +66,7 @@ class JobForm extends Component {
       description,
       email,
       foreground_data,
+      foregroundformat,
       context_data,
       p_value_cutoff,
       minimum_occurrences,
@@ -81,6 +84,7 @@ class JobForm extends Component {
       description,
       email,
       foreground_data,
+      foregroundformat,
       context_data,
       p_value_cutoff,
       minimum_occurrences,
@@ -109,6 +113,7 @@ class JobForm extends Component {
       description,
       email,
       foreground_data,
+      foregroundformat,
       context_data,
       p_value_cutoff,
       minimum_occurrences,
@@ -164,7 +169,7 @@ class JobForm extends Component {
             </div>
           </div>
           <div className="field">
-            <label className="label">Select input data file to upload (pre-aligned fixed length sequences, FASTA peptides, or MaxQuant evidence.txt).</label>
+            <label className="label">Select input data file to upload.</label>
             <label className="file-label">
               <div className="control">
                 <input
@@ -186,6 +191,65 @@ class JobForm extends Component {
               </div>
             </label>
           </div>
+          <div>
+            <label className="label">Select foreground data set format.</label>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="foregroundformat"
+                  onChange={this.handleChange}
+                  value="1"
+                />
+                Prealigned text file
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="foregroundformat"
+                  onChange={this.handleChange}
+                  value="2"
+                />
+                Prealigned FASTA file
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="foregroundformat"
+                  onChange={this.handleChange}
+                  value="3"
+                />
+                Text file peptide list
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="foregroundformat"
+                  onChange={this.handleChange}
+                  value="4"
+                />
+                FASTA peptide list
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="foregroundformat"
+                  onChange={this.handleChange}
+                  value="6"
+                />
+                MaxQuant "evidence.txt" file
+              </label>
+            </div>
+          </div>
+
           <div className="field">
             <label className="label">Select context FASTA file to upload. (Optional)</label>
             <label className="file-label">
