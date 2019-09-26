@@ -518,10 +518,14 @@ class Pattern:
                     new_pattern = np.logical_or(prior_positions,
                                                 new_pattern).astype(np.int8)
 
+                    try:
+                        stats_bonferroni_m = bonferroni_m
+                    except UnboundLocalError:
+                        stats_bonferroni_m = 1.0
                     stats = ParentStats(
                         pattern_id=self.pattern_id,
                         size=self.subset_tensor.shape[0],
-                        bonferroni_m=bonferroni_m,
+                        bonferroni_m=stats_bonferroni_m,
                         expected_frequency=positional_background_frequencies[residue_coordinates]
                     )
                     # Instantiate new Pattern object with new pattern,
@@ -1214,9 +1218,13 @@ class PatternContainer:
         if initial_removed_positional_residues == None:
             initial_removed_positional_residues = initial_pattern
 
-        bonferroni_m = np.count_nonzero(np.sum(sample.sequence_tensor, axis=0))
-        if bonferroni_m == 0.0:
+        if multiple_testing_correction:
+            bonferroni_m = np.count_nonzero(np.sum(sample.sequence_tensor, axis=0))
+            if bonferroni_m == 0.0:
+                bonferroni_m = 1.0
+        else:
             bonferroni_m = 1.0
+            
         parent_stats = ParentStats(
             pattern_id=None,
             size=sample.sequence_tensor.shape[0],

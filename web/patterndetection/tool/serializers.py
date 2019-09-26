@@ -28,6 +28,14 @@ class JobSerializer(serializers.ModelSerializer):
 			'compound_residue_decomposition',
 		)
 		read_only_fields = ('submitted', 'completed',)
+		extra_kwargs = {
+			'extend_sequences': {'default': False, 'initial': False},
+			'center_sequences': {'default': True, 'initial': True},
+			'multiple_testing_correction': {'default': True, 'initial': True},
+			'positional_weighting': {'default': True, 'initial': True},
+			'compound_residues': {'default': True, 'initial': True},
+			'compound_residue_decomposition': {'default': True, 'initial': True}
+		}
 
 
 class ForegroundFormatSerializer(serializers.ModelSerializer):

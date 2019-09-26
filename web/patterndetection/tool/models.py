@@ -19,6 +19,7 @@ class Job(models.Model):
 	"""Analysis input data and metadata."""
 
 	DEFAULT_P_VALUE_CUTOFF = 0.001
+	DEFAULT_MIN_OCCURRENCES = 2
 	DEFAULT_FC = 1.0
 	DEFAULT_DATAFORMAT = 1
 	DEFAULT_CONTEXTFORMAT = 1
@@ -46,19 +47,20 @@ class Job(models.Model):
 										on_delete=models.CASCADE,
 										default=DEFAULT_CONTEXTFORMAT)
 	p_value_cutoff = models.FloatField(default=DEFAULT_P_VALUE_CUTOFF)
-	minimum_occurrences = models.IntegerField(default=2)
-	fold_change_cutoff = models.FloatField(default=DEFAULT_FC)
+	minimum_occurrences = models.IntegerField(blank=True,
+												default=DEFAULT_MIN_OCCURRENCES)
+	fold_change_cutoff = models.FloatField(blank=True, default=DEFAULT_FC)
 	max_depth = models.IntegerField(blank=True, null=True)
-	extend_sequences = models.BooleanField(default=False)
+	extend_sequences = models.BooleanField(blank=True, default=False)
 	extension_direction = models.ForeignKey('ExtensionDirection',
 												on_delete=models.CASCADE,
 												default=DEFAULT_EXTENSION_DIRECTION)
-	width = models.IntegerField(default=8)
-	center_sequences = models.BooleanField(default=True)
-	multiple_testing_correction = models.BooleanField(default=True)
-	positional_weighting = models.BooleanField(default=True)
-	compound_residues = models.BooleanField(default=True)
-	compound_residue_decomposition = models.BooleanField(default=True)
+	width = models.IntegerField(blank=True, default=8)
+	center_sequences = models.BooleanField(blank=True, default=True)
+	multiple_testing_correction = models.BooleanField(blank=True, default=True)
+	positional_weighting = models.BooleanField(blank=True, default=True)
+	compound_residues = models.BooleanField(blank=True, default=True)
+	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
 
 
 class ForegroundFormat(models.Model):

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_rq',
     'patterndetection.tool',
+    'patterndetection.frontend',
 ]
 
 MIDDLEWARE = [
