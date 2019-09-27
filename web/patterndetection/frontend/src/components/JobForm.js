@@ -14,13 +14,13 @@ class JobForm extends Component {
     foreground_data: "",
     foregroundformat:"1",
     context_data: "",
-    p_value_cutoff: "",
+    p_value_cutoff: 0.001,
     contextformat: "",
-    minimum_occurrences: "",
-    fold_change_cutoff: "",
+    minimum_occurrences: 2,
+    fold_change_cutoff: 1.0,
     max_depth: "",
     extend_sequences: false,
-    width: "",
+    width: 8,
     center_sequences: true,
     multiple_testing_correction: true,
     positional_weighting: true,
@@ -34,6 +34,15 @@ class JobForm extends Component {
 
   handleCheckboxChange = e => {
     this.setState({ [e.target.name]: e.target.checked });
+  };
+
+  toggleAdvancedOptions = () => {
+    var advancedOptions = document.getElementById('advancedOptions');
+    if (advancedOptions.style.display === "none") {
+      advancedOptions.style.display = "block";
+    } else {
+      advancedOptions.style.display = "none";
+    }
   }
 
   handleUpload = e => {
@@ -105,6 +114,8 @@ class JobForm extends Component {
     };
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
+
+    alert("Thank you for your submission. Your results will be emailed to you.");
   };
   
   render() {
@@ -128,7 +139,7 @@ class JobForm extends Component {
     } = this.state;
     return (
       <div className="column">
-        <h1>Submit a new job for analysis.</h1>
+        <h4 className="title is-4">Submit a new job for analysis.</h4>
         <form onSubmit={this.handleSubmit} encType="multipart/form-data">
           <div className="field">
             <label className="label">Email</label>
@@ -200,6 +211,7 @@ class JobForm extends Component {
                   name="foregroundformat"
                   onChange={this.handleChange}
                   value="1"
+                  required
                 />
                 Prealigned text file
               </label>
@@ -249,7 +261,7 @@ class JobForm extends Component {
               </label>
             </div>
           </div>
-
+          <br />
           <div className="field">
             <label className="label">Select context FASTA file to upload. (Optional)</label>
             <label className="file-label">
@@ -273,127 +285,144 @@ class JobForm extends Component {
             </label>
           </div>
           <br />
-          <h2>Advanced options</h2>
-          <div className="field">
-            <label className="label">P-value threshold.</label>
-            <div className="control">
-              <input
-                className="input"
-                type="text"
-                name="p_value_cutoff"
-                onChange={this.handleChange}
-                value={p_value_cutoff}
-              />
+          <h5 className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options</h5>
+          <br />
+          <div id="advancedOptions" style={{display: "none"}}>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="center_sequences"
+                    onChange={this.handleCheckboxChange}
+                    value={center_sequences}
+                    checked={center_sequences}
+                  />
+                  Center sequences?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="extend_sequences"
+                    onChange={this.handleCheckboxChange}
+                    value={extend_sequences}
+                    checked={extend_sequences}
+                  />
+                  Expand and align peptides using context data set?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="compound_residues"
+                    onChange={this.handleCheckboxChange}
+                    value={compound_residues}
+                    checked={compound_residues}
+                  />
+                  Detect compound residue groups?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="proteomeupload"
+                    onChange={this.handleCheckboxChange}
+                    value={compound_residue_decomposition}
+                    checked={compound_residue_decomposition}
+                  />
+                  Enable compound residue decomposition?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">  
+                  <input
+                    type="checkbox"
+                    name="multiple_testing_correction"
+                    onChange={this.handleCheckboxChange}
+                    value={multiple_testing_correction}
+                    checked={multiple_testing_correction}
+                  />
+                  Enable multiple testing correction?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="positional_weighting"
+                    onChange={this.handleCheckboxChange}
+                    value={positional_weighting}
+                    checked={positional_weighting}
+                  />
+                  Enable positional weighting?
+                </label>
+              </div>
+            </div>
+            <br />
+            <div className="field">
+              <label className="label">P-value threshold.</label>
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  name="p_value_cutoff"
+                  onChange={this.handleChange}
+                  value={p_value_cutoff}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Minimum occurrences</label>
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  name="minimum_occurrences"
+                  onChange={this.handleChange}
+                  value={minimum_occurrences}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Fold change cutoff</label>
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  name="fold_change_cutoff"
+                  onChange={this.handleChange}
+                  value={fold_change_cutoff}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Enter desired width of expanded sequences.</label>
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  name="width"
+                  onChange={this.handleCheckboxChange}
+                  value={width}
+                />
+              </div>
             </div>
           </div>
-          <div className="field">
-            <label className="label">Minimum occurrences</label>
-            <div className="control">
-              <input
-                className="input"
-                type="text"
-                name="minimum_occurrences"
-                onChange={this.handleChange}
-                value={minimum_occurrences}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Fold change cutoff</label>
-            <div className="control">
-              <input
-                className="input"
-                type="text"
-                name="fold_change_cutoff"
-                onChange={this.handleChange}
-                value={fold_change_cutoff}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Center sequences?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="center_sequences"
-                onChange={this.handleCheckboxChange}
-                value={center_sequences}
-                checked={center_sequences}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Expand and align peptides using context data set?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="extend_sequences"
-                onChange={this.handleCheckboxChange}
-                value={extend_sequences}
-                checked={extend_sequences}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Enter desired width of expanded sequences.</label>
-            <div className="control">
-              <input
-                className="input"
-                type="text"
-                name="width"
-                onChange={this.handleCheckboxChange}
-                value={width}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Detect compound residue groups?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="compound_residues"
-                onChange={this.handleCheckboxChange}
-                value={compound_residues}
-                checked={compound_residues}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Enable compound residue decomposition?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="proteomeupload"
-                onChange={this.handleCheckboxChange}
-                value={compound_residue_decomposition}
-                checked={compound_residue_decomposition}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Enable multiple testing correction?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="multiple_testing_correction"
-                onChange={this.handleCheckboxChange}
-                value={multiple_testing_correction}
-                checked={multiple_testing_correction}
-              />
-            </div>
-          </div>
-          <div className="field">
-            <label className="label">Enable positional weighting?</label>
-            <div className="control">
-              <input
-                type="checkbox"
-                name="positional_weighting"
-                onChange={this.handleCheckboxChange}
-                value={positional_weighting}
-                checked={positional_weighting}
-              />
-            </div>
-          </div>
+          <br />
           <div className="control">
             <button type="submit" className="button is-info">
               Submit job

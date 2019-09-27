@@ -25,7 +25,13 @@ SECRET_KEY = ')rketa2_2i+!oep8cbz6)+=acdyybp$b=b@ze0y=$!x1cnlyo='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'langelab.org',
+    'www.langelab.org',
+    '165.22.153.175',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition

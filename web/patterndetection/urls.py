@@ -14,6 +14,6 @@ router.register(r'extensiondirection', viewsets.ExtensionDirectionViewSet, basen
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('', include('patterndetection.frontend.urls')),
+    path('patterndetection/', include('patterndetection.frontend.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
