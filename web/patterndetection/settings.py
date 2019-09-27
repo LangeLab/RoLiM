@@ -83,13 +83,15 @@ WSGI_APPLICATION = 'patterndetection.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+with open('db_password') as db_password_file:
+  db_password = db_password_file.read().strip()
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'patterndetection',
-        'USER': 'pd_user',
-        'PASSWORD': 'patterndetection!',
+        'USER': 'patterndetection',
+        'PASSWORD': db_password,
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -133,6 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -146,12 +149,15 @@ REST_FRAMEWORK = {
 }
 
 # Configure Queues
+with open('redis_password') as redis_password_file:
+  redis_password = redis_password_file.read().strip()
+
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
-        'PASSWORD': '5b821274bc70fd0013669f9587f58940c473c9f8fae1e0f8253ce17b996111c9',
+        'PASSWORD': redis_password,
         'DEFAULT_TIMEOUT': 360,
     },
     'with-sentinel': {
