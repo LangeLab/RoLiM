@@ -1,9 +1,6 @@
 gmail_app_password
 db_password
-<<<<<<< HEAD
-=======
 redis_password
 settings.py
->>>>>>> 56c070f53270a33ffab2161c3dbe12aba5e91729
 media/*
 !media/defaults
