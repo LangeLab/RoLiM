@@ -1,3 +1,6 @@
 gmail_app_password
+db_password
+redis_password
+settings.py
 media/*
 !media/defaults
