@@ -6,7 +6,7 @@ import JobForm from "./JobForm";
 
 const App = () => (
   <React.Fragment>
-  	<JobForm endpoint="api/job/" />
+  	<JobForm endpoint="/api/job/" />
   </React.Fragment>
 );
 const wrapper = document.getElementById("app");
