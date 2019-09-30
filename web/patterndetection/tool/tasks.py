@@ -48,6 +48,7 @@ def new_job(jobcode):
     extend_sequences = job.extend_sequences
     extension_direction = job.extension_direction
     width = job.width
+    print(width)
     center_sequences = job.center_sequences
     multiple_testing_correction = job.multiple_testing_correction
     positional_weighting = job.positional_weighting

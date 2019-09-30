@@ -344,7 +344,7 @@ def empty_position_vector(length, empty_position_value=0):
     return empty_position
 
 
-def align_sequences(context, sequences, width, terminal):
+def align_sequences(context, sequences, width=8, terminal='n'):
     """
     Take unaligned sequences and context. Map unaligned sequences to
         context. Truncated prime segment to half width. Extend sequence
@@ -794,7 +794,7 @@ def peptides_to_sample(peptides, context, background, center=True, width=8, term
     Returns:
         sample -- Sample instance.
     """
-    aligned_sequences = align_sequences(context, peptides, width, terminal)
+    aligned_sequences = align_sequences(context, peptides, width=width, terminal=terminal)
     sequence_df = sequences_to_df(aligned_sequences)
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
