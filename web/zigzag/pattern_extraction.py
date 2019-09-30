@@ -56,7 +56,7 @@ def extract_protease_substrate_patterns(background=None,
     # If no background is specified, use default SwissProt background.
     if background == None:
         # Load context sequences from fasta.
-        context = sequences.import_fasta('../data/uniprot/uniprot.fasta')
+        context = sequences.import_fasta('./media/defaults/uniprot.fasta')
         # Generate new Background instance.
         background = sequences.Background(context['sequence'].tolist())
     # Otherwise load user-specified background.
@@ -70,7 +70,7 @@ def extract_protease_substrate_patterns(background=None,
         print('{}\n'.format(protease))
         # Initialize output directory name.
         protease_output_directory = (
-                '../data/merops/proteases/' + protease.replace(" ", "_")
+                './media/merops/proteases/' + protease.replace(" ", "_")
         )
         # Prepare substrate sets for pattern extraction.
         single_letter_substrates = amino_acid_encoding_converter.convert_encoding(
