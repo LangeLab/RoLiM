@@ -67,7 +67,7 @@ def new_job(jobcode):
     # Currently only handling FASTA-formatted background.
     if context_data:
         # Load context sequences from uploaded FASTA.
-        context = sequences.import_fasta(context_data.name)
+        context = sequences.import_fasta(os.path.join(settings.MEDIA_ROOT, context_data.name))
     else:
         # Load context from default Swiss-Prot copy.
         context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
@@ -81,25 +81,27 @@ def new_job(jobcode):
             compound_residues=None
         )
 
+
+    foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     # Load sequences from Job submission data set.
     if foreground_format == 1:
         # Load input sequences from prealigned txt file.
         sample = sequences.load_prealigned_file(
-            os.path.join(settings.MEDIA_ROOT, foreground_data.name),
+            foreground_file_name,
             background,
             center=center_sequences
         )
     elif foreground_format == 2:
         # Load input sequences from prealigned FASTA file.
         sample = sequences.load_prealigned_fasta(
-            foreground_data.name,
+            foreground_file_name,
             background,
             center=center_sequences
         )
     elif foreground_format == 3:
         # Load input sequences from txt peptide list.
         sample = sequences.load_peptide_list_file(
-            foreground_data.name,
+            foreground_file_name,
             context,
             background,
             center=center_sequences,
@@ -109,7 +111,7 @@ def new_job(jobcode):
     elif foreground_format == 5:
         # Load input sequences from FASTA peptide list.
         sample = sequences.load_fasta_peptides(
-            foreground_data.name,
+            foreground_file_name,
             background,
             center=center_sequences,
             width=width,
@@ -118,14 +120,14 @@ def new_job(jobcode):
     elif foreground_format == 6:
         # Load input sequences from text field.
         sample = sequences.load_prealigned_field(
-            foreground_data.name,
+            foreground_file_name,
             background,
             center=center_sequences
         )
     elif foreground_format == 7:
         # Load input sequences from MaxQuant evidence.txt.
         sample = sequences.load_maxquant_evidence_file(
-            foreground_data.name,
+            foreground_file_name,
             context,
             background,
             width=width
