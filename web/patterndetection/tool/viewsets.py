@@ -40,9 +40,13 @@ class JobViewSet(viewsets.ModelViewSet):
 		except KeyError:
 			self.request.session['jobcodes'] = [self.jobcode]
 
+		# Save new job to database.
 		serializer.save(session_id=self.request.session.session_key,
 						jobcode=self.jobcode)
-		django_rq.enqueue(new_job, self.jobcode)
+
+		# Add job to task queue.
+		queue = django_rq.get_queue('default')
+		queue.enqueue(new_job, self.jobcode, timeout=5400)
 
 
 class ForegroundFormatViewSet(viewsets.ModelViewSet):
