@@ -840,7 +840,7 @@ def load_peptide_list_file(peptide_list_path, context, background, center=True, 
     with open(peptide_list_path, 'r') as peptide_list_file:
         peptides = import_peptide_list(peptide_list_file, delimiter)
     
-    sample = peptides_to_sample(peptides, context, background, width, terminal)
+    sample = peptides_to_sample(peptides, context, background, center=center, width=width, terminal=terminal)
 
     return sample
 
