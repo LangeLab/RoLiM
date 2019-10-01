@@ -46,7 +46,7 @@ def new_job(jobcode):
     fold_change_cutoff = job.fold_change_cutoff
     max_depth = job.max_depth
     extend_sequences = job.extend_sequences
-    extension_direction = job.extension_direction
+    extension_direction = job.extension_direction_id
     width = job.width
     center_sequences = job.center_sequences
     multiple_testing_correction = job.multiple_testing_correction
