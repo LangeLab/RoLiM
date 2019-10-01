@@ -375,9 +375,7 @@ def align_sequences(context, sequences, width=8, terminal='n'):
     """
 
     non_prime_width = width // 2
-    print(non_prime_width)
-    input()
-    
+
     # Generate aligned sequence by mapping sequence segments to context.
     aligned_sequences = []
     for i, sequence in sequences.iterrows():
@@ -797,11 +795,8 @@ def peptides_to_sample(peptides, context, background, center=True, width=8, term
     Returns:
         sample -- Sample instance.
     """
-    print(peptides)
-    input()
+
     aligned_sequences = align_sequences(context, peptides, width=width, terminal=terminal)
-    print(aligned_sequences)
-    input()
     sequence_df = sequences_to_df(aligned_sequences, center=center)
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
@@ -843,8 +838,6 @@ def load_peptide_list_file(peptide_list_path, context, background, center=True, 
     else:
         delimiter = '\t'
 
-    print(delimiter)
-    input()
     # open peptide list file
     with open(peptide_list_path, 'r') as peptide_list_file:
         peptides = import_peptide_list(peptide_list_file, delimiter)
