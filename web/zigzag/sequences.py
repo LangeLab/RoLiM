@@ -375,6 +375,8 @@ def align_sequences(context, sequences, width=8, terminal='n'):
     """
 
     non_prime_width = width // 2
+    print(non_prime_width)
+    input()
     
     # Generate aligned sequence by mapping sequence segments to context.
     aligned_sequences = []

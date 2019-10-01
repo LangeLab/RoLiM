@@ -83,6 +83,9 @@ def new_job(jobcode):
 
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     print(foreground_file_name)
+    print(width)
+    print(terminal)
+    print(center_sequences)
     input()
     # Load sequences from Job submission data set.
     if foreground_format == 1:
