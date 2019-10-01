@@ -795,6 +795,8 @@ def peptides_to_sample(peptides, context, background, center=True, width=8, term
         sample -- Sample instance.
     """
     aligned_sequences = align_sequences(context, peptides, width=width, terminal=terminal)
+    print(aligned_sequences)
+    input()
     sequence_df = sequences_to_df(aligned_sequences, center=center)
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)

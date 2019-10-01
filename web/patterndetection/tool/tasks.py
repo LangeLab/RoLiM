@@ -81,7 +81,6 @@ def new_job(jobcode):
             compound_residues=None
         )
 
-
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     # Load sequences from Job submission data set.
     if foreground_format == 1:
@@ -112,6 +111,7 @@ def new_job(jobcode):
         # Load input sequences from FASTA peptide list.
         sample = sequences.load_fasta_peptides(
             foreground_file_name,
+            context,
             background,
             center=center_sequences,
             width=width,
