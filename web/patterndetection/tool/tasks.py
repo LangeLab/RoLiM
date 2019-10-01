@@ -7,7 +7,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from rq.decorators import job
 
 from patterndetection.tool.models import Job
 from zigzag import sequences, pattern_extraction
@@ -15,7 +14,7 @@ from zigzag import sequences, pattern_extraction
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
 
-@job('default', timeout=5400)
+
 def new_job(jobcode):
     """
     Process and run job from user submission.
