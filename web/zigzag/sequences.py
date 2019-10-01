@@ -830,7 +830,7 @@ def load_peptide_list_file(peptide_list_path, context, background, center=True, 
     """
 
     # Detect delimiter from file extension (supports comma or tab).
-    file_extension = peptide_list_path[peptide_list_path[::-1].find('.'):].lower()
+    file_extension = peptide_list_path[-peptide_list_path[::-1].find('.'):].lower()
     if file_extension == 'csv':
         delimiter = ','
     else:
