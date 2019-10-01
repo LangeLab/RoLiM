@@ -660,6 +660,7 @@ def import_peptide_list(peptide_list_file, delimiter='\t'):
     for row in peptide_reader:    
         context_id = parse_swissprot_accession_number(row[1])
         if not context_id:
+            print('accession number parsing failed')
             continue
         sequence = row[0].upper()
         peptide_list.append([sequence, context_id])
@@ -794,6 +795,8 @@ def peptides_to_sample(peptides, context, background, center=True, width=8, term
     Returns:
         sample -- Sample instance.
     """
+    print(peptides)
+    input()
     aligned_sequences = align_sequences(context, peptides, width=width, terminal=terminal)
     print(aligned_sequences)
     input()
@@ -838,6 +841,8 @@ def load_peptide_list_file(peptide_list_path, context, background, center=True, 
     else:
         delimiter = '\t'
 
+    print(delimiter)
+    input()
     # open peptide list file
     with open(peptide_list_path, 'r') as peptide_list_file:
         peptides = import_peptide_list(peptide_list_file, delimiter)
