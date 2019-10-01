@@ -567,7 +567,7 @@ def sequences_to_df(sequences, center=True):
     """
     
     split_sequences = [list(sequence.rstrip().upper()) for sequence in sequences]
-    cols = generate_positions(center,len(split_sequences[0]))
+    cols = generate_positions(center, len(split_sequences[0]))
     sequence_df = pd.DataFrame(split_sequences, columns=cols)
     sequence_df.drop_duplicates(inplace=True)
 
@@ -795,7 +795,7 @@ def peptides_to_sample(peptides, context, background, center=True, width=8, term
         sample -- Sample instance.
     """
     aligned_sequences = align_sequences(context, peptides, width=width, terminal=terminal)
-    sequence_df = sequences_to_df(aligned_sequences)
+    sequence_df = sequences_to_df(aligned_sequences, center=center)
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
 
@@ -830,7 +830,7 @@ def load_peptide_list_file(peptide_list_path, context, background, center=True, 
     """
 
     # Detect delimiter from file extension (supports comma or tab).
-    file_extension = peptide_list_path[-peptide_list_path[::-1].find('.'):].lower()
+    file_extension = peptide_list_path[peptide_list_path[::-1].find('.'):].lower()
     if file_extension == 'csv':
         delimiter = ','
     else:
