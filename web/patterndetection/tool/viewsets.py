@@ -46,7 +46,7 @@ class JobViewSet(viewsets.ModelViewSet):
 
 		# Add job to task queue.
 		queue = django_rq.get_queue('default')
-		queue.enqueue(new_job, args=(self, self.jobcode), timeout=5400)
+		queue.enqueue(new_job, self.jobcode)
 
 
 class ForegroundFormatViewSet(viewsets.ModelViewSet):
