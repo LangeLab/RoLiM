@@ -162,7 +162,10 @@ def new_job(jobcode):
             positional_weighting=positional_weighting,
             allow_compound_residue_decomposition=compound_residue_decomposition
         )
-        patterns.post_processing()
+        if width % 2 == 0:
+            patterns.post_processing()
+        else:
+            patterns.post_processing(proteolysis_data=False)            
 
         # Compress outputs as zip archive.
         shutil.make_archive(

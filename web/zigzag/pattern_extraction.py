@@ -1293,7 +1293,7 @@ class PatternContainer:
         self.pattern_list = [pattern for pattern in self.pattern_list
                             if pattern.pattern_id not in drop_patterns]
 
-    def post_processing(self):
+    def post_processing(self, proteolysis_data=True):
         '''
         Removes patterns if their exclusive sequence subset is two
             sequences or less.
@@ -1317,10 +1317,13 @@ class PatternContainer:
             self,
             self.title,
             self.output_directory,
+            proteolysis_data=proteolysis_data,
             annotate_clustermap=False
         )
         
         # Generate tabular output.
+
+    def 
 
     def generate_pattern_outputs(self):
         """Last steps for retained patterns."""
