@@ -1323,7 +1323,6 @@ class PatternContainer:
         
         # Generate tabular output.
 
-    def 
 
     def generate_pattern_outputs(self):
         """Last steps for retained patterns."""

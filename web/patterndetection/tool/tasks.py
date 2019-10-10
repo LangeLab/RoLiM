@@ -208,7 +208,5 @@ def new_job(jobcode):
     server.sendmail(username, email, msg.as_string())
     server.quit()
 
-    # Mark job complete.
-
     # Remove completed job from Job table.
     job.delete()
