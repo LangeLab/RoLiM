@@ -38,8 +38,10 @@ class JobForm extends Component {
   toggleAdvancedOptions = () => {
     var advancedOptions = document.getElementById('advancedOptions');
     if (advancedOptions.style.display === "none") {
+      document.getElementById('advanced-options-header').innerHTML = 'Advanced Options &#9660';
       advancedOptions.style.display = "block";
     } else {
+      document.getElementById('advanced-options-header').innerHTML = 'Advanced Options &#9650';
       advancedOptions.style.display = "none";
     }
   }
@@ -280,7 +282,7 @@ class JobForm extends Component {
             </label>
           </div>
           <br />
-          <h5 className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options</h5>
+          <h5 id="advanced-options-header" className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options</h5>
           <br />
           <div id="advancedOptions" style={{display: "none"}}>
             <div className="field">
@@ -316,7 +318,7 @@ class JobForm extends Component {
                 <label className="checkbox">
                   <input
                     type="checkbox"
-                    name="proteomeupload"
+                    name="compound_residue_decomposition"
                     onChange={this.handleCheckboxChange}
                     value={compound_residue_decomposition}
                     checked={compound_residue_decomposition}
