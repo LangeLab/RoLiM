@@ -38,10 +38,10 @@ class JobForm extends Component {
   toggleAdvancedOptions = () => {
     var advancedOptions = document.getElementById('advancedOptions');
     if (advancedOptions.style.display === "none") {
-      document.getElementById('advanced-options-header').innerHTML = 'Advanced Options &#9660';
+      document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9660';
       advancedOptions.style.display = "block";
     } else {
-      document.getElementById('advanced-options-header').innerHTML = 'Advanced Options &#9650';
+      document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
       advancedOptions.style.display = "none";
     }
   }
