@@ -45,7 +45,7 @@ def new_job(jobcode):
     minimum_occurrences = job.minimum_occurrences
     fold_change_cutoff = job.fold_change_cutoff
     max_depth = job.max_depth
-    extend_sequences = job.extend_sequences
+    extend_sequences = True if foreground_format not in [1, 2, 6] else False
     extension_direction = job.extension_direction_id
     width = job.width
     center_sequences = job.center_sequences
@@ -82,83 +82,7 @@ def new_job(jobcode):
         )
 
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
-    # Load sequences from Job submission data set.
-    if foreground_format == 1:
-        # Load input sequences from prealigned txt file.
-        sample = sequences.load_prealigned_file(
-            foreground_file_name,
-            background,
-            center=center_sequences
-        )
-    elif foreground_format == 2:
-        # Load input sequences from prealigned FASTA file.
-        sample = sequences.load_prealigned_fasta(
-            foreground_file_name,
-            background,
-            center=center_sequences
-        )
-    elif foreground_format == 3:
-        # Load input sequences from txt peptide list.
-        sample = sequences.load_peptide_list_file(
-            foreground_file_name,
-            context,
-            background,
-            center=center_sequences,
-            width=width,
-            terminal=terminal
-        )
-    elif foreground_format == 5:
-        # Load input sequences from FASTA peptide list.
-        sample = sequences.load_fasta_peptides(
-            foreground_file_name,
-            context,
-            background,
-            center=center_sequences,
-            width=width,
-            terminal=terminal
-        )
-    elif foreground_format == 6:
-        # Load input sequences from text field.
-        sample = sequences.load_prealigned_field(
-            foreground_file_name,
-            background,
-            center=center_sequences
-        )
-    elif foreground_format == 7:
-        # Load input sequences from MaxQuant evidence.txt.
-        sample = sequences.load_maxquant_evidence_file(
-            foreground_file_name,
-            context,
-            background,
-            width=width
-        )
-
-    output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
-
-    # Run pattern extraction analysis and generate outputs.
-    patterns = pattern_extraction.PatternContainer(
-        sample,
-        background,
-        title,
-        output_directory,
-        max_depth=max_depth,
-        p_value_cutoff=p_value_cutoff,
-        minimum_occurrences=minimum_occurrences,
-        fold_change_cutoff=fold_change_cutoff,
-        multiple_testing_correction=multiple_testing_correction,
-        positional_weighting=positional_weighting,
-        allow_compound_residue_decomposition=compound_residue_decomposition
-    )
-    patterns.post_processing()
-
-    # Compress outputs as zip archive.
-    shutil.make_archive(
-        output_directory,
-        'zip',
-        os.path.join(settings.MEDIA_ROOT, jobcode),
-        'results'
-    )
-
+    
     # Set email login parameters.
     username = 'tsmithdmr@gmail.com'
     with open('gmail_app_password') as app_password:
@@ -169,19 +93,108 @@ def new_job(jobcode):
     msg['Subject'] = 'Pattern Detection Results'
     msg['From'] = username
     msg['To'] = email
-    html = 'Please find attached, the results of your pattern detection analysis.'
-    msg_body = MIMEText(html, 'html')
-    msg.attach(msg_body)
-    
-    # Attach results archive to email message.
-    filename = 'results.zip'
-    zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, 'results.zip')
-    with open(zip_path, 'rb') as attachment:
-        p = MIMEBase('application', 'octet-stream')
-        p.set_payload((attachment).read())
-        encoders.encode_base64(p)
-        p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-        msg.attach(p)
+
+    try:
+        # Load sequences from Job submission data set.
+        if foreground_format == 1:
+            # Load input sequences from prealigned txt file.
+            sample = sequences.load_prealigned_file(
+                foreground_file_name,
+                background,
+                center=center_sequences
+            )
+        elif foreground_format == 2:
+            # Load input sequences from prealigned FASTA file.
+            sample = sequences.load_prealigned_fasta(
+                foreground_file_name,
+                background,
+                center=center_sequences
+            )
+        elif foreground_format == 3:
+            # Load input sequences from txt peptide list.
+            sample = sequences.load_peptide_list_file(
+                foreground_file_name,
+                context,
+                background,
+                center=center_sequences,
+                width=width,
+                terminal=terminal
+            )
+        elif foreground_format == 5:
+            # Load input sequences from FASTA peptide list.
+            sample = sequences.load_fasta_peptides(
+                foreground_file_name,
+                context,
+                background,
+                center=center_sequences,
+                width=width,
+                terminal=terminal
+            )
+        elif foreground_format == 6:
+            # Load input sequences from text field.
+            sample = sequences.load_prealigned_field(
+                foreground_file_name,
+                background,
+                center=center_sequences
+            )
+        elif foreground_format == 7:
+            # Load input sequences from MaxQuant evidence.txt.
+            sample = sequences.load_maxquant_evidence_file(
+                foreground_file_name,
+                context,
+                background,
+                width=width
+            )
+
+        output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
+
+        # Run pattern extraction analysis and generate outputs.
+        patterns = pattern_extraction.PatternContainer(
+            sample,
+            background,
+            title,
+            output_directory,
+            max_depth=max_depth,
+            p_value_cutoff=p_value_cutoff,
+            minimum_occurrences=minimum_occurrences,
+            fold_change_cutoff=fold_change_cutoff,
+            multiple_testing_correction=multiple_testing_correction,
+            positional_weighting=positional_weighting,
+            allow_compound_residue_decomposition=compound_residue_decomposition
+        )
+        patterns.post_processing()
+
+        # Compress outputs as zip archive.
+        shutil.make_archive(
+            output_directory,
+            'zip',
+            os.path.join(settings.MEDIA_ROOT, jobcode),
+            'results'
+        )
+
+        # Prepare email.
+        html = 'Please find attached, the results of your pattern detection analysis.'
+        msg_body = MIMEText(html, 'html')
+        msg.attach(msg_body)
+        
+        # Attach results archive to email message.
+        filename = 'results.zip'
+        zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, 'results.zip')
+        with open(zip_path, 'rb') as attachment:
+            p = MIMEBase('application', 'octet-stream')
+            p.set_payload((attachment).read())
+            encoders.encode_base64(p)
+            p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+            msg.attach(p)
+    except:
+        html = (
+            'Something went wrong with your analysis. Please check that '
+            + 'the options you selected match the format of your data, and that '
+            + 'the format of your data matches a format supported by our tool.'
+            + '\nThank you!'
+        )
+        msg_body = MIMEText(html, 'html')
+        msg.attach(msg_body)
 
     # Start SMTP session using TLS security and login to Gmail
     server = smtplib.SMTP('smtp.gmail.com', 587)

@@ -8,7 +8,7 @@
     "build": "webpack --mode production ./patterndetection/frontend/src/index.js --output ./patterndetection/frontend/static/frontend/main.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Theodore Smith",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.6.2",

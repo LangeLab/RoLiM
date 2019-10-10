@@ -19,7 +19,6 @@ class JobForm extends Component {
     minimum_occurrences: 2,
     fold_change_cutoff: 1.0,
     max_depth: "",
-    extend_sequences: false,
     width: 8,
     center_sequences: true,
     multiple_testing_correction: true,
@@ -62,7 +61,6 @@ class JobForm extends Component {
     formData.append('p_value_cutoff', this.state.p_value_cutoff);
     formData.append('minimum_occurrences', this.state.minimum_occurrences);
     formData.append('fold_change_cutoff', this.state.fold_change_cutoff);
-    formData.append('extend_sequences', this.state.extend_sequences);
     formData.append('width', this.state.width);
     formData.append('center_sequences', this.state.center_sequences);
     formData.append('multiple_testing_correction', this.state.multiple_testing_correction);
@@ -80,7 +78,6 @@ class JobForm extends Component {
       p_value_cutoff,
       minimum_occurrences,
       fold_change_cutoff,
-      extend_sequences,
       width,
       center_sequences,
       multiple_testing_correction,
@@ -98,7 +95,6 @@ class JobForm extends Component {
       p_value_cutoff,
       minimum_occurrences,
       fold_change_cutoff,
-      extend_sequences,
       width,
       center_sequences,
       multiple_testing_correction,
@@ -129,7 +125,6 @@ class JobForm extends Component {
       p_value_cutoff,
       minimum_occurrences,
       fold_change_cutoff,
-      extend_sequences,
       width,
       center_sequences,
       multiple_testing_correction,
@@ -307,20 +302,6 @@ class JobForm extends Component {
                 <label className="checkbox">
                   <input
                     type="checkbox"
-                    name="extend_sequences"
-                    onChange={this.handleCheckboxChange}
-                    value={extend_sequences}
-                    checked={extend_sequences}
-                  />
-                  Expand and align peptides using context data set?
-                </label>
-              </div>
-            </div>
-            <div className="field">
-              <div className="control">
-                <label className="checkbox">
-                  <input
-                    type="checkbox"
                     name="compound_residues"
                     onChange={this.handleCheckboxChange}
                     value={compound_residues}
@@ -416,7 +397,7 @@ class JobForm extends Component {
                   className="input"
                   type="text"
                   name="width"
-                  onChange={this.handleCheckboxChange}
+                  onChange={this.handleChange}
                   value={width}
                 />
               </div>
