@@ -282,7 +282,7 @@ class JobForm extends Component {
             </label>
           </div>
           <br />
-          <h5 id="advanced-options-header" className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options</h5>
+          <h5 id="advanced-options-header" className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options &#9650</h5>
           <br />
           <div id="advancedOptions" style={{display: "none"}}>
             <div className="field">
