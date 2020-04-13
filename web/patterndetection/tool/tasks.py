@@ -92,7 +92,7 @@ def new_job(jobcode):
                 context['sequence'].tolist(),
                 width=width,
                 position_specific=position_specific,
-                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv')
+                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
             )
         else:
             background = sequences.Background(
@@ -100,7 +100,7 @@ def new_job(jobcode):
                 width=width,
                 position_specific=position_specific,
                 compound_residues=None,
-                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv')
+                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
             )
 
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)

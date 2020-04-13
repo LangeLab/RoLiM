@@ -1036,6 +1036,7 @@ def load_fasta_peptides(peptide_fasta_path,
                         center=True,
                         width=8,
                         terminal='n',
+                        require_context_id=True,
                         redundancy_level='protein',
                         first_protein_only=True,
                         original_row_merge='all'):
@@ -1106,6 +1107,7 @@ def load_peptide_list_field(peptide_list_field,
                             background,
                             width=8,
                             terminal='n',
+                            require_context_id=True,
                             redundancy_level='protein',
                             first_protein_only=True,
                             original_row_merge='all'):
@@ -1121,7 +1123,10 @@ def load_peptide_list_field(peptide_list_field,
     pass
 
 
-def load_prealigned_file(prealigned_file_path, background, center=True, redundancy_level='none'):
+def load_prealigned_file(prealigned_file_path,
+                            background,
+                            center=True,
+                            redundancy_level='none'):
     """
     Top-level helper function to load pre-aligned sequences from text
         file.

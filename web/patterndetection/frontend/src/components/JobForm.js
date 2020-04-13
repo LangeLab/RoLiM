@@ -157,12 +157,13 @@ class JobForm extends Component {
             </div>
           </div>
           <div className="field">
-            <label className="label">Title</label>
+            <label className="label">Title (10 characters max.)</label>
             <div className="control">
               <input
                 className="input"
                 type="text"
                 name="title"
+                maxlength="10"
                 onChange={this.handleChange}
                 value={title}
                 required
@@ -215,9 +216,10 @@ class JobForm extends Component {
                   value="1"
                   required
                 />
-                Prealigned text file
+                Prealigned text file (<a href='../../media/examples/prealigned_text_file.txt' download>Download example</a>)
               </label>
             </div>
+            {/*
             <div>
               <label>
                 <input
@@ -229,6 +231,7 @@ class JobForm extends Component {
                 Prealigned FASTA file
               </label>
             </div>
+            */}
             <div>
               <label>
                 <input
@@ -237,9 +240,10 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value="3"
                 />
-                Text file peptide list
+                Text file peptide list (<a href='../../media/examples/text_file_peptide_list.txt' download>Download example</a>)
               </label>
             </div>
+            {/*
             <div>
               <label>
                 <input
@@ -263,6 +267,7 @@ class JobForm extends Component {
               </label>
             </div>
           </div>
+          */}
           <br />
           <div className="field">
             <label className="label">Select context FASTA file to upload. (Optional)</label>
