@@ -28,7 +28,6 @@ def prealigned_text_file(request):
 	response = generate_example_file_response(path)
 
 	return response
-	
 
 
 def text_file_peptide_list(request):
@@ -36,9 +35,3 @@ def text_file_peptide_list(request):
 	response = generate_example_file_response(path)
 
 	return response
-
-
-
-def download(request, path):
-    
-    
