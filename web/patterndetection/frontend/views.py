@@ -1,6 +1,12 @@
+import os
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponse
+
+
+def index(request):
+    return render(request, 'frontend/index.html')
+
 
 def generate_example_file_response(path):
     file_path = os.path.join(settings.MEDIA_ROOT, path)
@@ -14,9 +20,6 @@ def generate_example_file_response(path):
         )
     
     return response
-    
-def index(request):
-    return render(request, 'frontend/index.html')
 
 
 def prealigned_text_file(request):
