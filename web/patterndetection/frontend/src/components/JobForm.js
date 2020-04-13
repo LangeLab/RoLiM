@@ -216,7 +216,7 @@ class JobForm extends Component {
                   value="1"
                   required
                 />
-                Prealigned text file (<a href='/peptidelist' download>Download example</a>)
+                Prealigned text file (<a href='/peptidelist' download>Example</a>)
               </label>
             </div>
             {/*
@@ -240,7 +240,7 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value="3"
                 />
-                Text file peptide list (<a href='/textfile' download>Download example</a>)
+                Text file peptide list (<a href='/textfile' download>Example</a>)
               </label>
             </div>
             {/*

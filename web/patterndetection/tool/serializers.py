@@ -15,6 +15,7 @@ class JobSerializer(serializers.ModelSerializer):
 			'context_data',
 			'contextformat',
 			'p_value_cutoff',
+			'position_specific',
 			'minimum_occurrences',
 			'fold_change_cutoff',
 			'max_depth',
@@ -29,6 +30,7 @@ class JobSerializer(serializers.ModelSerializer):
 		)
 		read_only_fields = ('submitted', 'completed',)
 		extra_kwargs = {
+			'position_specific': {'default': True, 'initial': True},
 			'extend_sequences': {'default': False, 'initial': False},
 			'center_sequences': {'default': True, 'initial': True},
 			'multiple_testing_correction': {'default': True, 'initial': True},
