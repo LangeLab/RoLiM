@@ -266,8 +266,8 @@ class JobForm extends Component {
                 MaxQuant "evidence.txt" file
               </label>
             </div>
+            */}
           </div>
-          */}
           <br />
           <div className="field">
             <label className="label">Select context FASTA file to upload. (Optional)</label>
