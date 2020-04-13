@@ -17,6 +17,7 @@ class Job(models.Model):
 	"""Analysis job."""
 
 	DEFAULT_ALPHA = 0.01
+	DEFAULT_MINIMUM_OCCURRENCES = 20
 	DEFAULT_FC = 1
 	DEFAULT_DATAFORMAT = 1
 	DEFAULT_BACKGROUNDFORMAT = 1
@@ -51,7 +52,7 @@ class Job(models.Model):
 										 default=DEFAULT_BACKGROUNDFORMAT)
 	alpha = models.FloatField(default=DEFAULT_ALPHA)
 	multiple_testing_correction = models.BooleanField(default=True)
-	minimum_occurrences = models.IntegerField(default=2)
+	minimum_occurrences = models.IntegerField(default=DEFAULT_MINIMUM_OCCURRENCES)
 	fold_change_cutoff = models.FloatField(default=DEFAULT_FC)
 	expand_peptides = models.BooleanField(default=False)
 	center_positions = models.BooleanField(default=True)

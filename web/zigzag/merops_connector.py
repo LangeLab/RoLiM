@@ -92,16 +92,39 @@ def retrieve_substrates(names=[],ids=[],organisms=['Homo sapiens']):
         with connection.cursor() as cursor:
             conditional_string = ""
             if names != []:
-                conditional_string += " AND Substrate_search.Protease IN ('" + "','".join(names) + "')"
+                conditional_string += (
+                    " AND Substrate_search.Protease IN ('"
+                    + "','".join(names)
+                    + "')"
+                )
             if ids != []:
-                conditional_string += " AND Substrate_search.cleavageID IN ('" + "','".join(ids) + "')"
+                conditional_string += (
+                    " AND Substrate_search.cleavageID IN ('"
+                    + "','".join(ids)
+                    + "')"
+                )
             if organisms != []:
-                conditional_string += " AND Substrate_search.organism IN ('" + "','".join(organisms) + "')" 
+                conditional_string += (
+                    " AND Substrate_search.organism IN ('"
+                    + "','".join(organisms)
+                    + "')"
+                ) 
             
             for site in sites:
-                conditional_string += " AND %s" % site + " IN ('" + "' ,'".join(THREE_LETTER_CODES) + "')"
+                conditional_string += (
+                    " AND %s" % site
+                    + " IN ('"
+                    + "' ,'".join(THREE_LETTER_CODES)
+                    + "')"
+                )
             
-            query = "SELECT Substrate_search.Protease, %s FROM Substrate_search INNER JOIN (SELECT code FROM activity_status WHERE organism = 'human' AND status = 'active') as human_active ON Substrate_search.code = human_active.code WHERE cleavage_type NOT IN ('synthetic','theoretical')%s" % (", Substrate_search.".join(sites),conditional_string)
+            query = (
+                "SELECT Substrate_search.Protease, {0} FROM Substrate_search"
+                + " INNER JOIN (SELECT code FROM activity_status WHERE organism"
+                + " = 'human' AND status = 'active') as human_active"
+                + " ON Substrate_search.code = human_active.code WHERE cleavage_type"
+                + " NOT IN ('synthetic','theoretical'){1}"
+            ).format(", Substrate_search.".join(sites), conditional_string)
             cursor.execute(query)
             all_substrates = cursor.fetchall()
     
@@ -154,7 +177,7 @@ def retrieve_vectorized_substrates(names=[]):
     return vectorized_substrates
 
 
-def retrieve_protease_patterns(names=[]):
+def retrieve_protease_patterns(names=[], enable_compound_residues=True):
     '''
     Retrieve protease substrate patterns from
         protease_patterns table in merops database.
@@ -168,6 +191,11 @@ def retrieve_protease_patterns(names=[]):
 
     connection = connect_to_merops_database()
 
+    if enable_compound_residues:
+        protease_pattern_table = 'protease_patterns'
+    else:
+        protease_pattern_table = 'protease_patterns_no_cr'
+
     if names != []:
         conditional_string = " WHERE Protease in ('%s')" % ("', '".join(names))
     else:
@@ -177,7 +205,10 @@ def retrieve_protease_patterns(names=[]):
 
     try:
         with connection.cursor() as cursor:
-            query = "SELECT Protease, pattern FROM protease_patterns%s" % (conditional_string)
+            query = "SELECT Protease, pattern FROM {0}{1}".format(
+                protease_pattern_table,
+                conditional_string
+            )
             cursor.execute(query)
             while True:
                 row = cursor.fetchone()
@@ -239,7 +270,10 @@ def vectorize_substrates(substrates):
         None
     '''
 
-    vector_template = pd.Series(np.zeros(len(THREE_LETTER_CODES),dtype=np.int8),index=THREE_LETTER_CODES)
+    vector_template = pd.Series(
+        np.zeros(len(THREE_LETTER_CODES), dtype=np.int8),
+        index=THREE_LETTER_CODES
+    )
 
     for protease,sequences in substrates.items():
         for i,sequence in sequences.iterrows():
@@ -280,7 +314,9 @@ def insert_vectorized_substrate(substrate):
 
     try:
         with connection.cursor() as cursor:
-            query = "INSERT INTO vectorized_substrates (%s) VALUES ('%s',%s)" % (", ".join(columns),substrate[0],", ".join(substrate[1:]))
+            query = (
+                "INSERT INTO vectorized_substrates ({0}) VALUES ('{1}}',{2})"
+            ).format(", ".join(columns), substrate[0], ", ".join(substrate[1:]))
             cursor.execute(query)
         connection.commit()
     finally:
@@ -301,17 +337,22 @@ def create_vectorized_substrates_table():
     '''
 
     # Generate column name and data type string.
-    columns = ["id int NOT NULL AUTO_INCREMENT","Protease varchar(100) NOT NULL"]
+    columns = [
+        "id int NOT NULL AUTO_INCREMENT",
+        "Protease varchar(100) NOT NULL",
+    ]
     for site in SITES:
         for residue in SINGLE_LETTER_CODES:
-            columns.append(site+"_"+residue+" int NOT NULL")
+            columns.append(site + "_" + residue + " int NOT NULL")
     columns.append("PRIMARY KEY (id)")
 
     # Open merops database connection and create vectorized_substrates table.
     connection = connect_to_merops_database()
     try:
         with connection.cursor() as cursor:
-            query = "CREATE TABLE vectorized_substrates (%s) " % ", ".join(columns)
+            query = (
+                "CREATE TABLE vectorized_substrates ({}) "
+            ).format(", ".join(columns))
             cursor.execute(query)
         connection.commit()
     finally:
@@ -333,7 +374,10 @@ def retrieve_protease_family_code(protease):
 
     try:
         with connection.cursor() as cursor:
-            query = "SELECT DISTINCT code FROM Substrate_search WHERE Protease = '%s'" % protease
+            query = (
+                "SELECT DISTINCT code FROM Substrate_search"
+                + " WHERE Protease = '{}'"
+            ).format(protease)
             cursor.execute(query)
             protease_code = cursor.fetchone()["code"]
     finally:
@@ -342,7 +386,7 @@ def retrieve_protease_family_code(protease):
     return protease_code[:protease_code.find('.')]
 
 
-def create_protease_patterns_table():
+def create_protease_patterns_table(enable_compound_residues=True):
     '''
     Creates protease_patterns table in merops database.
 
@@ -357,14 +401,22 @@ def create_protease_patterns_table():
 
     try:
         with connection.cursor() as cursor:
-            query = "CREATE TABLE protease_patterns (id int NOT NULL AUTO_INCREMENT, Protease varchar(100) NOT NULL, pattern varchar(64) NOT NULL, PRIMARY KEY (id))"
+            if enable_compound_residues:
+                protease_pattern_table = 'protease_patterns'
+            else:
+                protease_pattern_table = 'protease_patterns_no_cr'
+            query = (
+                "CREATE TABLE {} (id int NOT NULL AUTO_INCREMENT,"
+                + " Protease varchar(100) NOT NULL, pattern varchar(64) NOT NULL,"
+                + " PRIMARY KEY (id))"
+            ).format(protease_pattern_table)
             cursor.execute(query)
         connection.commit()
     finally:
         connection.close()
 
 
-def insert_protease_patterns(protease_patterns):
+def insert_protease_patterns(protease_patterns, enable_compound_residues=True):
     '''
 
     Parameters:
@@ -379,8 +431,14 @@ def insert_protease_patterns(protease_patterns):
             connection = connect_to_merops_database()
             try:
                 with connection.cursor() as cursor:
-                    query = ("INSERT INTO protease_patterns (Protease, pattern)"
-                            + " VALUES ('%s', '%s')") % (protease, pattern)
+                    if enable_compound_residues:
+                        protease_pattern_table = 'protease_patterns'
+                    else:
+                        protease_pattern_table = 'protease_patterns_no_cr'
+                    query = (
+                        "INSERT INTO {0} (Protease, pattern)"
+                        + " VALUES ('{1}', '{2}')"
+                    ).format(protease_pattern_table, protease, pattern)
                     cursor.execute(query)
                 connection.commit()
             finally:

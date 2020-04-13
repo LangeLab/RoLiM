@@ -1,4 +1,5 @@
 import os
+import re
 import itertools
 import io
 import uuid
@@ -25,6 +26,79 @@ ParentStats = namedtuple(
 )
 
 
+def pattern_sequence_match(pattern_matrix, background, sequence_tensor):
+    """
+    Matches pattern to all sequences in a sample. Returns a list of the same
+        length as the sample, containing an index-matched 0 for non-matching
+        sequences or 1 for matching sequences.
+
+    Parameters:
+        pattern -- Pattern instance.
+
+    Returns:
+        pattern_sequence_matches -- List.
+    """
+        
+    # Get constituent pattern.
+    try:
+        constituent_pattern = sequences.get_pattern_constituents(
+            pattern_matrix,
+            background
+        )
+    except AttributeError:
+        constituent_pattern = pattern_matrix
+
+    # Intersect pattern with sample sequence tensor.
+    positional_matches = np.sum(
+        np.any(
+            np.logical_and(
+                sequence_tensor,
+                constituent_pattern
+            ),
+            axis=2
+        ).astype(np.int8),
+        axis=1
+    )
+    pattern_sequence_matches  = np.zeros_like(positional_matches)
+    pattern_sequence_matches[
+        positional_matches == np.sum(np.any(constituent_pattern, axis=1).astype(np.int8))
+    ] = 1
+
+    return pattern_sequence_matches
+
+
+def pattern_to_regular_expression(character_pattern):
+    '''
+    Converts series-style patterns to regular expressions.
+
+    Parameters:
+        patterns -- List.
+    
+    Returns:
+        regular_expressions -- List.
+    '''
+
+    regular_expression = r"(?=("
+    separation = 0
+    for position in character_pattern.tolist():
+        stripped_position = position.replace('[', '').replace(']', '')
+        if stripped_position != '.':
+            if separation != 0:
+                regular_expression += (
+                    r"(.){"
+                    + re.escape(str(separation))+ r"}" 
+                    + position
+                )
+                separation = 0
+            else:
+                regular_expression += position
+        else:
+            separation += 1
+    regular_expression += r"))"
+    
+    return regular_expression
+
+
 def extract_protease_substrate_patterns(background=None,
                                         percentage_frequency_cutoff=0.05,
                                         max_depth=None,
@@ -33,7 +107,11 @@ def extract_protease_substrate_patterns(background=None,
                                         fold_change_cutoff=1,
                                         multiple_testing_correction=True,
                                         positional_weighting=True,
-                                        allow_compound_residue_decomposition=True):
+                                        allow_compound_residue_decomposition=True,
+                                        enable_compound_residues=True,
+                                        position_specific=True,
+                                        width=8,
+                                        center=True):
     '''
     Run pattern extraction on MEROPS protease substrate data sets.
     
@@ -46,22 +124,40 @@ def extract_protease_substrate_patterns(background=None,
 
     # Replace existing protease_patterns table with empty table.
     connection = merops_connector.connect_to_merops_database()
+
+    if enable_compound_residues:
+        protease_pattern_table = 'protease_patterns'
+    else:
+        protease_pattern_table = 'protease_patterns_no_cr'
+
     with connection.cursor() as cursor:
-        cursor.execute("SHOW TABLES LIKE 'protease_patterns'")
+        cursor.execute("SHOW TABLES LIKE '{}'".format(protease_pattern_table))
         if cursor.fetchone():
-            cursor.execute("DROP TABLE protease_patterns")
+            cursor.execute("DROP TABLE {}".format(protease_pattern_table))
             connection.commit()
-    merops_connector.create_protease_patterns_table()
+    merops_connector.create_protease_patterns_table(
+        enable_compound_residues=enable_compound_residues
+    )
+
+    if enable_compound_residues:
+        compound_residues = sequences.COMPOUND_RESIDUES
+    else:
+        compound_residues = None
 
     # If no background is specified, use default SwissProt background.
     if background == None:
         # Load context sequences from fasta.
-        context = sequences.import_fasta('./media/defaults/uniprot.fasta')
+        context = sequences.import_fasta(
+            os.path.join('media', 'defaults', 'uniprot.fasta')
+        )
         # Generate new Background instance.
-        background = sequences.Background(context['sequence'].tolist())
-    # Otherwise load user-specified background.
-    else:
-        pass
+        background = sequences.Background(
+            context['sequence'].tolist(),
+            compound_residues=compound_residues,
+            position_specific=position_specific,
+            width=width,
+            center=center
+        )
 
     # Get substrates for all MEROPS proteases and loop through the sets.
     pattern_containers = []
@@ -69,9 +165,14 @@ def extract_protease_substrate_patterns(background=None,
     for protease, substrates in protease_substrates.items():
         print('{}\n'.format(protease))
         # Initialize output directory name.
-        protease_output_directory = (
-                './media/merops/proteases/' + protease.replace(" ", "_")
-        )
+        if enable_compound_residues:
+            protease_output_directory = os.path.join(
+                'media', 'merops', 'proteases', protease.replace(" ", "_")
+            )
+        else:
+            protease_output_directory = os.path.join(
+                'media', 'merops', 'proteases_no_cr', protease.replace(" ", "_")
+            )
         # Prepare substrate sets for pattern extraction.
         single_letter_substrates = amino_acid_encoding_converter.convert_encoding(
             substrates,
@@ -158,8 +259,11 @@ def extract_protease_substrate_patterns(background=None,
                 for pattern in patterns.pattern_list
             ]
 
-            substrate_patterns = {protease:clusters}
-            merops_connector.insert_protease_patterns(substrate_patterns)
+            substrate_patterns = {protease: clusters}
+            merops_connector.insert_protease_patterns(
+                substrate_patterns,
+                enable_compound_residues=enable_compound_residues
+            )
             pattern_containers.append(patterns)
 
     for pattern_container in pattern_containers:
@@ -189,7 +293,13 @@ def generate_merops_heatmap(pattern_container, position_labels):
         + output_prefix
         + '_protease_pattern_heatmap.svg'
     )
-    protease_patterns = merops_connector.retrieve_protease_patterns()
+    if pattern_container.background.compound_residues is not None:
+        enable_compound_residues = True
+    else:
+        enable_compound_residues = False
+    protease_patterns = merops_connector.retrieve_protease_patterns(
+        enable_compound_residues=enable_compound_residues
+    )
     protease_labels = vis.generate_protease_labels(protease_patterns)
     non_exact_scoring_matrix = vis.generate_non_exact_protease_pattern_matrix(
         pattern_container,
@@ -229,7 +339,7 @@ class Pattern:
                     max_depth,                      
                     p_value_cutoff=0.001,
                     fold_change_cutoff=1.0,
-                    minimum_occurrences=2,
+                    minimum_occurrences=20,
                     positional_weighting=True,
                     multiple_testing_correction=True,
                     allow_compound_residue_decomposition=True,
@@ -259,6 +369,7 @@ class Pattern:
         self.background = pattern_container.background
         self.subset_tensor = subset_tensor
         self.pattern_matrix = initial_pattern.copy()
+        self.parent_stats = parent_stats
         self.invalid_pattern = False
 
         print(' '*current_depth*4 + 'new:\n' + ' '*current_depth*4 + ''.join(self.character_pattern().tolist()))
@@ -292,7 +403,7 @@ class Pattern:
         # Iteratively extract significantly enriched positional residues.
         if current_depth < max_depth:
             while self.subset_tensor.shape[0] >= minimum_occurrences:
-                # Break immediately and remove pattern from tree if
+                # Remove pattern from tree if
                 # prior set reduction has reduced subset tensor below
                 # significance threshold in context of the parent tensor
                 # in which the pattern was originally detected.
@@ -344,28 +455,39 @@ class Pattern:
                         """
                         print('Invalid pattern.')
                         self.invalid_pattern = True
-                        
-                
+
                 # Fix positional residues present in all sequences.
                 self.fix_homogeneous_positional_residues()
-                print(' '*current_depth*4 + 'homogeneous:\n' + ' '*current_depth*4 + ''.join(self.character_pattern().tolist()))
+                print(
+                    (' ' * current_depth * 4)
+                    + 'homogeneous:\n'
+                    + (' ' * current_depth * 4)
+                    + ''.join(self.character_pattern().tolist())
+                )
                 
                 # Calculate positional residue frequencies from subset_tensor.
                 positional_residue_frequencies = self.calculate_frequencies()
                 
-                # Calculate positional background frequency adjustments.
-                positional_background_frequencies = (
-                    self._adjust_positional_background_frequencies()
-                )
-                positional_background_frequencies[
-                    positional_background_frequencies > 1.0] = 1.0
+                if self.background.position_specific:
+                    positional_background_frequencies = (
+                        self.calculate_position_specific_background_frequencies(
+                            allow_compound_residue_decomposition
+                        )
+                    )
+                else:
+                    # Calculate positional background frequency adjustments.
+                    positional_background_frequencies = (
+                        self._adjust_positional_background_frequencies()
+                    )
+                    positional_background_frequencies[
+                        positional_background_frequencies > 1.0] = 1.0
 
                 # Calculate positional residue fold change.
                 positional_residue_fold_change = np.divide(
                     (positional_residue_frequencies / self.subset_tensor.shape[0]),
                     positional_background_frequencies,
                     out=np.ones_like(positional_background_frequencies),
-                    where=positional_background_frequencies!=0.0
+                    where=(positional_background_frequencies != 0.0)
                 )
 
                 # Calculate binomial p values from positional residues
@@ -462,7 +584,8 @@ class Pattern:
                     for enriched_positional_residue
                     in np.transpose(np.nonzero(max_positional_residue_enrichments))
                 ]
-
+                
+                new_patterns = []
                 prior_removed_positional_residues = self.removed_positional_residues.copy()
                 for m, enriched_positional_residue in enumerate(enriched_positional_residues):
                     if m > 0:
@@ -528,6 +651,7 @@ class Pattern:
                         bonferroni_m=stats_bonferroni_m,
                         expected_frequency=positional_background_frequencies[residue_coordinates]
                     )
+
                     # Instantiate new Pattern object with new pattern,
                     # matching sequences, and current depth.
                     pattern_container.add_new_pattern(
@@ -548,6 +672,7 @@ class Pattern:
                             set_reduction=set_reduction
                         )
                     )
+                    new_patterns.append(new_pattern)
 
                 # Remove sequences matching new pattern(s) from subset.
                 if set_reduction:
@@ -564,6 +689,140 @@ class Pattern:
                     )
                 """
 
+
+    def calculate_position_specific_background_frequencies(self,
+                                                            allow_compound_residue_decomposition):
+        # Get downstream fixed residues that do not include pattern.
+        if self.background.compound_residues is not None:
+            constituent_pattern = sequences.get_pattern_constituents(
+                self.pattern_matrix,
+                self.background
+            )
+            if allow_compound_residue_decomposition:
+                constituents_only = constituent_pattern - self.pattern_matrix
+                downstream_fixed_positional_residues = (
+                    self.removed_positional_residues
+                    + constituents_only
+                    - constituent_pattern
+                )
+            else:
+                downstream_fixed_positional_residues = (
+                    self.removed_positional_residues
+                    - constituent_pattern
+                )
+        else:
+            downstream_fixed_positional_residues = (
+                self.removed_positional_residues
+                - self.pattern_matrix
+            )
+
+        # Memory-intensive, high-performance version.
+        if self.background.fast:
+            # Restrict background to sequences matching pattern.
+            background_tensor = self.background.background_tensor[
+                np.logical_and(
+                    self.background.background_tensor,
+                    np.logical_or(
+                        self.pattern_matrix,
+                        np.invert(
+                            self.pattern_matrix.any(axis=1)
+                        )[..., np.newaxis]
+                    )
+                ).any(axis=(2)).all(axis=1),
+                :,
+                :
+            ]
+            # Eliminate background sequences which have been removed downstream.
+            background_tensor = self.background_tensor[
+                ~np.logical_and(
+                    background_tensor,
+                    np.logical_or(
+                        downstream_fixed_positional_residues,
+                        np.invert(
+                            downstream_fixed_positional_residues.any(axis=1)
+                        )[..., np.newaxis]
+                    )
+                ).any(axis=2).all(axis=1),
+                :,
+                :
+            ]
+            positional_background_frequencies = np.divide(
+                np.sum(
+                    background_tensor,
+                    axis=0,
+                    dtype=np.float64
+                ),
+                background_tensor.shape[0]
+            )
+        # Light-memory, slow version.
+        else:
+            # Get character representation of pattern.
+            if self.background.compound_residues is not None:
+                character_pattern = self.character_pattern(
+                    pattern_matrix=constituent_pattern
+                )
+            else:
+                character_pattern = self.character_pattern()
+            
+           #  Get subset of background matching pattern.
+            background_df = self.background.background_df
+            for position, residues in character_pattern.iteritems():
+                if residues == '.':
+                    continue
+                stripped_residues = residues.replace('[', '').replace(']', '')
+                background_df = background_df[
+                    background_df[position].isin(list(stripped_residues))
+                ]
+            
+            # Eliminate background sequences matching dowstream fixed residues.
+            fixed_downstream_characters = self.character_pattern(
+                pattern_matrix=downstream_fixed_positional_residues
+            )
+            for position, residues in fixed_downstream_characters.iteritems():
+                if residues == '.':
+                    continue
+                stripped_residues = residues.replace('[', '').replace(']', '')
+                background_df = background_df[
+                    ~background_df[position].isin(list(stripped_residues))
+                ]
+
+            # Calculate absolute simple residue background frequencies.
+            positional_background_frequencies = []
+            for column in background_df.columns:
+                positional_frequencies = background_df[column].value_counts()
+                positional_frequencies = positional_frequencies[
+                    positional_frequencies.index.isin(self.background.alphabet)
+                ]
+                positional_background_frequencies.append(
+                    pd.Series(
+                        [0] * len(self.background.alphabet),
+                        index=self.background.alphabet
+                    ).add(positional_frequencies).tolist()
+                )
+            positional_background_frequencies = np.array(
+                positional_background_frequencies,
+                dtype=np.float64
+            )
+
+            # Add absolute compound residue background frequencies.
+            if self.background.compound_residues is not None:
+                compound_residue_frequencies = np.inner(
+                    positional_background_frequencies,
+                    self.background.compound_residue_matrix
+                )
+                positional_background_frequencies = np.concatenate(
+                    (positional_background_frequencies, compound_residue_frequencies),
+                    axis=1
+                )
+
+            # Convert absolute frequencies to percentage frequencies.
+            positional_background_frequencies = (
+                positional_background_frequencies
+                / len(background_df)
+            )
+            np.nan_to_num(positional_background_frequencies, copy=False)
+
+        return positional_background_frequencies
 
     def fix_homogeneous_positional_residues(self):
         """
@@ -826,7 +1085,7 @@ class Pattern:
         flattened_positional_background_frequencies = positional_background_frequencies.flatten()
         binomial_p_values = []
         
-        for i,frequency in enumerate(positional_residue_frequencies.flatten()):
+        for i, frequency in enumerate(positional_residue_frequencies.flatten()):
             if frequency == self.subset_tensor.shape[0]:
                 binomial_p_values.append(np.nextafter(0, 1, dtype=np.float64))
             elif frequency == 0:
@@ -834,13 +1093,17 @@ class Pattern:
             else:
                 # Calculate probability of more extreme outcome via regularized
                 # incomplete beta function.
-                binomial_p_value = special.betainc(frequency + 1.0,
-                                        self.subset_tensor.shape[0] - frequency,
-                                        flattened_positional_background_frequencies[i])
+                binomial_p_value = special.betainc(
+                    frequency + 1.0,
+                    self.subset_tensor.shape[0] - frequency,
+                    flattened_positional_background_frequencies[i]
+                )
                 binomial_p_values.append(binomial_p_value)
 
-        binomial_p_values = np.array(binomial_p_values, dtype=np.float64).reshape(
-                                            positional_residue_frequencies.shape)
+        binomial_p_values = np.array(
+            binomial_p_values,
+            dtype=np.float64
+        ).reshape(positional_residue_frequencies.shape)
 
         return binomial_p_values
 
@@ -1020,7 +1283,7 @@ class Pattern:
             )
         ]
 
-    def character_pattern(self):
+    def character_pattern(self, pattern_matrix=None):
         '''
 
         Parameters:
@@ -1052,11 +1315,15 @@ class Pattern:
 
             return positional_residue
 
-        pattern_df = pd.DataFrame(self.pattern_matrix,
-                                    columns=self.background.ordered_residues)
-        pattern_df = pattern_df.apply(get_positional_residue, axis=1)
+        if pattern_matrix is None:
+            pattern_matrix = self.pattern_matrix
 
-        return pattern_df
+        pattern_df = pd.DataFrame(pattern_matrix,
+                                    columns=self.background.ordered_residues)
+        pattern_series = pattern_df.apply(get_positional_residue, axis=1)
+        pattern_series.index = self.pattern_container.sample.sequence_df.columns
+
+        return pattern_series
 
     def generate_sequence_strings(self, output_directory):
         """
@@ -1100,7 +1367,12 @@ class Pattern:
         self._sequence_strings = sequence_strings
 
         # Write sequence strings to text file.
-        output_file = output_directory + '/' + self.pattern_id + 'sequences.txt'
+        output_file = os.path.join(
+            output_directory,
+            ''.join(
+                self.character_pattern()
+            ).replace('[', '').replace(']', '').replace('.', 'x') + '_sequences.txt'
+        )
         with open(output_file, 'w') as fout:
             for sequence in sequence_strings:
                 fout.write('{}\n'.format(sequence))
@@ -1142,10 +1414,12 @@ class Pattern:
         options.color_scheme = colorscheme
         mformat = w.LogoFormat(data, options)
         
-        output_file = output_directory + (
-            '/' + self.pattern_id + '_logo_map.pdf'
+        output_file = os.path.join(
+            output_directory,
+            ''.join(
+                self.character_pattern()
+            ).replace('[', '').replace(']', '').replace('.', 'x') + '_logo_map.pdf'
         )
-        
         with open(output_file, "wb") as f:
             f.write(w.pdf_formatter(data, mformat))
 
@@ -1177,7 +1451,7 @@ class PatternContainer:
                     initial_removed_positional_residues=None,
                     max_depth=None,
                     p_value_cutoff=0.001,
-                    minimum_occurrences=2,
+                    minimum_occurrences=20,
                     fold_change_cutoff=1,
                     multiple_testing_correction=True,
                     positional_weighting=True,
@@ -1233,22 +1507,25 @@ class PatternContainer:
         )
 
         # Begin recursive pattern tree construction.
-        self.add_new_pattern(Pattern(
-            pattern_container=self,
-            parent_stats=parent_stats,
-            subset_tensor=self.sample.sequence_tensor,
-            initial_pattern=initial_pattern,
-            removed_positional_residues=initial_removed_positional_residues,
-            # Starting depth equal number of positions in initial_pattern.
-            current_depth=np.count_nonzero(np.any(initial_pattern, axis=1)),
-            # Max_depth either set by argument, or as len(initial_pattern)
-            max_depth=(max_depth if max_depth is not None else len(initial_pattern)),
-            p_value_cutoff=p_value_cutoff,
-            minimum_occurrences=minimum_occurrences,
-            fold_change_cutoff=fold_change_cutoff,
-            positional_weighting=positional_weighting,
-            multiple_testing_correction=multiple_testing_correction,
-            set_reduction=set_reduction))
+        self.add_new_pattern(
+            Pattern(
+                pattern_container=self,
+                parent_stats=parent_stats,
+                subset_tensor=self.sample.sequence_tensor,
+                initial_pattern=initial_pattern,
+                removed_positional_residues=initial_removed_positional_residues,
+                # Starting depth equal number of positions in initial_pattern.
+                current_depth=np.count_nonzero(np.any(initial_pattern, axis=1)),
+                # Max_depth either set by argument, or as len(initial_pattern)
+                max_depth=(max_depth if max_depth is not None else len(initial_pattern)),
+                p_value_cutoff=p_value_cutoff,
+                minimum_occurrences=minimum_occurrences,
+                fold_change_cutoff=fold_change_cutoff,
+                positional_weighting=positional_weighting,
+                multiple_testing_correction=multiple_testing_correction,
+                set_reduction=set_reduction
+            )
+        )
 
     def add_new_pattern(self, new_pattern):
         '''
@@ -1261,8 +1538,10 @@ class PatternContainer:
             None
         '''
         
-        patterns = [np.array_str(pattern.pattern_matrix.flatten())
-                    for pattern in self.pattern_list]
+        patterns = [
+            np.array_str(pattern.pattern_matrix.flatten())
+            for pattern in self.pattern_list
+        ]
         
         if (
             new_pattern.pattern_matrix.any()
@@ -1290,8 +1569,10 @@ class PatternContainer:
             elif pattern.invalid_pattern:
                 drop_patterns.append(pattern.pattern_id)
 
-        self.pattern_list = [pattern for pattern in self.pattern_list
-                            if pattern.pattern_id not in drop_patterns]
+        self.pattern_list = [
+            pattern for pattern in self.pattern_list
+            if pattern.pattern_id not in drop_patterns
+        ]
 
     def post_processing(self, proteolysis_data=True):
         '''
@@ -1322,18 +1603,159 @@ class PatternContainer:
         )
         
         # Generate tabular output.
+        self.generate_summary_table()
+
+    def generate_summary_table(self):
+        """
+        Output table conserving original input data set rows with
+            addtional output columns.
+        Parameters:
+
+        Returns:
+
+        """
+
+        if self.sample.original_sequences is not None:
+            # Match aligned sequences to detected patterns.
+            pattern_rows = []
+            for i, row in self.sample.original_sequences.iterrows():
+                if np.isnan(row['aligned_sequence'].isna()):
+                    pattern_rows.append([np.nan] * len(self.pattern_list))
+                else:
+                    matching_patterns = []
+                    for pattern in self.pattern_list:
+                        pattern_re = pattern_to_regular_expression(
+                            pattern.character_pattern(
+                                pattern_matrix=pattern.constituent_pattern
+                            )
+                        )
+                        pattern_match = 0
+                        for sequence in row['aligned_sequence'].split(';'):
+                            if re.match(pattern_re, sequence):
+                                pattern_match = 1
+                                break
+                        matching_patterns.append(pattern_match)
+                    pattern_rows.append(matching_patterns)
+
+            # Generate tabular output DataFrame.
+            pattern_columns = [
+                ''.join(pattern.character_pattern()) for pattern in self.pattern_list
+            ]
+            summary_table = pd.DataFrame(
+                pattern_rows,
+                columns=pattern_columns,
+                index=self.sample.original_sequences.index
+            )
+            summary_table = pd.concat(
+                [self.sample.original_sequences, summary_table],
+                axis=1
+            )
+
+            # Save summary table to tab-delimited file.
+            try:
+                os.makedirs(os.path.join(self.output_directory, 'summary'))
+            except FileExistsError:
+                pass
+            summary_table_path = os.path.join(
+                output_directory,
+                self.title.replace(' ', '_') + '_summary_table.txt'
+            )
+            summary_table.to_csv(
+                summary_table_path,
+                sep='\t',
+                header=True,
+                index=True
+            )
+            self.sequence_summary_table = summary_table
+
 
 
     def generate_pattern_outputs(self):
         """Last steps for retained patterns."""
-        # Save logo map and seqeunce strings for each pattern.
+        
+
+        pattern_directory = os.path.join(
+            self.output_directory,
+            'patterns'
+        )
+        try:
+            os.makedirs(pattern_directory)
+        except FileExistsError:
+            pass
+        
+        # Generate pattern summary table.
+        pattern_labels = []
+        sample_frequencies = []
+        foreground_frequencies = []
+        foreground_sizes = []
+        enrichments = []
         for pattern in self.pattern_list:
-            pattern_directory = (
-                self.output_directory + '/patterns/' + pattern.pattern_id
-            )
-            try:
-                os.makedirs(pattern_directory)
-            except FileExistsError:
-                pass
+            # Generate pattern label.
+            pattern_label = ''.join(pattern.character_pattern())
+            pattern_labels.append(pattern_label)
+            
+            # Save logo map and seqeunce strings for each pattern.  
             pattern.generate_sequence_strings(pattern_directory)
             pattern.generate_logo_map(pattern_directory)
+            
+            # Calculate pattern statistics.
+            sample_matches = pattern_sequence_match(
+                pattern.pattern_matrix,
+                self.background,
+                self.sample.sequence_tensor
+            )
+            sample_frequency = np.sum(sample_matches)
+            sample_frequencies.append(sample_frequency)
+            foreground_frequencies.append(pattern.subset_tensor.shape[0])
+            foreground_sizes.append(pattern.parent_stats.size)
+
+            # Generate constituent pattern.
+            try:
+                pattern.constituent_pattern = sequences.get_pattern_constituents(
+                    pattern.pattern_matrix,
+                    self.background
+                )
+            except AttributeError:
+                pattern.constituent_pattern = pattern.pattern_matrix
+
+            # Calculate pattern enrichment if position-specific background.
+            if self.background.position_specific:
+                sample_percentage_frequency = (
+                    sample_frequency / len(sample_matches)
+                )
+                pattern_regular_expression = pattern_to_regular_expression(
+                    pattern.character_pattern(pattern_matrix=pattern.constituent_pattern)
+                )
+                
+                background_frequency = 0
+                for sequence in self.background.background_sequences:
+                    background_matches = re.findall(pattern_regular_expression, sequence)
+                    background_frequency += len(background_matches)
+                background_percentage_frequency = (
+                    background_frequency / len(self.background.background_df)
+                )
+                try:
+                    enrichment = (
+                        sample_percentage_frequency / background_percentage_frequency
+                    )
+                except:
+                    enrichment = 0.0
+            else:
+                enrichment = np.nan    
+            enrichments.append(enrichment)
+
+        self.pattern_summary_table = pd.DataFrame(
+            {
+                'Pattern': pattern_labels,
+                'Sample Frequency': sample_frequencies,
+                'Foreground Frequency': foreground_frequencies,
+                'Foreground Size': foreground_sizes,
+                'Enrichment (Sample Frequency / Background Frequency)': enrichments  
+            }
+        )
+        self.pattern_summary_table.to_csv(
+            os.path.join(pattern_directory, 'pattern_summary_table.csv'),
+            sep=',',
+            header=True,
+            index=True
+        )

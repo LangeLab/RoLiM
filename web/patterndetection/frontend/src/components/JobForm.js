@@ -16,10 +16,11 @@ class JobForm extends Component {
     context_data: "",
     p_value_cutoff: 0.001,
     contextformat: "",
-    minimum_occurrences: 2,
+    position_specific: true,
+    minimum_occurrences: 20,
     fold_change_cutoff: 1.0,
     max_depth: "",
-    width: 8,
+    width: 15,
     center_sequences: true,
     multiple_testing_correction: true,
     positional_weighting: true,
@@ -61,6 +62,7 @@ class JobForm extends Component {
     formData.append('description', this.state.description);
     formData.append('email', this.state.email);
     formData.append('p_value_cutoff', this.state.p_value_cutoff);
+    formData.append('position_specific', this.state.position_specific);
     formData.append('minimum_occurrences', this.state.minimum_occurrences);
     formData.append('fold_change_cutoff', this.state.fold_change_cutoff);
     formData.append('width', this.state.width);
@@ -78,6 +80,7 @@ class JobForm extends Component {
       foregroundformat,
       context_data,
       p_value_cutoff,
+      position_specific,
       minimum_occurrences,
       fold_change_cutoff,
       width,
@@ -95,6 +98,7 @@ class JobForm extends Component {
       foregroundformat,
       context_data,
       p_value_cutoff,
+      position_specific,
       minimum_occurrences,
       fold_change_cutoff,
       width,
@@ -125,6 +129,7 @@ class JobForm extends Component {
       foregroundformat,
       context_data,
       p_value_cutoff,
+      position_specific,
       minimum_occurrences,
       fold_change_cutoff,
       width,
@@ -177,7 +182,7 @@ class JobForm extends Component {
             </div>
           </div>
           <div className="field">
-            <label className="label">Select input data file to upload.</label>
+            <label className="label">Select foreground data file to upload.</label>
             <label className="file-label">
               <div className="control">
                 <input
@@ -352,6 +357,20 @@ class JobForm extends Component {
                     checked={positional_weighting}
                   />
                   Enable positional weighting?
+                </label>
+              </div>
+            </div>
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="position_specific"
+                    onChange={this.handleCheckboxChange}
+                    value={position_specific}
+                    checked={position_specific}
+                  />
+                  Position specific background?
                 </label>
               </div>
             </div>

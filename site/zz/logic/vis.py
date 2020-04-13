@@ -45,7 +45,7 @@ CLUSTERMAP_ROW_COLORS = [
 ### REFACTOR!!!
 ########################################################################
 SUBSTITUTION_MATRIX = preprocessing.importSubstitutionMatrix(
-    '../data/BLOSUM62_percentages.txt'
+    './media/defaults/BLOSUM62_percentages.txt'
 )
 ########################################################################
 
@@ -178,7 +178,7 @@ def generate_non_exact_protease_pattern_matrix(patterns,
                         pattern.background
                     )
                 except AttributeError:
-                    pass
+                    protease_constituent_pattern = protease_pattern_matrix
 
                 # Score foreground pattern against protease pattern.
                 protease_pattern_intersection = np.sum(
@@ -617,6 +617,7 @@ def generate_figures(sequence_df,
                         patterns,
                         analysis_title,
                         output_dir,
+                        proteolysis_data=True,
                         annotate_clustermap=False):
     """
     Helper function used to generate all default output figures.
@@ -637,85 +638,93 @@ def generate_figures(sequence_df,
 
     # Create output directory.
     try:
-        os.makedirs(output_dir + '/figures')
+        os.makedirs(os.path.join(output_dir, 'summary'))
     except FileExistsError:
         pass
 
     # Get positions from sample data frame.
     position_labels = generate_position_labels(sequence_df)
 
-    # Get protease patterns from MEROPS database instance.
-    protease_patterns = merops_connector.retrieve_protease_patterns()
-    # Generate protease labels.
-    protease_labels = generate_protease_labels(protease_patterns)
+    if proteolysis_data:
+        # Toggle protease pattern compound residues.
+        if patterns.background.compound_residues is not None:
+            enable_compound_residues = True
+        else:
+            enable_compound_residues = False
 
-    # Calculate non-exact protease pattern intersection scores.
-    non_exact_scoring_matrix = generate_non_exact_protease_pattern_matrix(
-        patterns,
-        protease_patterns,
-        protease_labels
-    )
+        # Get protease patterns from MEROPS database instance.
+        protease_patterns = merops_connector.retrieve_protease_patterns(
+            enable_compound_residues=enable_compound_residues
+        )
+        # Generate protease labels.
+        protease_labels = generate_protease_labels(protease_patterns)
 
-    # Set absolute frequency protease pattern heatmap title.
-    protease_pattern_heatmap_title = (
-        analysis_title + ' - Protease Pattern Matches (Percent Positions Matched)'
-    )
-    
-    # Set output path for absolute frequency protease pattern heat map.
-    protease_pattern_heatmap_output_path = (
-        output_dir
-        + '/figures/'
-        + output_prefix
-        + '_protease_pattern_heatmap.svg'
-    )
+        # Calculate non-exact protease pattern intersection scores.
+        non_exact_scoring_matrix = generate_non_exact_protease_pattern_matrix(
+            patterns,
+            protease_patterns,
+            protease_labels
+        )
 
-    # Generate absolute frequency protease pattern heatmap.
-    generate_protease_pattern_heatmap(
-        protease_pattern_heatmap_title,
-        patterns,
-        non_exact_scoring_matrix,
-        protease_labels,
-        position_labels,
-        protease_pattern_heatmap_output_path
-    )
+        # Set absolute frequency protease pattern heatmap title.
+        protease_pattern_heatmap_title = (
+            analysis_title + ' - Protease Pattern Matches (Percent Positions Matched)'
+        )
+        
+        # Set output path for absolute frequency protease pattern heat map.
+        protease_pattern_heatmap_output_path = os.path.join(
+            output_dir,
+            'summary',
+            output_prefix + '_protease_pattern_heatmap.svg'
+        )
 
-    # Compute protease frequency matrix.
-    absolute_frequency_matrix = generate_protease_pattern_frequency_matrix(
-        patterns,
-        protease_patterns,
-        protease_labels
-    )
+        # Generate absolute frequency protease pattern heatmap.
+        generate_protease_pattern_heatmap(
+            protease_pattern_heatmap_title,
+            patterns,
+            non_exact_scoring_matrix,
+            protease_labels,
+            position_labels,
+            protease_pattern_heatmap_output_path
+        )
 
-    """
-    # Set absolute frequency protease pattern heatmap title.
-    absolute_heatmap_title = (
-        analysis_title + ' - Protease Pattern Frequency (Absolute)'
-    )
-    
-    # Set output path for absolute frequency protease pattern heat map.
-    absolute_heatmap_output_path = (
-        output_dir
-        + '/figures/'
-        + output_prefix
-        + '_absolute_heatmap.svg'
-    )
+        # Compute protease frequency matrix.
+        absolute_frequency_matrix = generate_protease_pattern_frequency_matrix(
+            patterns,
+            protease_patterns,
+            protease_labels
+        )
 
-    # Generate absolute frequency protease pattern heatmap.
-    generate_protease_pattern_heatmap(
-        absolute_heatmap_title,
-        patterns,
-        absolute_frequency_matrix,
-        protease_labels,
-        position_labels,
-        absolute_heatmap_output_path
-    )
-    """
+        """
+        # Set absolute frequency protease pattern heatmap title.
+        absolute_heatmap_title = (
+            analysis_title + ' - Protease Pattern Frequency (Absolute)'
+        )
+        
+        # Set output path for absolute frequency protease pattern heat map.
+        absolute_heatmap_output_path = (
+            output_dir
+            + '/figures/'
+            + output_prefix
+            + '_absolute_heatmap.svg'
+        )
 
-    # Generate percentage frequency matrix from absolute frequency matrix.
-    percentage_frequency_matrix = generate_protease_pattern_percentage_frequency_matrix(
-        absolute_frequency_matrix,
-        len(sequence_df)
-    )
+        # Generate absolute frequency protease pattern heatmap.
+        generate_protease_pattern_heatmap(
+            absolute_heatmap_title,
+            patterns,
+            absolute_frequency_matrix,
+            protease_labels,
+            position_labels,
+            absolute_heatmap_output_path
+        )
+        """
+
+        # Generate percentage frequency matrix from absolute frequency matrix.
+        percentage_frequency_matrix = generate_protease_pattern_percentage_frequency_matrix(
+            absolute_frequency_matrix,
+            len(sequence_df)
+        )
 
     """
     # Set percentage frequency protease pattern heatmap title.
@@ -771,11 +780,10 @@ def generate_figures(sequence_df,
     )
 
     # Set clustermap output path.
-    clustermap_output_path = (
-        output_dir
-        + '/figures/'
-        + output_prefix
-        + 'sequence_clustermap.svg'
+    clustermap_output_path = os.path.join(
+        output_dir,
+        'summary',
+        output_prefix + 'sequence_clustermap.svg'
     )
 
     # Pattern similarity clustermap.

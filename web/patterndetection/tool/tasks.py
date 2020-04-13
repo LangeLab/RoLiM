@@ -53,6 +53,7 @@ def new_job(jobcode):
     positional_weighting = job.positional_weighting
     compound_residues = job.compound_residues
     compound_residue_decomposition = job.compound_residue_decomposition
+    position_specific = job.position_specific
 
     # Set terminal based on sequence extension direction.
     if extension_direction == 1:
@@ -68,18 +69,39 @@ def new_job(jobcode):
     if context_data:
         # Load context sequences from uploaded FASTA.
         context = sequences.import_fasta(os.path.join(settings.MEDIA_ROOT, context_data.name))
+        # Generate new Background instance.
+        if compound_residues:
+            background = sequences.Background(
+                context['sequence'].tolist(),
+                width=width,
+                position_specific=position_specific
+            )
+        else:
+            background = sequences.Background(
+                context['sequence'].tolist(),
+                width=width,
+                position_specific=position_specific,
+                compound_residues=None
+            )
     else:
         # Load context from default Swiss-Prot copy.
         context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
-    
-    # Generate new Background instance.
-    if compound_residues:
-        background = sequences.Background(context['sequence'].tolist())
-    else:
-        background = sequences.Background(
-            context['sequence'].tolist(),
-            compound_residues=None
-        )
+        # Generate new Background instance.
+        if compound_residues:
+            background = sequences.Background(
+                context['sequence'].tolist(),
+                width=width,
+                position_specific=position_specific,
+                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv')
+            )
+        else:
+            background = sequences.Background(
+                context['sequence'].tolist(),
+                width=width,
+                position_specific=position_specific,
+                compound_residues=None,
+                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv')
+            )
 
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     

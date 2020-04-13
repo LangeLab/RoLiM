@@ -26,7 +26,9 @@ def new_job(jobcode):
         context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
     
     # Generate new Background instance.
-    background = sequences.Background(context['sequence'].tolist())
+    background = sequences.Background(
+        context['sequence'].tolist()
+    )
 
     # Figure out file type and run correct pre-processing steps.
     dataformat = job.dataformat_id

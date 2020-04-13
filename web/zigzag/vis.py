@@ -178,7 +178,7 @@ def generate_non_exact_protease_pattern_matrix(patterns,
                         pattern.background
                     )
                 except AttributeError:
-                    pass
+                    protease_constituent_pattern = protease_pattern_matrix
 
                 # Score foreground pattern against protease pattern.
                 protease_pattern_intersection = np.sum(
@@ -638,7 +638,7 @@ def generate_figures(sequence_df,
 
     # Create output directory.
     try:
-        os.makedirs(output_dir + '/figures')
+        os.makedirs(os.path.join(output_dir, 'summary'))
     except FileExistsError:
         pass
 
@@ -646,8 +646,16 @@ def generate_figures(sequence_df,
     position_labels = generate_position_labels(sequence_df)
 
     if proteolysis_data:
+        # Toggle protease pattern compound residues.
+        if patterns.background.compound_residues is not None:
+            enable_compound_residues = True
+        else:
+            enable_compound_residues = False
+
         # Get protease patterns from MEROPS database instance.
-        protease_patterns = merops_connector.retrieve_protease_patterns()
+        protease_patterns = merops_connector.retrieve_protease_patterns(
+            enable_compound_residues=enable_compound_residues
+        )
         # Generate protease labels.
         protease_labels = generate_protease_labels(protease_patterns)
 
@@ -664,11 +672,10 @@ def generate_figures(sequence_df,
         )
         
         # Set output path for absolute frequency protease pattern heat map.
-        protease_pattern_heatmap_output_path = (
-            output_dir
-            + '/figures/'
-            + output_prefix
-            + '_protease_pattern_heatmap.svg'
+        protease_pattern_heatmap_output_path = os.path.join(
+            output_dir,
+            'summary',
+            output_prefix + '_protease_pattern_heatmap.svg'
         )
 
         # Generate absolute frequency protease pattern heatmap.
@@ -773,11 +780,10 @@ def generate_figures(sequence_df,
     )
 
     # Set clustermap output path.
-    clustermap_output_path = (
-        output_dir
-        + '/figures/'
-        + output_prefix
-        + 'sequence_clustermap.svg'
+    clustermap_output_path = os.path.join(
+        output_dir,
+        'summary',
+        output_prefix + 'sequence_clustermap.svg'
     )
 
     # Pattern similarity clustermap.

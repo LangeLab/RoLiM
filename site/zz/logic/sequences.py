@@ -10,6 +10,8 @@ import pandas as pd
 # Ensure that Pandas always loads full sequence.
 pd.set_option('max_colwidth', 1000000)
 
+RANDOM_STATE = np.random.RandomState(seed=777)
+
 CompoundResidue = namedtuple(
     'CompoundResidue',
     ['description', 'residues']
@@ -105,7 +107,7 @@ compound_residues = {
 }
 """
 
-compound_residues = {
+COMPOUND_RESIDUES = {
     '1': CompoundResidue(
         description='Nonpolar, aliphatic R groups',
         residues=[
@@ -155,7 +157,8 @@ compound_residues = {
 
 Sample = namedtuple(
     'Sample',
-    ['sequence_df', 'sequence_tensor']
+    ['sequence_df', 'sequence_tensor', 'original_sequences'],
+    defaults=[None]
 )
 
 SWISSPROT_ACCESSION_PATTERN = re.compile(
@@ -171,9 +174,59 @@ PYRO_GLU = [
 ]
 
 
+def get_residue_index(residue, residue_dict):
+    """
+
+    Parameters:
+        residue -- String.
+        residue_dict -- Dict.
+
+    Returns:
+        residue_index -- Int.
+    """
+
+    try:
+        residue_index = residue_dict[residue]
+    except KeyError:
+        residue_index = -1
+
+    return residue_index
+
+
 def vectorize_sequences(data,
                         background,
                         empty_position_value=0):
+    """
+
+    Parameters:
+        data -- Pandas DataFrame.
+        background -- Background instance.
+        empty_position_value -- Int.
+
+    Returns:
+        sequence_tensor -- Numpy array. Dtype=np.int8
+    """
+
+    residue_dict = {residue: i for i, residue in enumerate(background.ordered_residues)}
+    # Construct tensor from residue indices.
+    index_array = data.applymap(
+        lambda x: get_residue_index(x, residue_dict)
+    ).to_numpy(dtype=np.int8)
+    sequence_tensor = np.eye(len(background.ordered_residues), dtype=np.int8)[index_array]
+    # Remove unknown residues from tensor.
+    sequence_tensor[index_array == -1] = 0
+    # Add compound residues to tensor.
+    if background.compound_residues is not None:
+        sequence_tensor[:, :, len(background.alphabet):] = np.inner(
+            sequence_tensor[:, :, :len(background.alphabet)],
+            background.compound_residue_matrix
+        )
+
+    return sequence_tensor
+
+def vectorize_sequences_original(data,
+                                    background,
+                                    empty_position_value=0):
     '''
 
     Parameters:
@@ -270,13 +323,13 @@ def vectorize_pattern(pattern,
     return pattern_matrix
 
 
-def get_pattern_constituents(pattern, background):
+def get_pattern_constituents(pattern_matrix, background):
     """
     Return pattern featuring all original residues, including compound
         residues, plus compound residue constituents.
 
     Parameters:
-        pattern -- 2D Numpy Array.
+        pattern_matrix -- 2D Numpy Array.
         background -- Background instance.
 
     Returns:
@@ -298,7 +351,7 @@ def get_pattern_constituents(pattern, background):
         raise e
     else:
         # Generate index array from pattern matrix.
-        compound_residue_index = np.argmax(pattern, axis=1) - len(background.alphabet)
+        compound_residue_index = np.argmax(pattern_matrix, axis=1) - len(background.alphabet)
 
         # Map simple positions to blank in compound residue matrix.
         compound_residue_index[
@@ -309,13 +362,13 @@ def get_pattern_constituents(pattern, background):
 
         # Combine constituents with simple fixed residues.
         fixed_position_residues = np.logical_or(
-            pattern[:, :len(background.alphabet)],
+            pattern_matrix[:, :len(background.alphabet)],
             positional_residue_constituents)
 
         constituent_pattern = np.concatenate(
             (
                 fixed_position_residues,
-                pattern[:, len(background.alphabet):]
+                pattern_matrix[:, len(background.alphabet):]
             ),
             axis=1
         )
@@ -344,7 +397,15 @@ def empty_position_vector(length, empty_position_value=0):
     return empty_position
 
 
-def align_sequences(context, sequences, width, terminal):
+def align_sequences(context,
+                    sequences,
+                    width=8,
+                    terminal='n',
+                    redundancy_level='protein',
+                    first_protein_only=True,
+                    original_row_merge='all',
+                    original_sequences=None,
+                    require_context_id=True):
     """
     Take unaligned sequences and context. Map unaligned sequences to
         context. Truncated prime segment to half width. Extend sequence
@@ -375,49 +436,160 @@ def align_sequences(context, sequences, width, terminal):
     """
 
     non_prime_width = width // 2
-    
+
+    # Remove exact peptides and protein ID duplicates unless disabled.
+    if redundancy_level != 'none':
+        sequences.drop_duplicates(inplace=True) 
+
     # Generate aligned sequence by mapping sequence segments to context.
     aligned_sequences = []
     for i, sequence in sequences.iterrows():
         # Select pre-mapped context elements if available.
         try:
-            context_ids = sequence['context_id'].replace(' ', '').split(';')
-        except KeyError:
+            context_ids = sequence['context_id'].replace(' ', '').split(';')  
+        except:
             context_elements = context['sequence'].tolist()
         else:
             # Currently only supporting protein accesssion ID lookup for
             # Swiss-Prot. Any other IDs will fail and revert to default
             # behavior of attempting to match sequence segment against
             # all context sequences.
-            swissprot_ids = []
-            for context_id in context_ids:
-                if context_id.startswith('sp|'):
-                    swissprot_ids.append(context_id)
-                elif SWISSPROT_ACCESSION_PATTERN.match(context_id):
-                    swissprot_ids.append(context_id)
+            if (len(max(context_ids, key=len)) == 0) and not require_context_id:
+                swissprot_ids = context['swissprot_id'].tolist()
+                context_elements = context['sequence'].tolist()
+            else:
+                swissprot_ids = []
+                context_elements = []
+                for context_id in context_ids:
+                    """
+                    if context_id.startswith('sp|'):
+                        swissprot_ids.append(context_id)
+                        if first_protein_only == True:
+                            break
+                    elif SWISSPROT_ACCESSION_PATTERN.match(context_id):
+                        swissprot_ids.append(context_id)
+                        if first_protein_only == True:
+                            break
+                    """
+                    if SWISSPROT_ACCESSION_PATTERN.match(context_id):
+                        swissprot_sequences = context[
+                            context['swissprot_id'] == context_id
+                        ]['sequence'].tolist()
+                        num_sequences = len(swissprot_sequences)
+                        if  num_sequences == 1:
+                            swissprot_ids.append(context_id)
+                            context_elements += swissprot_sequences
+                            if first_protein_only == True:
+                                break
+                        elif num_sequences > 1:
+                            raise AssertionError(
+                                '{} was found more than one time in the proteome.'.format(
+                                    context_id
+                                )
+                            )
+            """
             # Get protein(s) matching peptide from context proteome.
             if swissprot_ids:
                 context_elements = context[context['swissprot_id'].isin(
-                    context_ids)]['sequence'].tolist()
+                    swissprot_ids)]['sequence'].tolist()
             else:
+                swissprot_ids = context['swissprot_id'].tolist()
                 context_elements = context['sequence'].tolist()
-        # Regular expression matching of sequence to context.
-        extended_sequences = ExtendedSequences(n_term=set(), c_term=set())
-        for context_element in context_elements:
-            matches = match_segment_to_context(sequence['sequence'].rstrip().upper(),
-                                                    context_element,
-                                                    width,
-                                                    non_prime_width,
-                                                    terminal)
-            for n_term_match in sorted(list(matches.n_term)):
-                extended_sequences.n_term.add(n_term_match)
-            for c_term_match in sorted(list(matches.c_term)):
-                extended_sequences.c_term.add(c_term_match)
+            """
 
-        if extended_sequences.n_term:
-            aligned_sequences.append(merge_sequences(extended_sequences.n_term))
-        if extended_sequences.c_term:
-            aligned_sequences.append(merge_sequences(extended_sequences.c_term))
+        # Regular expression matching of sequence to context.
+        extended_sequences = {}
+        for j, context_element in enumerate(context_elements):
+            matches = match_segment_to_context(
+                sequence['sequence'].rstrip().upper(),
+                context_element,
+                width,
+                non_prime_width,
+                terminal
+            )
+            if matches.n_term or matches.c_term:
+                context_id = swissprot_ids[j]
+                extended_sequences[context_id] = ExtendedSequences(
+                    n_term=set(),
+                    c_term=set()
+                )
+                for n_term_match in sorted(list(matches.n_term)):
+                    extended_sequences[context_id].n_term.add(n_term_match)
+                for c_term_match in sorted(list(matches.c_term)):
+                    extended_sequences.c_term.add(c_term_match)
+
+        # Add all aligned instances of peptide if redundancy_level is 'none'.
+        if original_row_merge == 'none':
+            for context_id, context_element_matches in extended_sequences.items():
+                for extended_sequence in sorted(list(context_element_matches.n_term)):
+                    aligned_sequences.append([i, extended_sequence, context_id])
+                for extended_sequence in sorted(list(context_element_matches.c_term)):
+                    aligned_sequences.append([i, extended_sequence, context_id])
+        # Merge aligned instances of peptide at protein level otherwise.
+        elif original_row_merge == 'protein':
+            for context_id, context_element_matches in extended_sequences.items():
+                if extended_sequences.n_term:
+                    aligned_sequences.append([i, merge_sequences(context_element_matches.n_term), context_id])
+                if extended_sequences.c_term:
+                    aligned_sequences.append([i, merge_sequences(context_element_matches.c_term), context_id])
+        elif original_row_merge == 'all':
+            context_ids = []
+            all_extended_sequences = ExtendedSequences(
+                n_term=set(),
+                c_term=set()
+            )
+            for context_id, context_element_matches in extended_sequences.items():
+                for extended_sequence in context_element_matches.n_term:
+                    all_extended_sequences.n_term.add(extended_sequence)
+                for extended_sequence in context_element_matches.c_term:
+                    all_extended_sequences.c_term.add(extended_sequence)
+                context_ids.append(context_id)
+            context_id = '; '.join(context_ids)
+            if all_extended_sequences.n_term:
+                aligned_sequences.append([i, merge_sequences(all_extended_sequences.n_term), context_id])
+            if all_extended_sequences.c_term:
+                aligned_sequences.append([i, merge_sequences(all_extended_sequences.c_term), context_id])
+
+
+    # Generate aligned sequence data frame for redundancy processing.
+    aligned_sequences_df = pd.DataFrame(
+        aligned_sequences,
+        columns=['original_row', 'extended_sequence', 'context_id']
+    )
+
+    # Redundancy handling.
+    if redundancy_level == 'protein':
+        aligned_sequences_df.drop_duplicates(
+            subset=['extended_sequence', 'context_id'],
+            inplace=True
+        )
+    elif redundancy_level == 'sequence':
+        aligned_sequences_df.drop_duplicates(
+            subset=['extended_sequence'],
+            inplace=True
+        )
+
+    # Update tabular output DataFrame.
+    if original_sequences is not None:
+        aligned_sequence_list = []
+        matched_context_id_list = []
+        for i, original_row in original_sequences.iterrows():
+            aligned_row_results = aligned_sequences_df[
+                aligned_sequences_df['original_row'] == i
+            ]
+            aligned_sequence = '; '.join(aligned_row_results['extended_sequence'].tolist())
+            aligned_sequence_list.append(
+                aligned_sequence if aligned_sequence != '' else np.nan
+            )
+            matched_context_id = '; '.join(aligned_row_results['context_id'].tolist())
+            matched_context_id_list.append(
+                matched_context_id if matched_context_id != '' else np.nan
+
+            )
+        original_sequences['aligned_sequence'] = aligned_sequence_list
+        original_sequences['matched_context_id'] = matched_context_id_list
+
+    aligned_sequences = aligned_sequences_df['extended_sequence'].tolist()
 
     return aligned_sequences
 
@@ -543,12 +715,12 @@ def generate_positions(center, num_positions):
                 position_label = 'p' + str(abs(p1_pos-(i+1))) + "'"
                 positions.append(position_label)
     else:
-        positions = ['p{}'.format(i) for i in range(1, num_positions+1)]
+        positions = ['p{}'.format(i) for i in range(1, num_positions + 1)]
 
     return positions
 
 
-def sequences_to_df(sequences, center=True):
+def sequences_to_df(sequences, center=True, redundancy_level='none'):
     """
     Split sequence strings to Pandas DataFrame with one column per
         position.
@@ -567,9 +739,10 @@ def sequences_to_df(sequences, center=True):
     """
     
     split_sequences = [list(sequence.rstrip().upper()) for sequence in sequences]
-    cols = generate_positions(center,len(split_sequences[0]))
+    cols = generate_positions(center, len(split_sequences[0]))
     sequence_df = pd.DataFrame(split_sequences, columns=cols)
-    sequence_df.drop_duplicates(inplace=True)
+    if redundancy_level == 'sequence':
+        sequence_df.drop_duplicates(inplace=True)
 
     return sequence_df
 
@@ -641,7 +814,10 @@ def import_fasta(fasta_path, swissprot=True):
     return fasta_df
 
 
-def import_peptide_list(peptide_list_file, delimiter='\t'):
+def import_peptide_list(peptide_list_file,
+                        delimiter='\t',
+                        require_context_id=True,
+                        redundancy_level='protein'):
     """
     Import peptide list and row-matched protein IDs from text file.
 
@@ -658,14 +834,20 @@ def import_peptide_list(peptide_list_file, delimiter='\t'):
     # Parse peptides and accession numbers in input file.
     peptide_reader = csv.reader(peptide_list_file, delimiter=delimiter)
     for row in peptide_reader:    
-        context_id = parse_swissprot_accession_number(row[1])
-        if not context_id:
+        try:
+            context_id = parse_swissprot_accession_number(row[1])
+        except:
+            context_id = None
+        if require_context_id and not context_id:
             continue
         sequence = row[0].upper()
         peptide_list.append([sequence, context_id])
 
     cols = ['sequence', 'context_id']
     peptide_list = pd.DataFrame(peptide_list, columns=cols)
+
+    if redundancy_level != 'none':
+        peptide_list.drop_duplicates(inplace=True)
 
     return peptide_list
 
@@ -727,7 +909,8 @@ def import_maxquant_evidence(evidence_path,
 def expand_maxquant_evidence_sequences(evidence_df,
                                         context,
                                         width=8,
-                                        terminal='n'):
+                                        terminal='n',
+                                        require_context_id=True):
     """
     Expands sequences from MaxQuant experiment dictionary.
 
@@ -752,14 +935,20 @@ def expand_maxquant_evidence_sequences(evidence_df,
         protein_id = sequence['context_id'].split(';')[0]
         swissprot_id = parse_swissprot_accession_number(protein_id)
         prime_sequences.loc[i, 'context_id'] = swissprot_id
-    expanded_sequences = align_sequences(context, prime_sequences, width, terminal=terminal)
-    print(expanded_sequences)
+    expanded_sequences = align_sequences(
+        context,
+        prime_sequences,
+        width=width,
+        terminal=terminal,
+        require_context_id=require_context_id
+    )
+
     sequence_df = sequences_to_df(expanded_sequences)
     
     return sequence_df
 
 
-def fasta_to_sequences(fasta_df, center=False):
+def fasta_to_sequences(fasta_df, center=False, redundancy_level='none'):
     """
     Convenience function to convert FASTA dataframe to dataframe
         containing one column per sequence position.
@@ -776,12 +965,25 @@ def fasta_to_sequences(fasta_df, center=False):
                         to columns by position and accompanying fields
                         as specified above.
     """
-    sequence_df = sequences_to_df(fasta_df['sequence'].to_list(), center)
+    sequence_df = sequences_to_df(
+        fasta_df['sequence'].to_list(),
+        center=center,
+        redundancy_level=redundancy_level
+    )
 
     return sequence_df
 
 
-def peptides_to_sample(peptides, context, background, width=8, terminal='n'):
+def peptides_to_sample(peptides,
+                        context,
+                        background,
+                        center=True,
+                        width=8,
+                        terminal='n',
+                        redundancy_level='protein',
+                        first_protein_only=True,
+                        original_row_merge='all',
+                        require_context_id=True):
     """
     Align peptides and return data frame of positional residues.
 
@@ -794,28 +996,66 @@ def peptides_to_sample(peptides, context, background, width=8, terminal='n'):
     Returns:
         sample -- Sample instance.
     """
-    aligned_sequences = align_sequences(context, peptides, width, terminal)
-    sequence_df = sequences_to_df(aligned_sequences)
+
+    original_sequences = peptides.copy()
+    original_sequences.columns = [
+        'input_sequence',
+        'input_context_id',
+    ]
+
+    aligned_sequences = align_sequences(
+        context,
+        peptides,
+        width=width,
+        terminal=terminal,
+        redundancy_level=redundancy_level,
+        first_protein_only=first_protein_only,
+        original_row_merge=original_row_merge,
+        original_sequences=original_sequences,
+        require_context_id=require_context_id
+    )
+
+    sequence_df = sequences_to_df(
+        aligned_sequences,
+        center=center,
+        redundancy_level=redundancy_level
+    )
     sequence_tensor = vectorize_sequences(sequence_df, background)
-    sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
+    sample = Sample(
+        sequence_df=sequence_df,
+        sequence_tensor=sequence_tensor,
+        original_sequences=original_sequences
+    )
 
     return sample
 
 
-def load_fasta_peptides(peptide_fasta_path, context, background, width=8, terminal='n'):
+def load_fasta_peptides(peptide_fasta_path,
+                        context,
+                        background,
+                        center=True,
+                        width=8,
+                        terminal='n',
+                        redundancy_level='protein',
+                        first_protein_only=True,
+                        original_row_merge='all'):
     """
     Top-level helper function to load and extend peptides from FASTA
         file.
     """
-    # call import_fasta
-    # call alignment functions
-    
-    sample = peptides_to_sample(peptides, context, width, terminal)
-    
-    return sample
+    pass
 
 
-def load_peptide_list_file(peptide_list_path, context, background, width=8, terminal='n'):
+def load_peptide_list_file(peptide_list_path,
+                            context,
+                            background,
+                            center=True,
+                            width=8,
+                            terminal='n',
+                            require_context_id=True,
+                            redundancy_level='protein',
+                            first_protein_only=True,
+                            original_row_merge='all'):
     """
     Top-level helper function to load and extend peptides from text
         file.
@@ -838,14 +1078,37 @@ def load_peptide_list_file(peptide_list_path, context, background, width=8, term
 
     # open peptide list file
     with open(peptide_list_path, 'r') as peptide_list_file:
-        peptides = import_peptide_list(peptide_list_file, delimiter)
+        peptides = import_peptide_list(
+            peptide_list_file,
+            delimiter=delimiter,
+            require_context_id=require_context_id,
+            redundancy_level=redundancy_level
+        )
     
-    sample = peptides_to_sample(peptides, context, background, width, terminal)
+    sample = peptides_to_sample(
+        peptides,
+        context,
+        background,
+        center=center,
+        width=width,
+        terminal=terminal,
+        redundancy_level=redundancy_level,
+        first_protein_only=first_protein_only,
+        original_row_merge=original_row_merge,
+        require_context_id=require_context_id
+    )
 
     return sample
 
 
-def load_peptide_list_field(peptide_list_field, context, background, width=8, terminal='n'):
+def load_peptide_list_field(peptide_list_field,
+                            context,
+                            background,
+                            width=8,
+                            terminal='n',
+                            redundancy_level='protein',
+                            first_protein_only=True,
+                            original_row_merge='all'):
     """
     Top-level helper function to load and extend peptides from text
         field.
@@ -855,23 +1118,17 @@ def load_peptide_list_field(peptide_list_field, context, background, width=8, te
     Returns:
         sample -- Sample instance.
     """
-    # create fileio object from peptide list field
-    # call import_peptide_list
-    peptides = import_peptide_list(peptide_list_file, delimiter)
-    
-    sample = peptides_to_sample(peptides, context, width, terminal)
-
-    return sample
+    pass
 
 
-def load_prealigned_file(prealigned_file_path, background, center=True):
+def load_prealigned_file(prealigned_file_path, background, center=True, redundancy_level='none'):
     """
     Top-level helper function to load pre-aligned sequences from text
         file.
     """
     
     with open(prealigned_file_path, 'r') as prealigned_file:
-        sequence_df = sequences_to_df(prealigned_file, center=center)
+        sequence_df = sequences_to_df(prealigned_file, center=center, redundancy_level='none')
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
 
@@ -951,7 +1208,14 @@ class Background:
     def __init__(self,
                     sequences, 
                     background_dict=None,
-                    compound_residues=compound_residues):
+                    compound_residues=COMPOUND_RESIDUES,
+                    position_specific=False,
+                    width=15,
+                    regular_expression=None,
+                    initial_background_size_limit=None,
+                    fast=False,
+                    center=False,
+                    precomputed=None):
         """
         Default background mode. Initialize from list of sequences.
 
@@ -961,6 +1225,10 @@ class Background:
         Returns:
             None
         """
+
+        # Set background construction method parameters.
+        self._position_specific = position_specific
+        self._fast = fast
 
         # Load single residue background frequencies from context.
         self._background_sequences = sequences
@@ -975,13 +1243,130 @@ class Background:
         self._alphabet = sorted(list(self.background_dict.keys()))
 
         # Pre-process compound residues if specified.
-        if compound_residues is not None:
+        self._compound_residues = compound_residues
+        if self._compound_residues is not None:
             self._background_dict.update(
                 self._generate_compound_residues(compound_residues)
             )
 
         # Generate background frequency vector.
         self._background_vector = self._vectorize_background()
+
+        # Generate positional background tensor.
+        if precomputed is not None:
+            self._background_df = pd.read_csv(
+                precomputed,
+                sep=',',
+                header=0
+            )
+        elif position_specific:
+            if fast:
+                self._generate_background_tensor_efficient(
+                    sequences,
+                    width,
+                    regular_expression,
+                    initial_background_size_limit
+                )
+            else:
+                self._generate_background_df(
+                    sequences,
+                    width,
+                    regular_expression,
+                    initial_background_size_limit,
+                    center
+                )
+            
+    def _generate_background_df(self,
+                                sequences,
+                                width,
+                                regular_expression,
+                                initial_background_size_limit,
+                                center):
+        """
+        Generates Pandas DataFrame containing aligned background
+            sequences from reference data set.
+
+        Parameters:
+            sequences -- List-like.
+            width -- Int.
+            regular_expression -- String.
+            initial_background_size_limit -- Int.
+
+        Returns:
+            None
+        """
+
+
+        self._background_df = sequences_to_df(
+            self.get_all_centered(sequences, width, regular_expression),
+            center=center
+        )
+
+    def _generate_background_tensor(self,
+                                    sequences,
+                                    width,
+                                    regular_expression,
+                                    initial_background_size_limit):
+        """
+        Generates background tensor as 3D NumPy array.
+
+        Parameters:
+            sequences -- List-like.
+            width -- Int.
+            regular_expression -- String.
+            initial_background_size_limit -- Int.
+
+        Returns:
+            None
+        """
+
+        # Load full background data set unless size limit specified.
+        if not initial_background_size_limit:
+            initial_background_size_limit = len(sequences)
+
+        self._background_tensor = vectorize_sequences(
+            sequences_to_df(
+                self.get_all_centered(sequences, width, regular_expression)
+            ),
+            self
+        )
+
+    def _generate_background_tensor_efficient(self,
+                                                sequences,
+                                                width,
+                                                regular_expression,
+                                                initial_background_size_limit):
+        """
+        NumPy-based background tensor generation solution.
+
+        Parameters:
+            sequences -- List-like.
+            width -- Int.
+            regular_expression -- String.
+            initial_background_size_limit -- Int.
+
+        Returns:
+            None
+        """
+
+        # Load full background data set unless size limit specified.
+        if not initial_background_size_limit:
+            initial_background_size_limit = len(sequences)
+
+        # Generate residue index dict for efficient lookup.
+        residue_dict = {residue: i for i, residue in enumerate(self._ordered_residues)}
+        self._background_tensor = sequences_to_df(
+            self.get_all_centered(sequences, width, regular_expression)
+        ).applymap(lambda x: residue_dict[x]).to_numpy(dtype=np.int8)
+
+        # Set compound residue constituents.
+
+        # Set compound residues based on simple residues.
+        if compound_residues is not None:
+            self._background_tensor[:, :, len(self._alphabet):] = np.inner(
+                self._background_tensor[:, :, :len(self._alphabet)],
+                background.compound_residue_matrix
+            )
 
     @classmethod
     def from_csv(cls, background_path):
@@ -1022,6 +1407,10 @@ class Background:
 
         return cls(None, background_dict=background_dict)
 
+    @property
+    def fast(self):
+        return self._fast
+    
     @property
     def background_sequences(self):
         """Get background sequences."""
@@ -1090,6 +1479,19 @@ class Background:
     @property
     def alphabet(self):
         return self._alphabet
+
+    @property
+    def background_tensor(self):
+        return self._background_tensor
+
+    @property
+    def background_df(self):
+        return self._background_df
+    
+
+    @property
+    def position_specific(self):
+        return self._position_specific
     
     def _calculate_percentage_frequencies(self, remove_ambiguous_residues=True):
         """
@@ -1134,7 +1536,6 @@ class Background:
                                         compound residue frequencies.
         """
 
-        self._compound_residues = compound_residues
         self._compound_residue_codes = sorted(list(compound_residues.keys()))
         
         self._compound_residue_frequencies = {}
@@ -1188,3 +1589,29 @@ class Background:
             dtype=np.float64)
         
         return background_frequency_vector
+
+    def get_all_centered(self, sequences, width, regular_expression=None):
+        """
+        Get all residue-centered sequences of specified width from context data set.
+        
+        Parameters:
+            context -- Pandas DataFrame.
+            residue -- String.
+            width -- Int.
+        
+        Returns:
+            centered_sequences -- List.
+        """
+        
+        if not regular_expression:
+            regular_expression = r'(?=(.{{{0}}}))'.format(width)
+        elif (len(regular_expression) == 1) and (regular_expression.isalpha()):
+            flanking_width = width // 2
+            residue_cases = regular_expression.lower() + regular_expression.upper()
+            regular_expression = r'(?=(.{{{0}}}[{1}].{{{0}}}))'.format(flanking_width, residue_cases)
+        
+        centered_sequences = []
+        for sequence in sequences:
+            centered_sequences += re.findall(regular_expression, sequence)
+        
+        return centered_sequences

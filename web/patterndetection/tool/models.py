@@ -61,6 +61,7 @@ class Job(models.Model):
 	positional_weighting = models.BooleanField(blank=True, default=True)
 	compound_residues = models.BooleanField(blank=True, default=True)
 	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
+	position_specific = models.BooleanField(blank=True, default=True)
 
 
 class ForegroundFormat(models.Model):
