@@ -65,46 +65,6 @@ def new_job(jobcode):
     else:
         terminal = None
 
-    # Currently only handling FASTA-formatted background.
-    if context_data:
-        # Load context sequences from uploaded FASTA.
-        context = sequences.import_fasta(
-            os.path.join(settings.MEDIA_ROOT, context_data.name)
-        )
-        # Generate new Background instance.
-        if compound_residues:
-            background = sequences.Background(
-                context['sequence'].tolist(),
-                width=width,
-                position_specific=position_specific
-            )
-        else:
-            background = sequences.Background(
-                context['sequence'].tolist(),
-                width=width,
-                position_specific=position_specific,
-                compound_residues=None
-            )
-    else:
-        # Load context from default Swiss-Prot copy.
-        context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
-        # Generate new Background instance.
-        if compound_residues:
-            background = sequences.Background(
-                context['sequence'].tolist(),
-                width=width,
-                position_specific=position_specific,
-                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
-            )
-        else:
-            background = sequences.Background(
-                context['sequence'].tolist(),
-                width=width,
-                position_specific=position_specific,
-                compound_residues=None,
-                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
-            )
-
     foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     
     # Set email login parameters.
@@ -119,6 +79,46 @@ def new_job(jobcode):
     msg['To'] = email
 
     try:
+        # Currently only handling FASTA-formatted background.
+        if context_data:
+            # Load context sequences from uploaded FASTA.
+            context = sequences.import_fasta(
+                os.path.join(settings.MEDIA_ROOT, context_data.name)
+            )
+            # Generate new Background instance.
+            if compound_residues:
+                background = sequences.Background(
+                    context['sequence'].tolist(),
+                    width=width,
+                    position_specific=position_specific
+                )
+            else:
+                background = sequences.Background(
+                    context['sequence'].tolist(),
+                    width=width,
+                    position_specific=position_specific,
+                    compound_residues=None
+                )
+        else:
+            # Load context from default Swiss-Prot copy.
+            context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
+            # Generate new Background instance.
+            if compound_residues:
+                background = sequences.Background(
+                    context['sequence'].tolist(),
+                    width=width,
+                    position_specific=position_specific,
+                    precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                )
+            else:
+                background = sequences.Background(
+                    context['sequence'].tolist(),
+                    width=width,
+                    position_specific=position_specific,
+                    compound_residues=None,
+                    precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
+                )
+
         # Load sequences from Job submission data set.
         if foreground_format == 1:
             # Load input sequences from prealigned txt file.
