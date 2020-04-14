@@ -119,7 +119,8 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
-    state = this.initial_state;
+    for (var k in this.initial_state) {
+      this.setState({ k: this.initial_state[k] });
 
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
