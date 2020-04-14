@@ -7,7 +7,7 @@ class JobForm extends Component {
     endpoint: PropTypes.string.isRequired
   };
   
-  state = {
+  initial_state = {
     title: "",
     description: "",
     email: "",
@@ -27,6 +27,8 @@ class JobForm extends Component {
     compound_residues: true,
     compound_residue_decomposition: true
   };
+
+  state = this.initial_state;
 
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
@@ -116,6 +118,8 @@ class JobForm extends Component {
     };
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
+    
+    state = this.initial_state;
 
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
