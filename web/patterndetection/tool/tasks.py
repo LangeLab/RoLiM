@@ -187,7 +187,7 @@ def new_job(jobcode):
         if width % 2 == 0:
             patterns.post_processing()
         else:
-            patterns.post_processing(proteolysis_data=False)            
+            patterns.post_processing(proteolysis_data=False)
 
         # Compress outputs as zip archive.
         shutil.make_archive(
@@ -211,12 +211,12 @@ def new_job(jobcode):
             encoders.encode_base64(p)
             p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
             msg.attach(p)
-    except:
+    except Exception as e:
         html = (
-            'Something went wrong with your analysis. Please check that '
-            + 'the options you selected match the format of your data, and that '
-            + 'the format of your data matches a format supported by our tool.'
-            + '\nThank you!'
+            'Something went wrong with your analysis:<br /><br />{}'.format(e)
+            + '<br /><br />Please check that the options you selected match the'
+            + ' format of your data, and that the format of your data matches a'
+            + ' format supported by our tool.<br /><br />Thank you!'
         )
         msg_body = MIMEText(html, 'html')
         msg.attach(msg_body)

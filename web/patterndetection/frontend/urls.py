@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = [
 	path('patterndetection/', views.index),
-	path('textfile/', views.prealigned_text_file),
-	path('peptidelist/', views.text_file_peptide_list),
+	path('pattern/textfile/', views.prealigned_text_file),
+	path('patterndetection/peptidelist/', views.text_file_peptide_list),
 ]

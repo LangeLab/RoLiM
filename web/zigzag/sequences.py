@@ -720,7 +720,7 @@ def generate_positions(center, num_positions):
     return positions
 
 
-def sequences_to_df(sequences, center=True, redundancy_level='none'):
+def sequences_to_df(sequences, center=False, redundancy_level='none'):
     """
     Split sequence strings to Pandas DataFrame with one column per
         position.
@@ -908,7 +908,8 @@ def import_maxquant_evidence(evidence_path,
 
 def expand_maxquant_evidence_sequences(evidence_df,
                                         context,
-                                        width=8,
+                                        width=15,
+                                        center=False,
                                         terminal='n',
                                         require_context_id=True):
     """
@@ -977,8 +978,8 @@ def fasta_to_sequences(fasta_df, center=False, redundancy_level='none'):
 def peptides_to_sample(peptides,
                         context,
                         background,
-                        center=True,
-                        width=8,
+                        center=False,
+                        width=15,
                         terminal='n',
                         redundancy_level='protein',
                         first_protein_only=True,
@@ -1033,8 +1034,8 @@ def peptides_to_sample(peptides,
 def load_fasta_peptides(peptide_fasta_path,
                         context,
                         background,
-                        center=True,
-                        width=8,
+                        center=False,
+                        width=15,
                         terminal='n',
                         require_context_id=True,
                         redundancy_level='protein',
@@ -1050,8 +1051,8 @@ def load_fasta_peptides(peptide_fasta_path,
 def load_peptide_list_file(peptide_list_path,
                             context,
                             background,
-                            center=True,
-                            width=8,
+                            center=False,
+                            width=15,
                             terminal='n',
                             require_context_id=True,
                             redundancy_level='protein',
@@ -1065,6 +1066,10 @@ def load_peptide_list_file(peptide_list_path,
         peptide_list_path -- String.
         context -- Pandas DataFrame.
         terminal -- String.
+        require_context_id -- Boolean.
+        redundancy_level -- String.
+        first_protein_only -- Boolean.
+        original_row_merge -- String.
 
     Returns:
         sample -- Sample instance.
@@ -1105,7 +1110,7 @@ def load_peptide_list_file(peptide_list_path,
 def load_peptide_list_field(peptide_list_field,
                             context,
                             background,
-                            width=8,
+                            width=15,
                             terminal='n',
                             require_context_id=True,
                             redundancy_level='protein',
@@ -1125,7 +1130,7 @@ def load_peptide_list_field(peptide_list_field,
 
 def load_prealigned_file(prealigned_file_path,
                             background,
-                            center=True,
+                            center=False,
                             redundancy_level='none'):
     """
     Top-level helper function to load pre-aligned sequences from text
@@ -1133,7 +1138,11 @@ def load_prealigned_file(prealigned_file_path,
     """
     
     with open(prealigned_file_path, 'r') as prealigned_file:
-        sequence_df = sequences_to_df(prealigned_file, center=center, redundancy_level='none')
+        sequence_df = sequences_to_df(
+            prealigned_file,
+            center=center,
+            redundancy_level=redundancy_level
+        )
     sequence_tensor = vectorize_sequences(sequence_df, background)
     sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
 

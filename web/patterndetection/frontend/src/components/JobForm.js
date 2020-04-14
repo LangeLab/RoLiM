@@ -21,7 +21,7 @@ class JobForm extends Component {
     fold_change_cutoff: 1.0,
     max_depth: "",
     width: 15,
-    center_sequences: true,
+    center_sequences: false,
     multiple_testing_correction: true,
     positional_weighting: true,
     compound_residues: true,
@@ -216,7 +216,7 @@ class JobForm extends Component {
                   value="1"
                   required
                 />
-                Prealigned text file (<a href='/peptidelist' download>Example</a>)
+                Prealigned text file (<a href='/patterndetection/peptidelist' download>Example</a>)
               </label>
             </div>
             {/*
@@ -240,7 +240,7 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value="3"
                 />
-                Text file peptide list (<a href='/textfile' download>Example</a>)
+                Text file peptide list (<a href='/patterndetection/textfile' download>Example</a>)
               </label>
             </div>
             {/*
