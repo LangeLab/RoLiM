@@ -117,8 +117,8 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
-    if (document.getElementById('textfile').checked) {
-      document.getElementById('textfile').checked = false;
+    if (document.getElementById('peptidelist').checked) {
+      document.getElementById('peptidelist').checked = false;
     }
     if (document.getElementById('prealigned').checked) {
       document.getElementById('prealigned').checked = false;
