@@ -119,6 +119,7 @@ class JobForm extends Component {
     
     this.setState({ ['title']: "" });
     this.setState({ ['email']: "" });
+    this.setState({ ['description']: "" });
     this.setState({ ['foreground_data']: "" });
     this.setState({ ['foregroundformat']: 1 });
     this.setState({ ['context_data']: "" });
