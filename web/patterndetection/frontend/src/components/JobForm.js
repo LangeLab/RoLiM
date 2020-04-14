@@ -49,7 +49,7 @@ class JobForm extends Component {
 
   handleUpload = e => {
     this.setState({ [e.target.name]: e.target.files[0] });
-    document.getElementById(e.target.name + "-text").textContent = "File selected.";
+    document.getElementById(e.target.name + "-text").textContent = e.target.files[0].name;
   };
   
   handleSubmit = e => {
@@ -157,13 +157,13 @@ class JobForm extends Component {
             </div>
           </div>
           <div className="field">
-            <label className="label">Title (10 characters max.)</label>
+            <label className="label">Title (20 characters max.)</label>
             <div className="control">
               <input
                 className="input"
                 type="text"
                 name="title"
-                maxlength="10"
+                maxlength="20"
                 onChange={this.handleChange}
                 value={title}
                 required

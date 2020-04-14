@@ -68,7 +68,9 @@ def new_job(jobcode):
     # Currently only handling FASTA-formatted background.
     if context_data:
         # Load context sequences from uploaded FASTA.
-        context = sequences.import_fasta(os.path.join(settings.MEDIA_ROOT, context_data.name))
+        context = sequences.import_fasta(
+            os.path.join(settings.MEDIA_ROOT, context_data.name)
+        )
         # Generate new Background instance.
         if compound_residues:
             background = sequences.Background(
@@ -112,7 +114,7 @@ def new_job(jobcode):
     
     # Generate new email message and specify details.
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = 'Pattern Detection Results'
+    msg['Subject'] = 'RoLiM Results: {}'.format(title)
     msg['From'] = username
     msg['To'] = email
 
