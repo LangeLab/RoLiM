@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import smtplib
 
@@ -215,7 +216,7 @@ def new_job(jobcode):
             msg.attach(p)
     except Exception as e:
         html = (
-            'Something went wrong with your analysis:<br /><br />{}'.format(e)
+            'Something went wrong with your analysis:<br /><br />{}'.format(re.escape(e))
             + '<br /><br />Please check that the options you selected match the'
             + ' format of your data, and that the format of your data matches a'
             + ' format supported by our tool.<br /><br />Thank you!'

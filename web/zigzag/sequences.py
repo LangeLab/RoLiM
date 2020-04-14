@@ -1267,7 +1267,7 @@ class Background:
         self._background_vector = self._vectorize_background()
 
         # Generate positional background tensor.
-        if precomputed is not None:
+        if  precomputed is not None:
             self._background_df = pd.read_csv(
                 precomputed,
                 sep=',',
