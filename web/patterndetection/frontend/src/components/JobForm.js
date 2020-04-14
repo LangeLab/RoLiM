@@ -6,8 +6,8 @@ class JobForm extends Component {
   static propTypes = {
     endpoint: PropTypes.string.isRequired
   };
-  
-  initial_state = {
+
+  state = {
     title: "",
     description: "",
     email: "",
@@ -27,8 +27,6 @@ class JobForm extends Component {
     compound_residues: true,
     compound_residue_decomposition: true
   };
-
-  state = this.initial_state;
 
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
@@ -119,9 +117,23 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
-    for (var k in this.initial_state) {
-      this.setState({ k: this.initial_state[k] });
-    }
+    this.setState({ ['title']: "" });
+    this.setState({ ['email']: "" });
+    this.setState({ ['foreground_data']: "" });
+    this.setState({ ['foregroundformat']: 1 });
+    this.setState({ ['context_data']: "" });
+    this.setState({ ['p_value_cutoff']: 0.001 });
+    this.setState({ ['contextformat']: "" });
+    this.setState({ ['position_specific']: true });
+    this.setState({ ['minimum_occurrences']: 20 });
+    this.setState({ ['fold_change_cutoff']: 1.0 });
+    this.setState({ ['max_depth']: "" });
+    this.setState({ ['width']: 15 });
+    this.setState({ ['center_sequences']: false });
+    this.setState({ ['multiple_testing_correction']: true });
+    this.setState({ ['positional_weighting']: true });
+    this.setState({ ['compound_residues']: true });
+    this.setState({ ['compound_residue_decomposition']: true });
 
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
