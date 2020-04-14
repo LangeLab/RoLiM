@@ -117,6 +117,18 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
+    if (document.getElementById('textfile').checked) {
+      document.getElementById('textfile').checked = false;
+    }
+    if (document.getElementById('prealigned').checked) {
+      document.getElementById('prealigned').checked = false;
+    }
+    if (this.state.foreground_data != "") {
+      document.getElementById("foreground_data-text").textContent = 'Choose a file...';
+    }
+    if (this.state.foreground_data != "") {
+      document.getElementById("context_data-text").textContent = 'Choose a file...';
+    }
     this.setState({ ['title']: "" });
     this.setState({ ['email']: "" });
     this.setState({ ['description']: "" });
@@ -231,6 +243,7 @@ class JobForm extends Component {
                 <input
                   type="radio"
                   name="foregroundformat"
+                  id="prealigned"
                   onChange={this.handleChange}
                   value="1"
                   required
@@ -256,6 +269,7 @@ class JobForm extends Component {
                 <input
                   type="radio"
                   name="foregroundformat"
+                  id="peptidelist"
                   onChange={this.handleChange}
                   value="3"
                 />
