@@ -69,7 +69,7 @@ def new_job(jobcode):
     else:
         terminal = None
 
-    foreground_file_name = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
+    foreground_path = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     
     # Set email login parameters.
     username = 'tsmithdmr@gmail.com'
@@ -127,21 +127,21 @@ def new_job(jobcode):
         if foreground_format == 1:
             # Load input sequences from prealigned txt file.
             sample = sequences.load_prealigned_file(
-                foreground_file_name,
+                foreground_path,
                 background,
                 center=center_sequences
             )
         elif foreground_format == 2:
             # Load input sequences from prealigned FASTA file.
             sample = sequences.load_prealigned_fasta(
-                foreground_file_name,
+                foreground_path,
                 background,
                 center=center_sequences
             )
         elif foreground_format == 3:
             # Load input sequences from txt peptide list.
             sample = sequences.load_peptide_list_file(
-                foreground_file_name,
+                foreground_path,
                 context,
                 background,
                 center=center_sequences,
@@ -151,7 +151,7 @@ def new_job(jobcode):
         elif foreground_format == 5:
             # Load input sequences from FASTA peptide list.
             sample = sequences.load_fasta_peptides(
-                foreground_file_name,
+                foreground_path,
                 context,
                 background,
                 center=center_sequences,
@@ -161,14 +161,14 @@ def new_job(jobcode):
         elif foreground_format == 6:
             # Load input sequences from text field.
             sample = sequences.load_prealigned_field(
-                foreground_file_name,
+                foreground_path,
                 background,
                 center=center_sequences
             )
         elif foreground_format == 7:
             # Load input sequences from MaxQuant evidence.txt.
             sample = sequences.load_maxquant_evidence_file(
-                foreground_file_name,
+                foreground_path,
                 context,
                 background,
                 width=width
@@ -176,8 +176,27 @@ def new_job(jobcode):
 
         output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
 
+        # Run pattern extraction analysis and generate outputs.
+        patterns = pattern_extraction.PatternContainer(
+            sample,
+            background,
+            title,
+            output_directory,
+            max_depth=max_depth,
+            p_value_cutoff=p_value_cutoff,
+            minimum_occurrences=minimum_occurrences,
+            fold_change_cutoff=fold_change_cutoff,
+            multiple_testing_correction=multiple_testing_correction,
+            positional_weighting=positional_weighting,
+            allow_compound_residue_decomposition=compound_residue_decomposition
+        )
+        if width % 2 == 0:
+            patterns.post_processing()
+        else:
+            patterns.post_processing(proteolysis_data=False)
+
         # Generate log file.
-        log_file_path = os.path.join(output_directory, 'log.txt')
+        log_file_path = os.path.join(output_directory, summary, 'log.txt')
         with open(log_file_path, 'w') as log_file:
             log_file.write('Title:  {}\n'.format(title))
             log_file.write('Description:  {}\n'.format(description))
@@ -217,26 +236,7 @@ def new_job(jobcode):
             log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
             log_file.write(
                 'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
-            )         
-
-        # Run pattern extraction analysis and generate outputs.
-        patterns = pattern_extraction.PatternContainer(
-            sample,
-            background,
-            title,
-            output_directory,
-            max_depth=max_depth,
-            p_value_cutoff=p_value_cutoff,
-            minimum_occurrences=minimum_occurrences,
-            fold_change_cutoff=fold_change_cutoff,
-            multiple_testing_correction=multiple_testing_correction,
-            positional_weighting=positional_weighting,
-            allow_compound_residue_decomposition=compound_residue_decomposition
-        )
-        if width % 2 == 0:
-            patterns.post_processing()
-        else:
-            patterns.post_processing(proteolysis_data=False)
+            )
 
         # Compress outputs as zip archive.
         shutil.make_archive(
