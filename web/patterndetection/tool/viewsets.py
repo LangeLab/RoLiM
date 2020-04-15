@@ -41,8 +41,10 @@ class JobViewSet(viewsets.ModelViewSet):
 			self.request.session['jobcodes'] = [self.jobcode]
 
 		# Save new job to database.
-		serializer.save(session_id=self.request.session.session_key,
-						jobcode=self.jobcode)
+		serializer.save(
+			session_id=self.request.session.session_key,
+			jobcode=self.jobcode
+		)
 
 		# Add job to task queue.
 		queue = django_rq.get_queue('default')

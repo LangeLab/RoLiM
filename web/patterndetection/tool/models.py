@@ -39,6 +39,9 @@ class Job(models.Model):
 	foregroundformat = models.ForeignKey('ForegroundFormat',
 											on_delete=models.CASCADE,
 											default=DEFAULT_DATAFORMAT)
+	foreground_filename = models.CharField(max_length=260,
+											blank=True,
+											default="")
 	context_data = models.FileField('Uploaded File',
 										upload_to=unique_filename,
 										blank=True,
@@ -46,6 +49,9 @@ class Job(models.Model):
 	contextformat = models.ForeignKey('ContextFormat',
 										on_delete=models.CASCADE,
 										default=DEFAULT_CONTEXTFORMAT)
+	context_filename = models.CharField(max_length=260,
+											blank=True,
+											default="")
 	p_value_cutoff = models.FloatField(default=DEFAULT_P_VALUE_CUTOFF)
 	minimum_occurrences = models.IntegerField(blank=True,
 												default=DEFAULT_MIN_OCCURRENCES)

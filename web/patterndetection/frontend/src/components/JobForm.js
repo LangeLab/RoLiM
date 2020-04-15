@@ -12,10 +12,12 @@ class JobForm extends Component {
     description: "",
     email: "",
     foreground_data: "",
-    foregroundformat:"1",
+    foregroundformat: "1",
+    foreground_filename: "",
     context_data: "",
-    p_value_cutoff: 0.001,
     contextformat: "",
+    context_filename: "",
+    p_value_cutoff: 0.001,
     position_specific: true,
     minimum_occurrences: 20,
     fold_change_cutoff: 1.0,
@@ -49,6 +51,9 @@ class JobForm extends Component {
 
   handleUpload = e => {
     this.setState({ [e.target.name]: e.target.files[0] });
+    this.setState({
+      [e.target.name.slice(0, [e.target.name].indexOf("_")) + "_filename"]: e.target.files[0].name
+    });
     document.getElementById(e.target.name + "-text").textContent = e.target.files[0].name;
   };
   
@@ -57,7 +62,9 @@ class JobForm extends Component {
     let formData = new FormData();
     formData.append('foreground_data', this.state.foreground_data);
     formData.append('foregroundformat', this.state.foregroundformat);
+    formData.append('foreground_filename', this.state.foreground_filename);
     formData.append('context_data', this.state.context_data);
+    formData.append('context_filename', this.state.context_filename);
     formData.append('title', this.state.title);
     formData.append('description', this.state.description);
     formData.append('email', this.state.email);
@@ -79,6 +86,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       context_data,
+      context_filename,
       p_value_cutoff,
       position_specific,
       minimum_occurrences,
@@ -97,6 +105,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       context_data,
+      context_filename,
       p_value_cutoff,
       position_specific,
       minimum_occurrences,
@@ -135,6 +144,7 @@ class JobForm extends Component {
     this.setState({ ['foreground_data']: "" });
     this.setState({ ['foregroundformat']: 1 });
     this.setState({ ['context_data']: "" });
+    this.setState({ ['context_filename']: "" });
     this.setState({ ['p_value_cutoff']: 0.001 });
     this.setState({ ['contextformat']: "" });
     this.setState({ ['position_specific']: true });
@@ -159,6 +169,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       context_data,
+      context_filename,
       p_value_cutoff,
       position_specific,
       minimum_occurrences,

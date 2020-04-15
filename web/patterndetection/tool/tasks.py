@@ -40,8 +40,11 @@ def new_job(jobcode):
     email = job.email
     title = job.title
     description = job.description
+    submitted = job.submitted
     foreground_format = job.foregroundformat_id
+    foreground_filename = job.foreground_filename
     context_format = job.contextformat_id
+    context_filename = job.context_filename
     p_value_cutoff = job.p_value_cutoff
     minimum_occurrences = job.minimum_occurrences
     fold_change_cutoff = job.fold_change_cutoff
@@ -172,6 +175,49 @@ def new_job(jobcode):
             )
 
         output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
+
+        # Generate log file.
+        log_file_path = os.path.join(output_directory, 'log.txt')
+        with open(log_file_path) as log_file:
+            log_file.write('Title:  {}\n'.format(title))
+            log_file.write('Description:  {}\n'.format(description))
+            log_file.write('Email:  {}\n'.format(email))
+            log_file.write('Submitted:  {}\n'.format(submitted))
+            log_file.write('Foreground file:  {}\n'.format(foreground_filename))
+            log_file.write(
+                'Foreground format:  {}\n'.format(
+                    ForegroundFormat.get(id=foreground_format)
+                )
+            )
+            log_file.write(
+                'Context file:  {}\n'.format(
+                    context_filename if context_filename
+                    else "Swiss-Prot human proteome"
+                )
+            )
+            log_file.write(
+                'Context format:  {}\n'.format(
+                    ContextFormat.get(id=context_format)
+                )
+            )
+            log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))
+            log_file.write('Minimum occurrences:  {}\n'.format(minimum_occurrences))
+            log_file.write('Fold change cutoff:  {}\n'.format(fold_change_cutoff))
+            log_file.write('Max depth:  {}\n'.format(max_depth))
+            log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
+            log_file.write('Extension direction:  {}\n'.format(extension_direction))
+            log_file.write('Width:  {}\n'.format(width))
+            log_file.write('Centered sequences:  {}\n'.format(center_sequences))
+            log_file.write(
+                'Multiple testing correction:  {}\n'.format(multiple_testing_correction)
+            )
+            log_file.write(
+                'Positional weighting:  {}\n'.format(positional_weighting)
+            )
+            log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
+            log_file.write(
+                'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
+            )         
 
         # Run pattern extraction analysis and generate outputs.
         patterns = pattern_extraction.PatternContainer(
