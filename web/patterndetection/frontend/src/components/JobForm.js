@@ -85,6 +85,7 @@ class JobForm extends Component {
       email,
       foreground_data,
       foregroundformat,
+      foreground_filename,
       context_data,
       context_filename,
       p_value_cutoff,
@@ -104,6 +105,7 @@ class JobForm extends Component {
       email,
       foreground_data,
       foregroundformat,
+      foreground_filename,
       context_data,
       context_filename,
       p_value_cutoff,
@@ -143,6 +145,7 @@ class JobForm extends Component {
     this.setState({ ['description']: "" });
     this.setState({ ['foreground_data']: "" });
     this.setState({ ['foregroundformat']: 1 });
+    this.setState({ ['foreground_filename']: "" });
     this.setState({ ['context_data']: "" });
     this.setState({ ['context_filename']: "" });
     this.setState({ ['p_value_cutoff']: 0.001 });
@@ -171,6 +174,7 @@ class JobForm extends Component {
       email,
       foreground_data,
       foregroundformat,
+      foreground_filename,
       context_data,
       context_filename,
       p_value_cutoff,
