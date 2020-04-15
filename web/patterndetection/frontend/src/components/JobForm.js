@@ -158,6 +158,9 @@ class JobForm extends Component {
     this.setState({ ['compound_residues']: true });
     this.setState({ ['compound_residue_decomposition']: true });
 
+    document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
+    advancedOptions.style.display = "none";
+
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
   

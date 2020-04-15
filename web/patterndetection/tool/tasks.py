@@ -178,7 +178,7 @@ def new_job(jobcode):
 
         # Generate log file.
         log_file_path = os.path.join(output_directory, 'log.txt')
-        with open(log_file_path) as log_file:
+        with open(log_file_path, 'w') as log_file:
             log_file.write('Title:  {}\n'.format(title))
             log_file.write('Description:  {}\n'.format(description))
             log_file.write('Email:  {}\n'.format(email))
