@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-from patterndetection.tool.models import Job
+from patterndetection.tool.models import Job, ForegroundFormat, ContextFormat
 from zigzag import sequences, pattern_extraction
 
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
@@ -205,7 +205,7 @@ def new_job(jobcode):
             log_file.write('Foreground file:  {}\n'.format(foreground_filename))
             log_file.write(
                 'Foreground format:  {}\n'.format(
-                    ForegroundFormat.get(id=foreground_format)
+                    ForegroundFormat.objects.get(id=foreground_format)
                 )
             )
             log_file.write(
@@ -216,7 +216,7 @@ def new_job(jobcode):
             )
             log_file.write(
                 'Context format:  {}\n'.format(
-                    ContextFormat.get(id=context_format)
+                    ContextFormat.objects.get(id=context_format)
                 )
             )
             log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))
