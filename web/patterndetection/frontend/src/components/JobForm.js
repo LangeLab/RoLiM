@@ -52,7 +52,7 @@ class JobForm extends Component {
   handleUpload = e => {
     this.setState({ [e.target.name]: e.target.files[0] });
     this.setState({
-      [e.target.name.slice(0, [e.target.name].indexOf("_")) + "_filename"]: e.target.files[0].name
+      [e.target.name.slice(0, e.target.name.indexOf("_")) + "_filename"]: e.target.files[0].name
     });
     document.getElementById(e.target.name + "-text").textContent = e.target.files[0].name;
   };
