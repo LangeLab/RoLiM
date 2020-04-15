@@ -196,7 +196,7 @@ def new_job(jobcode):
             patterns.post_processing(proteolysis_data=False)
 
         # Generate log file.
-        log_file_path = os.path.join(output_directory, summary, 'log.txt')
+        log_file_path = os.path.join(output_directory, 'summary', 'log.txt')
         with open(log_file_path, 'w') as log_file:
             log_file.write('Title:  {}\n'.format(title))
             log_file.write('Description:  {}\n'.format(description))
