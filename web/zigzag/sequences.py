@@ -1037,7 +1037,8 @@ def peptides_to_sample(peptides,
         first_protein_only=first_protein_only,
         original_row_merge=original_row_merge,
         original_sequences=original_sequences,
-        require_context_id=require_context_id
+        require_context_id=require_context_id,
+        precomputed=background.precomputed
     )
 
     sequence_df = sequences_to_df(
@@ -1264,6 +1265,8 @@ class Background:
             None
         """
 
+        self.precomputed = precomputed
+
         # Set background construction method parameters.
         self._position_specific = position_specific
         self._fast = fast
@@ -1291,9 +1294,9 @@ class Background:
         self._background_vector = self._vectorize_background()
 
         # Generate positional background tensor.
-        if  precomputed is not None:
+        if  self.precomputed is not None:
             self._background_df = pd.read_csv(
-                precomputed,
+                self.precomputed,
                 sep=',',
                 header=0
             )
