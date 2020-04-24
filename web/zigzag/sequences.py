@@ -16,7 +16,11 @@ RANDOM_STATE = np.random.RandomState(seed=777)
 DEFAULTS = os.path.join('..', 'media', 'defaults')
 
 PRECOMPUTED_PATHS = {
-    'swissprot_human': os.path.join(DEFAULTS, 'uniprot.fasta'),
+    'swissprot_human': [
+        os.path.join(DEFAULTS, 'swissprot_human_background_8.csv'),
+        os.path.join(DEFAULTS, 'swissprot_human_background_13.csv'),
+        os.path.join(DEFAULTS, 'swissprot_human_background_15.csv'),
+    ]
 }
 
 CompoundResidue = namedtuple(
@@ -405,7 +409,7 @@ def empty_position_vector(length, empty_position_value=0):
 
 
 def get_all_ids_from_context(context, precomputed):
-    if precomputed == PRECOMPUTED_PATHS['swissprot_human']:
+    if precomputed in PRECOMPUTED_PATHS['swissprot_human']:
         context_ids = context['swissprot_id'].tolist()
     else:
         context_ids = context['id'].tolist()
@@ -486,22 +490,22 @@ def align_sequences(context,
                 swissprot_ids = []
                 context_elements = []
                 for context_id in context_ids:
-                    if precomputed == PRECOMPUTED_PATHS['swissprot_human']:
-                        context_id = parse_swissprot_accession_number(context_id)
-                        if SWISSPROT_ACCESSION_PATTERN.match(context_id):
+                    if precomputed in PRECOMPUTED_PATHS['swissprot_human']:
+                        parsed_id = parse_swissprot_accession_number(context_id)
+                        if SWISSPROT_ACCESSION_PATTERN.match(parsed_id):
                             swissprot_sequences = context[
-                                context['swissprot_id'] == context_id
+                                context['swissprot_id'] == parsed_id
                             ]['sequence'].tolist()
                             num_sequences = len(swissprot_sequences)
                             if  num_sequences == 1:
-                                swissprot_ids.append(context_id)
+                                swissprot_ids.append(parsed_id)
                                 context_elements += swissprot_sequences
                                 if first_protein_only:
                                     break
                             elif num_sequences > 1:
                                 raise AssertionError(
                                     '{} was found more than one time in the proteome.'.format(
-                                        context_id
+                                        parsed_id
                                     )
                                 )
                     else:
