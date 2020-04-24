@@ -863,19 +863,11 @@ def import_peptide_list(peptide_list_file,
             context_id = row[1]
         except:
             context_id = None
-        if (
-            require_context_id
-            and ((context_id is None) or (len(context_id) == 0))
-        ):
-            continue
         sequence = row[0].upper()
         peptide_list.append([sequence, context_id])
 
     cols = ['sequence', 'context_id']
     peptide_list = pd.DataFrame(peptide_list, columns=cols)
-
-    if redundancy_level != 'none':
-        peptide_list.drop_duplicates(inplace=True)
 
     return peptide_list
 
