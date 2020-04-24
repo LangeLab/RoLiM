@@ -1657,7 +1657,7 @@ class PatternContainer:
             except FileExistsError:
                 pass
             summary_table_path = os.path.join(
-                output_directory,
+                self.output_directory,
                 self.title.replace(' ', '_') + '_summary_table.txt'
             )
             summary_table.to_csv(
