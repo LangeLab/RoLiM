@@ -58,6 +58,7 @@ def new_job(jobcode):
     compound_residues = job.compound_residues
     compound_residue_decomposition = job.compound_residue_decomposition
     position_specific = job.position_specific
+    require_context_id = job.require_context_id
 
     # Set terminal based on sequence extension direction.
     if extension_direction == 1:
@@ -146,7 +147,8 @@ def new_job(jobcode):
                 background,
                 center=center_sequences,
                 width=width,
-                terminal=terminal
+                terminal=terminal,
+                require_context_id=require_context_id
             )
         elif foreground_format == 5:
             # Load input sequences from FASTA peptide list.
@@ -156,7 +158,8 @@ def new_job(jobcode):
                 background,
                 center=center_sequences,
                 width=width,
-                terminal=terminal
+                terminal=terminal,
+                require_context_id=require_context_id
             )
         elif foreground_format == 6:
             # Load input sequences from text field.
@@ -205,7 +208,7 @@ def new_job(jobcode):
             log_file.write('Foreground file:  {}\n'.format(foreground_filename))
             log_file.write(
                 'Foreground format:  {}\n'.format(
-                    ForegroundFormat.objects.get(id=foreground_format)
+                    ForegroundFormat.objects.get(id=foreground_format).foreground_format
                 )
             )
             log_file.write(
@@ -216,7 +219,7 @@ def new_job(jobcode):
             )
             log_file.write(
                 'Context format:  {}\n'.format(
-                    ContextFormat.objects.get(id=context_format)
+                    ContextFormat.objects.get(id=context_format).context_format
                 )
             )
             log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))

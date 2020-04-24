@@ -29,6 +29,7 @@ class JobSerializer(serializers.ModelSerializer):
 			'positional_weighting',
 			'compound_residues',
 			'compound_residue_decomposition',
+			'require_context_id',
 		)
 		read_only_fields = ('submitted', 'completed',)
 		extra_kwargs = {
@@ -38,7 +39,8 @@ class JobSerializer(serializers.ModelSerializer):
 			'multiple_testing_correction': {'default': True, 'initial': True},
 			'positional_weighting': {'default': True, 'initial': True},
 			'compound_residues': {'default': True, 'initial': True},
-			'compound_residue_decomposition': {'default': True, 'initial': True}
+			'compound_residue_decomposition': {'default': True, 'initial': True},
+			'require_context_id': {'default': True, 'initial': True},
 		}
 
 

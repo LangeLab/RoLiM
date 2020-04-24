@@ -68,7 +68,7 @@ class Job(models.Model):
 	compound_residues = models.BooleanField(blank=True, default=True)
 	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
 	position_specific = models.BooleanField(blank=True, default=True)
-
+	require_context_id = models.BooleanField(blank=True, default=True)
 
 class ForegroundFormat(models.Model):
 	"""Supported foreground data set format options."""

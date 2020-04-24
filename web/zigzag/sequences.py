@@ -1,3 +1,4 @@
+import os
 import re
 import csv
 import io
@@ -11,6 +12,12 @@ import pandas as pd
 pd.set_option('max_colwidth', 1000000)
 
 RANDOM_STATE = np.random.RandomState(seed=777)
+
+DEFAULTS = os.path.join('..', 'media', 'defaults')
+
+PRECOMPUTED_PATHS = {
+    'swissprot_human': os.path.join(DEFAULTS, 'uniprot.fasta'),
+}
 
 CompoundResidue = namedtuple(
     'CompoundResidue',
@@ -397,6 +404,15 @@ def empty_position_vector(length, empty_position_value=0):
     return empty_position
 
 
+def get_all_ids_from_context(context, precomputed):
+    if precomputed == PRECOMPUTED_PATHS['swissprot_human']:
+        context_ids = context['swissprot_id'].tolist()
+    else:
+        context_ids = context['id'].tolist()
+
+    return context_ids
+
+
 def align_sequences(context,
                     sequences,
                     width=8,
@@ -405,7 +421,8 @@ def align_sequences(context,
                     first_protein_only=True,
                     original_row_merge='all',
                     original_sequences=None,
-                    require_context_id=True):
+                    require_context_id=True,
+                    precomputed=None):
     """
     Take unaligned sequences and context. Map unaligned sequences to
         context. Truncated prime segment to half width. Extend sequence
@@ -448,38 +465,53 @@ def align_sequences(context,
         try:
             context_ids = sequence['context_id'].replace(' ', '').split(';')  
         except:
-            context_elements = context['sequence'].tolist()
+            if require_context_id:
+                continue
+            else:
+                context_ids = get_all_ids_from_context(context, precomputed)
+                context_elements = context['sequence'].tolist()
+                first_protein_only = False
         else:
             # Currently only supporting protein accesssion ID lookup for
             # Swiss-Prot. Any other IDs will fail and revert to default
             # behavior of attempting to match sequence segment against
             # all context sequences.
             if (len(max(context_ids, key=len)) == 0) and not require_context_id:
-                swissprot_ids = context['swissprot_id'].tolist()
+                context_ids = get_all_ids_from_context(context, precomputed)
                 context_elements = context['sequence'].tolist()
+                first_protein_only = False
+            elif len(max(context_ids, key=len)) == 0:
+                continue
             else:
                 swissprot_ids = []
                 context_elements = []
                 for context_id in context_ids:
-                    """
-                    if context_id.startswith('sp|'):
-                        swissprot_ids.append(context_id)
-                        if first_protein_only == True:
-                            break
-                    elif SWISSPROT_ACCESSION_PATTERN.match(context_id):
-                        swissprot_ids.append(context_id)
-                        if first_protein_only == True:
-                            break
-                    """
-                    if SWISSPROT_ACCESSION_PATTERN.match(context_id):
-                        swissprot_sequences = context[
-                            context['swissprot_id'] == context_id
+                    if precomputed == PRECOMPUTED_PATHS['swissprot_human']:
+                        context_id = parse_swissprot_accession_number(context_id)
+                        if SWISSPROT_ACCESSION_PATTERN.match(context_id):
+                            swissprot_sequences = context[
+                                context['swissprot_id'] == context_id
+                            ]['sequence'].tolist()
+                            num_sequences = len(swissprot_sequences)
+                            if  num_sequences == 1:
+                                swissprot_ids.append(context_id)
+                                context_elements += swissprot_sequences
+                                if first_protein_only:
+                                    break
+                            elif num_sequences > 1:
+                                raise AssertionError(
+                                    '{} was found more than one time in the proteome.'.format(
+                                        context_id
+                                    )
+                                )
+                    else:
+                        context_sequences = context[
+                            context['id'] == context_id
                         ]['sequence'].tolist()
-                        num_sequences = len(swissprot_sequences)
-                        if  num_sequences == 1:
-                            swissprot_ids.append(context_id)
-                            context_elements += swissprot_sequences
-                            if first_protein_only == True:
+                        num_sequences = len(context_sequences)
+                        if num_sequences == 1:
+                            context_elements += context_sequences
+                            if first_protein_only:
                                 break
                         elif num_sequences > 1:
                             raise AssertionError(
@@ -487,15 +519,8 @@ def align_sequences(context,
                                     context_id
                                 )
                             )
-            """
-            # Get protein(s) matching peptide from context proteome.
-            if swissprot_ids:
-                context_elements = context[context['swissprot_id'].isin(
-                    swissprot_ids)]['sequence'].tolist()
-            else:
-                swissprot_ids = context['swissprot_id'].tolist()
-                context_elements = context['sequence'].tolist()
-            """
+                if len(swissprot_ids) > 0:
+                    context_ids = swissprot_ids
 
         # Regular expression matching of sequence to context.
         extended_sequences = {}
@@ -508,7 +533,7 @@ def align_sequences(context,
                 terminal
             )
             if matches.n_term or matches.c_term:
-                context_id = swissprot_ids[j]
+                context_id = context_ids[j]
                 extended_sequences[context_id] = ExtendedSequences(
                     n_term=set(),
                     c_term=set()
@@ -835,10 +860,13 @@ def import_peptide_list(peptide_list_file,
     peptide_reader = csv.reader(peptide_list_file, delimiter=delimiter)
     for row in peptide_reader:    
         try:
-            context_id = parse_swissprot_accession_number(row[1])
+            context_id = row[1]
         except:
             context_id = None
-        if require_context_id and not context_id:
+        if (
+            require_context_id
+            and ((context_id is None) or (len(context_id) == 0))
+        ):
             continue
         sequence = row[0].upper()
         peptide_list.append([sequence, context_id])

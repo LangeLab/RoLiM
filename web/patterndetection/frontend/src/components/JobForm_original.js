@@ -27,8 +27,7 @@ class JobForm extends Component {
     multiple_testing_correction: true,
     positional_weighting: true,
     compound_residues: true,
-    compound_residue_decomposition: true,
-    require_context_id: true,
+    compound_residue_decomposition: true
   };
 
   handleChange = e => {
@@ -79,7 +78,6 @@ class JobForm extends Component {
     formData.append('positional_weighting', this.state.positional_weighting);
     formData.append('compound_residues', this.state.compound_residues);
     formData.append('compound_residue_decomposition', this.state.compound_residue_decomposition);
-    formData.append('require_context_id', this.state.require_context_id);
 
     const {
       title,
@@ -99,8 +97,7 @@ class JobForm extends Component {
       multiple_testing_correction,
       positional_weighting,
       compound_residues,
-      compound_residue_decomposition,
-      require_context_id
+      compound_residue_decomposition
     } = this.state;
     const job = {
       title,
@@ -120,8 +117,7 @@ class JobForm extends Component {
       multiple_testing_correction,
       positional_weighting,
       compound_residues,
-      compound_residue_decomposition,
-      require_context_id
+      compound_residue_decomposition
     };
     const csrftoken = getCookie('csrftoken');
     const conf = {
@@ -164,7 +160,6 @@ class JobForm extends Component {
     this.setState({ ['positional_weighting']: true });
     this.setState({ ['compound_residues']: true });
     this.setState({ ['compound_residue_decomposition']: true });
-    this.setState({ ['require_context_id']: true });
 
     document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
     advancedOptions.style.display = "none";
@@ -191,8 +186,7 @@ class JobForm extends Component {
       multiple_testing_correction,
       positional_weighting,
       compound_residues,
-      compound_residue_decomposition,
-      require_context_id
+      compound_residue_decomposition
     } = this.state;
     return (
       <div className="column">
@@ -272,7 +266,7 @@ class JobForm extends Component {
                   value="1"
                   required
                 />
-                Prealigned text file (<a href='/patterndetection/textfile' download>Example</a>)
+                Prealigned text file (<a href='/patterndetection/peptidelist' download>Example</a>)
               </label>
             </div>
             {/*
@@ -297,7 +291,7 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value="3"
                 />
-                Text file peptide list (<a href='/patterndetection/peptidelist' download>Example</a>)
+                Text file peptide list (<a href='/patterndetection/textfile' download>Example</a>)
               </label>
             </div>
             {/*
@@ -362,7 +356,7 @@ class JobForm extends Component {
                     value={center_sequences}
                     checked={center_sequences}
                   />
-                  Center sequence position numbers around central residue?
+                  Center sequences?
                 </label>
               </div>
             </div>
@@ -433,20 +427,6 @@ class JobForm extends Component {
                     checked={position_specific}
                   />
                   Position specific background?
-                </label>
-              </div>
-            </div>
-            <div className="field">
-              <div className="control">
-                <label className="checkbox">
-                  <input
-                    type="checkbox"
-                    name="require_context_id"
-                    onChange={this.handleCheckboxChange}
-                    value={require_context_id}
-                    checked={require_context_id}
-                  />
-                  Require protein identifier?
                 </label>
               </div>
             </div>
