@@ -785,15 +785,13 @@ def parse_swissprot_accession_number(identifier):
         swissprot_accession_number -- String.
     """
 
-    swissprot_accession_number = ';'.join(
-        [identifier[match.start():match.end()]
-            for match
-            in re.finditer(
-                SWISSPROT_ACCESSION_PATTERN,
-                identifier
-            )
-        ]
-    )
+    swissprot_accession_number = [
+        identifier[match.start():match.end()]
+        for match in re.finditer(
+            SWISSPROT_ACCESSION_PATTERN,
+            identifier
+        )
+    ][0]
 
     return swissprot_accession_number
 
