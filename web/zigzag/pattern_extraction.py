@@ -1619,7 +1619,7 @@ class PatternContainer:
             # Match aligned sequences to detected patterns.
             pattern_rows = []
             for i, row in self.sample.original_sequences.iterrows():
-                if np.isnan(row['aligned_sequence'].isna()):
+                if np.isnan(row['aligned_sequence']):
                     pattern_rows.append([np.nan] * len(self.pattern_list))
                 else:
                     matching_patterns = []

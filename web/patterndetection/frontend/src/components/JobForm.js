@@ -362,7 +362,6 @@ class JobForm extends Component {
                     value={center_sequences}
                     checked={center_sequences}
                   />
-                  Center sequence position numbers around central residue?
                 </label>
               </div>
             </div>
