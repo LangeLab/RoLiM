@@ -1658,6 +1658,7 @@ class PatternContainer:
                 pass
             summary_table_path = os.path.join(
                 self.output_directory,
+                'summary',
                 self.title.replace(' ', '_') + '_summary_table.txt'
             )
             summary_table.to_csv(
