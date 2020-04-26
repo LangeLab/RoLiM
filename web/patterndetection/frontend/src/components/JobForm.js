@@ -4,7 +4,7 @@ import getCookie from "./utils";
 
 function HelpText(props) {
   return (
-    <span className="icon is-small" onClick={() => alert(this.props.text)}>
+    <span className="icon is-small" onClick={() => alert(props.text)}>
       <i className="fa fa-question"></i>
     </span>
   );
