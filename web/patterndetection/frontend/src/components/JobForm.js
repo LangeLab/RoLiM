@@ -375,10 +375,10 @@ class JobForm extends Component {
                     value={center_sequences}
                     checked={center_sequences}
                   />
-                  Center sequence position numbers? <HelpText text={
+                </label>
+                Center sequence position numbers? <HelpText text={
                     "For example:\n\nCentered:"
                     + "p4-p3-p2-p1-p1'-p2'-p3'-p4\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8-p9-p10-p11-p12-p13-p14-p15\n"} />
-                </label>
               </div>
             </div>
             <div className="field">
@@ -391,11 +391,11 @@ class JobForm extends Component {
                     value={compound_residues}
                     checked={compound_residues}
                   />
-                  Detect compound residue groups? <HelpText text={
+                </label>
+                Detect compound residue groups? <HelpText text={
                     "Enables aggregation of single amino"
                     + " acids into groups of biochemically and/or structurally similar amino acids which"
                     + " may be cumulatively enriched.\n"} />
-                </label>
               </div>
             </div>
             <div className="field">
