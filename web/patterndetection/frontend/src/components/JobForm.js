@@ -8,9 +8,9 @@ function HelpText(props) {
   };
 
   return (
-    <span className="icon is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>
+    <button className="button is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>
       <i className="fa fa-question"></i>
-    </span>
+    </button>
   );
 }
 
