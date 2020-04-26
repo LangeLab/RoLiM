@@ -3,11 +3,9 @@ import PropTypes from "prop-types";
 import getCookie from "./utils";
 
 function HelpText(props) {
-  render() {
-    return (
+  return (
       <button onClick={() => alert(props.text)}>?</button>
     );
-  }
 }
 
 class JobForm extends Component {
