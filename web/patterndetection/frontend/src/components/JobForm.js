@@ -453,10 +453,10 @@ class JobForm extends Component {
                   />
                   Position specific background? <HelpText text={
                     "Enables background frequency calculation"
-                    + "from a complete, position-specific background derived from the context data set used for"
-                    + "an analysis. When disabled, background frequency are averaged across all posiitons of the"
-                    + "context data set and dynamically updated when position/residue pairs are eliminated from"
-                    + "the foreground data set."} />
+                    + " from a complete, position-specific background derived from the context data set used for"
+                    + " an analysis. When disabled, background frequency are averaged across all posiitons of the"
+                    + " context data set and dynamically updated when position/residue pairs are eliminated from"
+                    + " the foreground data set."} />
                 </label>
               </div>
             </div>
@@ -472,8 +472,8 @@ class JobForm extends Component {
                   />
                   Require protein identifier? <HelpText text={
                     "Require a protein identifier for each foreground"
-                    + "sequence. Foreground protein identifiers must match the format of protein identifiers used"
-                    + "in the context data set."} />
+                    + " sequence. Foreground protein identifiers must match the format of protein identifiers used"
+                    + " in the context data set."} />
                 </label>
               </div>
             </div>
@@ -482,7 +482,7 @@ class JobForm extends Component {
               <label className="label">
                 P-value threshold. <HelpText text={
                   "The p-value corresponding to the frequency of a position/residue pair must be below this threshold"
-                  + "in order to be considered significantly enriched."} />
+                  + " in order to be considered significantly enriched."} />
               </label>
               <div className="control">
                 <input
@@ -498,7 +498,7 @@ class JobForm extends Component {
               <label className="label">
                 Minimum occurrences <HelpText text={
                   "The minimum frequency of a position/residue pair in the foreground data set"
-                  + "required for the pair to be considered enriched."} />
+                  + " required for the pair to be considered enriched."} />
               </label>
               <div className="control">
                 <input
@@ -514,7 +514,7 @@ class JobForm extends Component {
               <label className="label">
                 Fold difference cutoff <HelpText text={
                   "The minimum fold difference of position/residue pair in the foreground data set"
-                  + "vs. the background data set required for the pair to be considered enriched."} />
+                  + " vs. the background data set required for the pair to be considered enriched."} />
               </label>
               <div className="control">
                 <input
@@ -530,7 +530,7 @@ class JobForm extends Component {
               <label className="label">
                 Enter desired width of expanded sequences. <HelpText text={
                   "The number of residues in each sequence of the foreground data set. Every sequences included"
-                  + "in the foreground data set MUST contain the same number of residues."} />
+                  + " in the foreground data set MUST contain the same number of residues."} />
               </label>
               <div className="control">
                 <input
