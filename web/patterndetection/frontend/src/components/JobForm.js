@@ -5,7 +5,7 @@ import getCookie from "./utils";
 function HelpText(props) {
   const iconStyleOverride = {
     float: 'right',
-    paddingLeft: '50%',
+    paddingLeft: '10px',
   };
 
   return (
