@@ -2,6 +2,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import getCookie from "./utils";
 
+function HelpText(props) {
+  render() {
+    return (
+      <button onClick={() => alert(props.text)}>?</button>
+    );
+  }
+}
+
 class JobForm extends Component {
   static propTypes = {
     endpoint: PropTypes.string.isRequired
@@ -362,7 +370,7 @@ class JobForm extends Component {
                     value={center_sequences}
                     checked={center_sequences}
                   />
-                  Center sequence position numbers around central residue?
+                  Center sequence position numbers? <HelpText text="For example:\n\nCentered: p4-p3-p2-p1-p1'-p2'-p3'-p4\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8" />
                 </label>
               </div>
             </div>

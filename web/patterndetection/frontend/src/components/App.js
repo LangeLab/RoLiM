@@ -6,6 +6,7 @@ import JobForm from "./JobForm";
 
 const App = () => (
   <React.Fragment>
+  	<h1>RoLiM</h1>
   	<JobForm endpoint="/api/job/" />
   </React.Fragment>
 );
