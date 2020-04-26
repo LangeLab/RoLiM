@@ -368,7 +368,9 @@ class JobForm extends Component {
                     value={center_sequences}
                     checked={center_sequences}
                   />
-                  Center sequence position numbers? <HelpText text="For example:\n\nCentered: p4-p3-p2-p1-p1'-p2'-p3'-p4\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8" />
+                  Center sequence position numbers? <HelpText text={
+                    "For example:\n\nCentered:"
+                    + "p4-p3-p2-p1-p1'-p2'-p3'-p4\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8"} />
                 </label>
               </div>
             </div>
@@ -382,7 +384,10 @@ class JobForm extends Component {
                     value={compound_residues}
                     checked={compound_residues}
                   />
-                  Detect compound residue groups?
+                  Detect compound residue groups? <HelpText text={
+                    "Enables aggregation of single amino"
+                    + "acids into groups of biochemically and/or structurally similar amino acids which"
+                    + "may be cumulatively enriched."} />
                 </label>
               </div>
             </div>
@@ -396,7 +401,10 @@ class JobForm extends Component {
                     value={compound_residue_decomposition}
                     checked={compound_residue_decomposition}
                   />
-                  Enable compound residue decomposition?
+                  Enable compound residue decomposition? <HelpText text={
+                    "Enables decomposition of enriched"
+                    + "compound positional residue groups into subsets composed of the constituents of the compound"
+                    + "residue group (e.g. [RK] -> [R, K])"} />
                 </label>
               </div>
             </div>
@@ -410,7 +418,9 @@ class JobForm extends Component {
                     value={multiple_testing_correction}
                     checked={multiple_testing_correction}
                   />
-                  Enable multiple testing correction?
+                  Enable multiple testing correction? <HelpText text={
+                    "Enables optional Bonferroni correction"
+                    + "for positional residue p-values."} />
                 </label>
               </div>
             </div>
@@ -424,7 +434,10 @@ class JobForm extends Component {
                     value={positional_weighting}
                     checked={positional_weighting}
                   />
-                  Enable positional weighting?
+                  Enable positional weighting? <HelpText text={
+                    "Enables optional positional weighting term in"
+                    + "positional residue enrichment calculation. Positional weight is calculated as"
+                    + "(1 / # distinct residues in a position)."} />
                 </label>
               </div>
             </div>
@@ -438,7 +451,12 @@ class JobForm extends Component {
                     value={position_specific}
                     checked={position_specific}
                   />
-                  Position specific background?
+                  Position specific background? <HelpText text={
+                    "Enables background frequency calculation"
+                    + "from a complete, position-specific background derived from the context data set used for"
+                    + "an analysis. When disabled, background frequency are averaged across all posiitons of the"
+                    + "context data set and dynamically updated when position/residue pairs are eliminated from"
+                    + "the foreground data set."} />
                 </label>
               </div>
             </div>
@@ -452,13 +470,20 @@ class JobForm extends Component {
                     value={require_context_id}
                     checked={require_context_id}
                   />
-                  Require protein identifier?
+                  Require protein identifier? <HelpText text={
+                    "Require a protein identifier for each foreground"
+                    + "sequence. Foreground protein identifiers must match the format of protein identifiers used"
+                    + "in the context data set."} />
                 </label>
               </div>
             </div>
             <br />
             <div className="field">
-              <label className="label">P-value threshold.</label>
+              <label className="label">
+                P-value threshold. <HelpText text={
+                  "The p-value corresponding to the frequency of a position/residue pair must be below this threshold"
+                  + "in order to be considered significantly enriched."} />
+              </label>
               <div className="control">
                 <input
                   className="input"
@@ -470,7 +495,11 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">Minimum occurrences</label>
+              <label className="label">
+                Minimum occurrences <HelpText text={
+                  "The minimum frequency of a position/residue pair in the foreground data set"
+                  + "required for the pair to be considered enriched."} />
+              </label>
               <div className="control">
                 <input
                   className="input"
@@ -482,7 +511,11 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">Fold change cutoff</label>
+              <label className="label">
+                Fold difference cutoff <HelpText text={
+                  "The minimum fold difference of position/residue pair in the foreground data set"
+                  + "vs. the background data set required for the pair to be considered enriched."} />
+              </label>
               <div className="control">
                 <input
                   className="input"
@@ -494,7 +527,11 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">Enter desired width of expanded sequences.</label>
+              <label className="label">
+                Enter desired width of expanded sequences. <HelpText text={
+                  "The number of residues in each sequence of the foreground data set. Every sequences included"
+                  + "in the foreground data set MUST contain the same number of residues."} />
+              </label>
               <div className="control">
                 <input
                   className="input"

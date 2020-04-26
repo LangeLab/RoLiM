@@ -6,7 +6,8 @@ import JobForm from "./JobForm";
 
 const App = () => (
   <React.Fragment>
-  	<h1>RoLiM</h1>
+  	<h1>RoLiM: Rpbust detection of linear motifs in sequence data.</h1>
+  	<br />
   	<JobForm endpoint="/api/job/" />
   </React.Fragment>
 );
