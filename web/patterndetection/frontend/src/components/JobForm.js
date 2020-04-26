@@ -386,8 +386,8 @@ class JobForm extends Component {
                   />
                   Detect compound residue groups? <HelpText text={
                     "Enables aggregation of single amino"
-                    + "acids into groups of biochemically and/or structurally similar amino acids which"
-                    + "may be cumulatively enriched."} />
+                    + " acids into groups of biochemically and/or structurally similar amino acids which"
+                    + " may be cumulatively enriched."} />
                 </label>
               </div>
             </div>
@@ -403,8 +403,8 @@ class JobForm extends Component {
                   />
                   Enable compound residue decomposition? <HelpText text={
                     "Enables decomposition of enriched"
-                    + "compound positional residue groups into subsets composed of the constituents of the compound"
-                    + "residue group (e.g. [RK] -> [R, K])"} />
+                    + " compound positional residue groups into subsets composed of the constituents of the compound"
+                    + " residue group (e.g. [RK] -> [R, K])"} />
                 </label>
               </div>
             </div>
@@ -420,7 +420,7 @@ class JobForm extends Component {
                   />
                   Enable multiple testing correction? <HelpText text={
                     "Enables optional Bonferroni correction"
-                    + "for positional residue p-values."} />
+                    + " for positional residue p-values."} />
                 </label>
               </div>
             </div>
@@ -436,8 +436,8 @@ class JobForm extends Component {
                   />
                   Enable positional weighting? <HelpText text={
                     "Enables optional positional weighting term in"
-                    + "positional residue enrichment calculation. Positional weight is calculated as"
-                    + "(1 / # distinct residues in a position)."} />
+                    + " positional residue enrichment calculation. Positional weight is calculated as"
+                    + " (1 / # distinct residues in a position)."} />
                 </label>
               </div>
             </div>
