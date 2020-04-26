@@ -3,8 +3,13 @@ import PropTypes from "prop-types";
 import getCookie from "./utils";
 
 function HelpText(props) {
+  const iconStyleOverride = {
+    float: 'right',
+    padding-left: '50%',
+  };
+
   return (
-    <span className="icon is-small" style={{float: 'right', padding-left: '50%'}} onClick={() => alert(props.text)}>
+    <span className="icon is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>
       <i className="fa fa-question"></i>
     </span>
   );
