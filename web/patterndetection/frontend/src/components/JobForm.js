@@ -492,7 +492,7 @@ class JobForm extends Component {
             </div>
             <br />
             <div className="field">
-              <label className="label">
+              <label className="checkbox">
                 P-value threshold.
               </label>
               <HelpText text={
@@ -509,7 +509,7 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">
+              <label className="checkbox">
                 Minimum occurrences
               </label>
               <HelpText text={
@@ -526,7 +526,7 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">
+              <label className="checkbox">
                 Fold difference cutoff
               </label>
               <HelpText text={
@@ -543,7 +543,7 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="label">
+              <label className="checkbox">
                 Enter desired width of expanded sequences.
               </label>
               <HelpText text={
