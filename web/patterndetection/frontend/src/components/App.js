@@ -6,7 +6,7 @@ import JobForm from "./JobForm";
 
 const App = () => (
   <div>
-  	<div>
+  	<div className="container">
   		<h1 class="title">RoLiM</h1>
   		<h2 class="subtitle">Robust detection of linear motifs in sequence data.</h2>
   	</div>
