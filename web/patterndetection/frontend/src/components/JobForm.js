@@ -5,12 +5,11 @@ import getCookie from "./utils";
 function HelpText(props) {
   const iconStyleOverride = {
     float: 'right',
+    fontWeight: 'bold',
   };
 
   return (
-    <button className="button is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>
-      <i className="fa fa-question"></i>
-    </button>
+    <button className="button is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>?</button>
   );
 }
 
