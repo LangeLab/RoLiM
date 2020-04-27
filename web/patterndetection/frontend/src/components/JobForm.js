@@ -542,12 +542,13 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="checkbox">
+              <label className="checkbox staticclass">
                 Enter desired width of expanded sequences.
               </label>
               <HelpText text={
-                  "The number of residues in each sequence of the foreground data set. Every sequences included"
-                  + " in the foreground data set MUST contain the same number of residues.\n"} />
+                  "The number of residues in each aligned sequence of the foreground data set. If peptides are"
+                  + " supplied and extension/alignment is enabled, this is the final length of each extended and aligned sequence."
+                  + " If pre-aligned sequences are supplied, each supplied sequence MUST be of this length.\n"} />
               <div className="control">
                 <input
                   className="input"
