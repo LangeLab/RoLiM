@@ -542,7 +542,7 @@ class JobForm extends Component {
               </div>
             </div>
             <div className="field">
-              <label className="checkbox staticclass">
+              <label className="checkbox">
                 Enter desired width of expanded sequences.
               </label>
               <HelpText text={

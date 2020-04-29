@@ -5,8 +5,8 @@ import Table from "./Table";
 import JobForm from "./JobForm";
 
 const App = () => (
-  <div>
-  	<div className="container">
+  <div className="container">
+  	<div>
   		<h1 class="title">RoLiM</h1>
   		<h2 class="subtitle">Robust detection of linear motifs in sequence data.</h2>
   	</div>
