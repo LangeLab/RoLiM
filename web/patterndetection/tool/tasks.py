@@ -108,20 +108,35 @@ def new_job(jobcode):
             # Load context from default Swiss-Prot copy.
             context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
             # Generate new Background instance.
-            if compound_residues:
-                background = sequences.Background(
-                    context['sequence'].tolist(),
-                    width=width,
-                    position_specific=position_specific,
-                    precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+            try:
+                if compound_residues:
+                    background = sequences.Background(
+                        context['sequence'].tolist(),
+                        width=width,
+                        position_specific=position_specific,
+                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                    )
+                else:
+                    background = sequences.Background(
+                        context['sequence'].tolist(),
+                        width=width,
+                        position_specific=position_specific,
+                        compound_residues=None,
+                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
                 )
-            else:
-                background = sequences.Background(
-                    context['sequence'].tolist(),
-                    width=width,
-                    position_specific=position_specific,
-                    compound_residues=None,
-                    precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
+            except:
+                if compound_residues:
+                    background = sequences.Background(
+                        context['sequence'].tolist(),
+                        width=width,
+                        position_specific=position_specific
+                    )
+                else:
+                    background = sequences.Background(
+                        context['sequence'].tolist(),
+                        width=width,
+                        position_specific=position_specific,
+                        compound_residues=None
                 )
 
         # Load sequences from Job submission data set.
@@ -193,7 +208,7 @@ def new_job(jobcode):
             positional_weighting=positional_weighting,
             allow_compound_residue_decomposition=compound_residue_decomposition
         )
-        if width % 2 == 0:
+        if width == 8:
             patterns.post_processing()
         else:
             patterns.post_processing(proteolysis_data=False)
