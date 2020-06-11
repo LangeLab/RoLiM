@@ -91,6 +91,10 @@ def new_job(jobcode):
 
     # Generate log file.
     log_file_directory = os.path.join(output_directory, 'summary')
+    try:
+        os.makedirs(log_file_directory)
+    except:
+        pass
     log_file_path = os.path.join(log_file_directory, 'log.txt')
     with open(log_file_path, 'w') as log_file:
         log_file.write('Title:  {}\n'.format(title))
