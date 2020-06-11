@@ -311,8 +311,17 @@ def new_job(jobcode):
         except Exception as e:
             raise ParameterException() from e
     except Exception as e:
+        exception_type = type(e).__name__
+        if exception_type == 'ContextException':
+            exception_message = 'the format and contents of the context file you selected'
+        elif exception_type == 'ForegroundException':
+            exception_message = 'the format and contents of the foreground file you provided'
+        elif exception_message == 'ParameterException':
+            exception_message = 'that the parameters you provided are consistent with your data'
+
         html = (
-            'Something went wrong with your analysis:<br /><br />{}'.format(traceback.format_exc())
+            'Something went wrong with your analysis. Please check {}:<br /><br />{}'.format(
+                traceback.format_exc())
             + '<br /><br />Please check that the options you selected match the'
             + ' format of your data, and that the format of your data matches a'
             + ' format supported by our tool.<br /><br />Thank you!'
