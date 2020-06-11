@@ -1,4 +1,5 @@
 import os
+import traceback
 import re
 import shutil
 import smtplib
@@ -120,10 +121,11 @@ def new_job(jobcode):
         )
         log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))
         log_file.write('Minimum occurrences:  {}\n'.format(minimum_occurrences))
-        log_file.write('Fold change cutoff:  {}\n'.format(fold_change_cutoff))
+        log_file.write('Fold difference cutoff:  {}\n'.format(fold_change_cutoff))
         log_file.write('Max depth:  {}\n'.format(max_depth))
         log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
         log_file.write('Extension direction:  {}\n'.format(extension_direction))
+        log_file.write('Require protein identifiers:  {}\n').format(require_context_id)
         log_file.write('Width:  {}\n'.format(width))
         log_file.write('Centered sequences:  {}\n'.format(center_sequences))
         log_file.write(
@@ -132,6 +134,7 @@ def new_job(jobcode):
         log_file.write(
             'Positional weighting:  {}\n'.format(positional_weighting)
         )
+        log_file.write('Position specific background:  {}\n').format(position_specific)
         log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
         log_file.write(
             'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
@@ -292,7 +295,7 @@ def new_job(jobcode):
     
     except Exception as e:
         html = (
-            'Something went wrong with your analysis:<br /><br />{}'.format(e)
+            'Something went wrong with your analysis:<br /><br />{}'.format(traceback.format_exc)
             + '<br /><br />Please check that the options you selected match the'
             + ' format of your data, and that the format of your data matches a'
             + ' format supported by our tool.<br /><br />Thank you!'
@@ -303,7 +306,10 @@ def new_job(jobcode):
             p = MIMEBase('application', 'octet-stream')
             p.set_payload((attachment).read())
             encoders.encode_base64(p)
-            p.add_header('Content-Disposition', "attachment; filename= %s" % log_file_path)
+            p.add_header(
+                'Content-Disposition',
+                "attachment; filename= %s" % os.path.basename(log_file_path)
+            )
             msg.attach(p)
 
     # Start SMTP session using TLS security and login to Gmail

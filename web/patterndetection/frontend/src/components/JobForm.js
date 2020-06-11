@@ -331,7 +331,7 @@ class JobForm extends Component {
           <br />
           <div className="field">
               <label className="checkbox">
-                Enter desired width of expanded sequences.
+                Enter desired width of expanded sequences. (MEROPS comparison only supported for width-8 sequences)
               </label>
               <HelpText text={
                   "The number of residues in each aligned sequence of the foreground data set. If peptides are"
