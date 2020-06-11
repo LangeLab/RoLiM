@@ -17,6 +17,15 @@ DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
 
 
+class ContextException(Exception): pass
+
+
+class ForegroundException(Exception): pass
+
+
+class ParameterException(Exception): pass
+
+
 def new_job(jobcode):
     """
     Process and run job from user submission.
@@ -141,47 +150,14 @@ def new_job(jobcode):
         )
 
     try:
-        # Currently only handling FASTA-formatted background.
-        if context_data:
-            # Load context sequences from uploaded FASTA.
-            context = sequences.import_fasta(
-                os.path.join(settings.MEDIA_ROOT, context_data.name)
-            )
-            # Generate new Background instance.
-            if compound_residues:
-                background = sequences.Background(
-                    context['sequence'].tolist(),
-                    width=width,
-                    position_specific=position_specific
+        try:
+            # Currently only handling FASTA-formatted background.
+            if context_data:
+                # Load context sequences from uploaded FASTA.
+                context = sequences.import_fasta(
+                    os.path.join(settings.MEDIA_ROOT, context_data.name)
                 )
-            else:
-                background = sequences.Background(
-                    context['sequence'].tolist(),
-                    width=width,
-                    position_specific=position_specific,
-                    compound_residues=None
-                )
-        else:
-            # Load context from default Swiss-Prot copy.
-            context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
-            # Generate new Background instance.
-            try:
-                if compound_residues:
-                    background = sequences.Background(
-                        context['sequence'].tolist(),
-                        width=width,
-                        position_specific=position_specific,
-                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
-                    )
-                else:
-                    background = sequences.Background(
-                        context['sequence'].tolist(),
-                        width=width,
-                        position_specific=position_specific,
-                        compound_residues=None,
-                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
-                )
-            except:
+                # Generate new Background instance.
                 if compound_residues:
                     background = sequences.Background(
                         context['sequence'].tolist(),
@@ -194,105 +170,146 @@ def new_job(jobcode):
                         width=width,
                         position_specific=position_specific,
                         compound_residues=None
+                    )
+            else:
+                # Load context from default Swiss-Prot copy.
+                context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
+                # Generate new Background instance.
+                try:
+                    if compound_residues:
+                        background = sequences.Background(
+                            context['sequence'].tolist(),
+                            width=width,
+                            position_specific=position_specific,
+                            precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                        )
+                    else:
+                        background = sequences.Background(
+                            context['sequence'].tolist(),
+                            width=width,
+                            position_specific=position_specific,
+                            compound_residues=None,
+                            precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                    )
+                except:
+                    if compound_residues:
+                        background = sequences.Background(
+                            context['sequence'].tolist(),
+                            width=width,
+                            position_specific=position_specific
+                        )
+                    else:
+                        background = sequences.Background(
+                            context['sequence'].tolist(),
+                            width=width,
+                            position_specific=position_specific,
+                            compound_residues=None
+                    )
+        except Exception as e:
+            raise ContextException() from e
+
+        try:
+            # Load sequences from Job submission data set.
+            if foreground_format == 1:
+                # Load input sequences from prealigned txt file.
+                sample = sequences.load_prealigned_file(
+                    foreground_path,
+                    background,
+                    center=center_sequences
                 )
+            elif foreground_format == 2:
+                # Load input sequences from prealigned FASTA file.
+                sample = sequences.load_prealigned_fasta(
+                    foreground_path,
+                    background,
+                    center=center_sequences
+                )
+            elif foreground_format == 3:
+                # Load input sequences from txt peptide list.
+                sample = sequences.load_peptide_list_file(
+                    foreground_path,
+                    context,
+                    background,
+                    center=center_sequences,
+                    width=width,
+                    terminal=terminal,
+                    require_context_id=require_context_id
+                )
+            elif foreground_format == 5:
+                # Load input sequences from FASTA peptide list.
+                sample = sequences.load_fasta_peptides(
+                    foreground_path,
+                    context,
+                    background,
+                    center=center_sequences,
+                    width=width,
+                    terminal=terminal,
+                    require_context_id=require_context_id
+                )
+            elif foreground_format == 6:
+                # Load input sequences from text field.
+                sample = sequences.load_prealigned_field(
+                    foreground_path,
+                    background,
+                    center=center_sequences
+                )
+            elif foreground_format == 7:
+                # Load input sequences from MaxQuant evidence.txt.
+                sample = sequences.load_maxquant_evidence_file(
+                    foreground_path,
+                    context,
+                    background,
+                    width=width
+                )
+        except Exception as e:
+            raise ForegroundException() from e
 
-        # Load sequences from Job submission data set.
-        if foreground_format == 1:
-            # Load input sequences from prealigned txt file.
-            sample = sequences.load_prealigned_file(
-                foreground_path,
+        try:
+            # Run pattern extraction analysis and generate outputs.
+            patterns = pattern_extraction.PatternContainer(
+                sample,
                 background,
-                center=center_sequences
+                title,
+                output_directory,
+                max_depth=max_depth,
+                p_value_cutoff=p_value_cutoff,
+                minimum_occurrences=minimum_occurrences,
+                fold_change_cutoff=fold_change_cutoff,
+                multiple_testing_correction=multiple_testing_correction,
+                positional_weighting=positional_weighting,
+                allow_compound_residue_decomposition=compound_residue_decomposition
             )
-        elif foreground_format == 2:
-            # Load input sequences from prealigned FASTA file.
-            sample = sequences.load_prealigned_fasta(
-                foreground_path,
-                background,
-                center=center_sequences
-            )
-        elif foreground_format == 3:
-            # Load input sequences from txt peptide list.
-            sample = sequences.load_peptide_list_file(
-                foreground_path,
-                context,
-                background,
-                center=center_sequences,
-                width=width,
-                terminal=terminal,
-                require_context_id=require_context_id
-            )
-        elif foreground_format == 5:
-            # Load input sequences from FASTA peptide list.
-            sample = sequences.load_fasta_peptides(
-                foreground_path,
-                context,
-                background,
-                center=center_sequences,
-                width=width,
-                terminal=terminal,
-                require_context_id=require_context_id
-            )
-        elif foreground_format == 6:
-            # Load input sequences from text field.
-            sample = sequences.load_prealigned_field(
-                foreground_path,
-                background,
-                center=center_sequences
-            )
-        elif foreground_format == 7:
-            # Load input sequences from MaxQuant evidence.txt.
-            sample = sequences.load_maxquant_evidence_file(
-                foreground_path,
-                context,
-                background,
-                width=width
+            if width == 8:
+                patterns.post_processing()
+            else:
+                patterns.post_processing(proteolysis_data=False)
+
+            # Compress outputs as zip archive.
+            archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
+            zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, archive_name)
+            shutil.make_archive(
+                zip_path,
+                'zip',
+                os.path.join(settings.MEDIA_ROOT, jobcode),
+                'results'
             )
 
-        # Run pattern extraction analysis and generate outputs.
-        patterns = pattern_extraction.PatternContainer(
-            sample,
-            background,
-            title,
-            output_directory,
-            max_depth=max_depth,
-            p_value_cutoff=p_value_cutoff,
-            minimum_occurrences=minimum_occurrences,
-            fold_change_cutoff=fold_change_cutoff,
-            multiple_testing_correction=multiple_testing_correction,
-            positional_weighting=positional_weighting,
-            allow_compound_residue_decomposition=compound_residue_decomposition
-        )
-        if width == 8:
-            patterns.post_processing()
-        else:
-            patterns.post_processing(proteolysis_data=False)
-
-        # Compress outputs as zip archive.
-        archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
-        zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, archive_name)
-        shutil.make_archive(
-            zip_path,
-            'zip',
-            os.path.join(settings.MEDIA_ROOT, jobcode),
-            'results'
-        )
-
-        # Prepare email.
-        html = 'Please find attached, the results of your pattern detection analysis.'
-        msg_body = MIMEText(html, 'html')
-        msg.attach(msg_body)
-        
-        # Attach results archive to email message.
-        zip_filename = zip_path + '.zip'
-        zip_basename = os.path.basename(zip_filename)
-        with open(zip_filename, 'rb') as attachment:
-            p = MIMEBase('application', 'octet-stream')
-            p.set_payload((attachment).read())
-            encoders.encode_base64(p)
-            p.add_header('Content-Disposition', "attachment; filename= %s" % zip_basename)
-            msg.attach(p)
-    
+            # Prepare email.
+            html = 'Please find attached, the results of your pattern detection analysis.'
+            msg_body = MIMEText(html, 'html')
+            msg.attach(msg_body)
+            
+            # Attach results archive to email message.
+            zip_filename = zip_path + '.zip'
+            zip_basename = os.path.basename(zip_filename)
+            with open(zip_filename, 'rb') as attachment:
+                p = MIMEBase('application', 'octet-stream')
+                p.set_payload((attachment).read())
+                encoders.encode_base64(p)
+                p.add_header('Content-Disposition', "attachment; filename= %s" % zip_basename)
+                msg.attach(p)
+        except Exception as e:
+            raise ParameterException() from e
     except Exception as e:
         html = (
             'Something went wrong with your analysis:<br /><br />{}'.format(traceback.format_exc())
