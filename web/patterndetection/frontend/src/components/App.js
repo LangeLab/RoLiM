@@ -6,10 +6,11 @@ import JobForm from "./JobForm";
 
 const App = () => (
   <div className="container">
-  	<div>
-  		<h1 class="title">RoLiM</h1>
-  		<h2 class="subtitle">Robust detection of linear motifs in sequence data.</h2>
-  	</div>
+  	<header>
+  		<h1 class="title"><a href="https://langelab.med.ubc.ca/">Lange Lab</a></h1>
+  		<h2 class="title">RoLiM</h2>
+  		<h3 class="subtitle">Robust detection of linear motifs in sequence data.</h3>
+  	</header>
   	<br />
   	<JobForm endpoint="/api/job/" />
   </div>

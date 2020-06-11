@@ -9,7 +9,7 @@ function HelpText(props) {
   };
 
   return (
-    <button className="button is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>?</button>
+    <button type="button" className="button is-small" style={iconStyleOverride} onClick={() => alert(props.text)}>?</button>
   );
 }
 
@@ -40,6 +40,7 @@ class JobForm extends Component {
     compound_residues: true,
     compound_residue_decomposition: true,
     require_context_id: true,
+    extension_direction: "1"
   };
 
   handleChange = e => {
@@ -91,6 +92,7 @@ class JobForm extends Component {
     formData.append('compound_residues', this.state.compound_residues);
     formData.append('compound_residue_decomposition', this.state.compound_residue_decomposition);
     formData.append('require_context_id', this.state.require_context_id);
+    formData.append('extension_direction', this.state.extension_direction);
 
     const {
       title,
@@ -111,7 +113,8 @@ class JobForm extends Component {
       positional_weighting,
       compound_residues,
       compound_residue_decomposition,
-      require_context_id
+      require_context_id,
+      extension_direction
     } = this.state;
     const job = {
       title,
@@ -132,7 +135,8 @@ class JobForm extends Component {
       positional_weighting,
       compound_residues,
       compound_residue_decomposition,
-      require_context_id
+      require_context_id,
+      extension_direction
     };
     const csrftoken = getCookie('csrftoken');
     const conf = {
@@ -176,6 +180,7 @@ class JobForm extends Component {
     this.setState({ ['compound_residues']: true });
     this.setState({ ['compound_residue_decomposition']: true });
     this.setState({ ['require_context_id']: true });
+    this.setState({ ['extension_direction']: 1 });
 
     document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
     advancedOptions.style.display = "none";
@@ -203,7 +208,8 @@ class JobForm extends Component {
       positional_weighting,
       compound_residues,
       compound_residue_decomposition,
-      require_context_id
+      require_context_id,
+      extension_direction
     } = this.state;
     return (
       <div className="column">
@@ -286,19 +292,6 @@ class JobForm extends Component {
                 Prealigned text file (<a href='/patterndetection/textfile' download>Example</a>)
               </label>
             </div>
-            {/*
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="foregroundformat"
-                  onChange={this.handleChange}
-                  value="2"
-                />
-                Prealigned FASTA file
-              </label>
-            </div>
-            */}
             <div>
               <label>
                 <input
@@ -311,30 +304,6 @@ class JobForm extends Component {
                 Text file peptide list (<a href='/patterndetection/peptidelist' download>Example</a>)
               </label>
             </div>
-            {/*
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="foregroundformat"
-                  onChange={this.handleChange}
-                  value="4"
-                />
-                FASTA peptide list
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="foregroundformat"
-                  onChange={this.handleChange}
-                  value="6"
-                />
-                MaxQuant "evidence.txt" file
-              </label>
-            </div>
-            */}
           </div>
           <br />
           <div className="field">
@@ -358,6 +327,25 @@ class JobForm extends Component {
                 </span>
               </div>
             </label>
+          </div>
+          <br />
+          <div className="field">
+              <label className="checkbox">
+                Enter desired width of expanded sequences.
+              </label>
+              <HelpText text={
+                  "The number of residues in each aligned sequence of the foreground data set. If peptides are"
+                  + " supplied and extension/alignment is enabled, this is the final length of each extended and aligned sequence."
+                  + " If pre-aligned sequences are supplied, each supplied sequence MUST be of this length.\n"} />
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  name="width"
+                  onChange={this.handleChange}
+                  value={width}
+                />
+              </div>
           </div>
           <br />
           <h5 id="advanced-options-header" className="title is-5" onClick={this.toggleAdvancedOptions}>Advanced options &#9650;</h5>
@@ -489,6 +477,46 @@ class JobForm extends Component {
                     + " in the context data set.\n"} />
               </div>
             </div>
+            <div>
+            <label className="label">Select sequence extension direction.</label>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="extension_direction"
+                  id="nextension"
+                  onChange={this.handleChange}
+                  value="1"
+                  required
+                />
+                N-terminal
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="extension_direction"
+                  id="cextension"
+                  onChange={this.handleChange}
+                  value="2"
+                />
+                C-terminal
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="extension_direction"
+                  id="bothextension"
+                  onChange={this.handleChange}
+                  value="3"
+                />
+                Both
+              </label>
+            </div>
+          </div>
             <br />
             <div className="field">
               <label className="checkbox">
@@ -538,24 +566,7 @@ class JobForm extends Component {
                   name="fold_change_cutoff"
                   onChange={this.handleChange}
                   value={fold_change_cutoff}
-                />
-              </div>
-            </div>
-            <div className="field">
-              <label className="checkbox">
-                Enter desired width of expanded sequences.
-              </label>
-              <HelpText text={
-                  "The number of residues in each aligned sequence of the foreground data set. If peptides are"
-                  + " supplied and extension/alignment is enabled, this is the final length of each extended and aligned sequence."
-                  + " If pre-aligned sequences are supplied, each supplied sequence MUST be of this length.\n"} />
-              <div className="control">
-                <input
-                  className="input"
-                  type="text"
-                  name="width"
-                  onChange={this.handleChange}
-                  value={width}
+                  min="1"
                 />
               </div>
             </div>

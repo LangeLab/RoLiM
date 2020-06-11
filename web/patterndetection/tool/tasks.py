@@ -83,6 +83,51 @@ def new_job(jobcode):
     msg['From'] = username
     msg['To'] = email
 
+    output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
+
+    # Generate log file.
+    log_file_path = os.path.join(output_directory, 'summary', 'log.txt')
+    with open(log_file_path, 'w') as log_file:
+        log_file.write('Title:  {}\n'.format(title))
+        log_file.write('Description:  {}\n'.format(description))
+        log_file.write('Email:  {}\n'.format(email))
+        log_file.write('Submitted:  {}\n'.format(submitted))
+        log_file.write('Foreground file:  {}\n'.format(foreground_filename))
+        log_file.write(
+            'Foreground format:  {}\n'.format(
+                ForegroundFormat.objects.get(id=foreground_format).foreground_format
+            )
+        )
+        log_file.write(
+            'Context file:  {}\n'.format(
+                context_filename if context_filename
+                else "Swiss-Prot human proteome"
+            )
+        )
+        log_file.write(
+            'Context format:  {}\n'.format(
+                ContextFormat.objects.get(id=context_format).context_format
+            )
+        )
+        log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))
+        log_file.write('Minimum occurrences:  {}\n'.format(minimum_occurrences))
+        log_file.write('Fold change cutoff:  {}\n'.format(fold_change_cutoff))
+        log_file.write('Max depth:  {}\n'.format(max_depth))
+        log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
+        log_file.write('Extension direction:  {}\n'.format(extension_direction))
+        log_file.write('Width:  {}\n'.format(width))
+        log_file.write('Centered sequences:  {}\n'.format(center_sequences))
+        log_file.write(
+            'Multiple testing correction:  {}\n'.format(multiple_testing_correction)
+        )
+        log_file.write(
+            'Positional weighting:  {}\n'.format(positional_weighting)
+        )
+        log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
+        log_file.write(
+            'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
+        )
+
     try:
         # Currently only handling FASTA-formatted background.
         if context_data:
@@ -192,8 +237,6 @@ def new_job(jobcode):
                 width=width
             )
 
-        output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
-
         # Run pattern extraction analysis and generate outputs.
         patterns = pattern_extraction.PatternContainer(
             sample,
@@ -213,52 +256,11 @@ def new_job(jobcode):
         else:
             patterns.post_processing(proteolysis_data=False)
 
-        # Generate log file.
-        log_file_path = os.path.join(output_directory, 'summary', 'log.txt')
-        with open(log_file_path, 'w') as log_file:
-            log_file.write('Title:  {}\n'.format(title))
-            log_file.write('Description:  {}\n'.format(description))
-            log_file.write('Email:  {}\n'.format(email))
-            log_file.write('Submitted:  {}\n'.format(submitted))
-            log_file.write('Foreground file:  {}\n'.format(foreground_filename))
-            log_file.write(
-                'Foreground format:  {}\n'.format(
-                    ForegroundFormat.objects.get(id=foreground_format).foreground_format
-                )
-            )
-            log_file.write(
-                'Context file:  {}\n'.format(
-                    context_filename if context_filename
-                    else "Swiss-Prot human proteome"
-                )
-            )
-            log_file.write(
-                'Context format:  {}\n'.format(
-                    ContextFormat.objects.get(id=context_format).context_format
-                )
-            )
-            log_file.write('P-value cutoff:  {}\n'.format(p_value_cutoff))
-            log_file.write('Minimum occurrences:  {}\n'.format(minimum_occurrences))
-            log_file.write('Fold change cutoff:  {}\n'.format(fold_change_cutoff))
-            log_file.write('Max depth:  {}\n'.format(max_depth))
-            log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
-            log_file.write('Extension direction:  {}\n'.format(extension_direction))
-            log_file.write('Width:  {}\n'.format(width))
-            log_file.write('Centered sequences:  {}\n'.format(center_sequences))
-            log_file.write(
-                'Multiple testing correction:  {}\n'.format(multiple_testing_correction)
-            )
-            log_file.write(
-                'Positional weighting:  {}\n'.format(positional_weighting)
-            )
-            log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
-            log_file.write(
-                'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
-            )
-
         # Compress outputs as zip archive.
+        archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
+        zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, archive_name)
         shutil.make_archive(
-            output_directory,
+            zip_path,
             'zip',
             os.path.join(settings.MEDIA_ROOT, jobcode),
             'results'
@@ -270,14 +272,14 @@ def new_job(jobcode):
         msg.attach(msg_body)
         
         # Attach results archive to email message.
-        filename = 'results.zip'
-        zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, 'results.zip')
-        with open(zip_path, 'rb') as attachment:
+        zip_filename = zip_path + '.zip'
+        with open(zip_filename, 'rb') as attachment:
             p = MIMEBase('application', 'octet-stream')
             p.set_payload((attachment).read())
             encoders.encode_base64(p)
-            p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+            p.add_header('Content-Disposition', "attachment; filename= %s" % zip_filename)
             msg.attach(p)
+    
     except Exception as e:
         html = (
             'Something went wrong with your analysis:<br /><br />{}'.format(e)
@@ -287,6 +289,12 @@ def new_job(jobcode):
         )
         msg_body = MIMEText(html, 'html')
         msg.attach(msg_body)
+        with open(log_file_path, 'rb') as attachment:
+            p = MIMEBase('application', 'octet-stream')
+            p.set_payload((attachment).read())
+            encoders.encode_base64(p)
+            p.add_header('Content-Disposition', "attachment; filename= %s" % log_file_path)
+            msg.attach(p)
 
     # Start SMTP session using TLS security and login to Gmail
     server = smtplib.SMTP('smtp.gmail.com', 587)

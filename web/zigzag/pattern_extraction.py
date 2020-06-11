@@ -285,7 +285,7 @@ def generate_merops_heatmap(pattern_container, position_labels):
     protease_pattern_heatmap_title = (
         pattern_container.title + ' - Protease Pattern Matches (Percent Positions Matched)'
     )
-    output_prefix = pattern_container.title.replace(" ", "_")
+    output_prefix = re.sub(r'\W+', ' ', pattern_container.title).strip().replace(" ", "_")
     # Set output path for absolute frequency protease pattern heat map.
     protease_pattern_heatmap_output_path = (
         pattern_container.output_directory
