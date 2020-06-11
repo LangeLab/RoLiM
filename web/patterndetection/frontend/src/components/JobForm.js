@@ -487,6 +487,7 @@ class JobForm extends Component {
                   id="nextension"
                   onChange={this.handleChange}
                   value="1"
+                  checked="checked"
                   required
                 />
                 N-terminal

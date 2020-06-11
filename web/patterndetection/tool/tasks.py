@@ -282,7 +282,7 @@ def new_job(jobcode):
         
         # Attach results archive to email message.
         zip_filename = zip_path + '.zip'
-        zip_basename = os.basename(zip_filename)
+        zip_basename = os.path.basename(zip_filename)
         with open(zip_filename, 'rb') as attachment:
             p = MIMEBase('application', 'octet-stream')
             p.set_payload((attachment).read())
