@@ -179,7 +179,7 @@ def new_job(jobcode):
                         width=width,
                         position_specific=position_specific,
                         compound_residues=None,
-                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background.csv_{}'.format(width))
+                        precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
                 )
             except:
                 if compound_residues:
