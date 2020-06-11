@@ -282,11 +282,12 @@ def new_job(jobcode):
         
         # Attach results archive to email message.
         zip_filename = zip_path + '.zip'
+        zip_basename = os.basename(zip_filename)
         with open(zip_filename, 'rb') as attachment:
             p = MIMEBase('application', 'octet-stream')
             p.set_payload((attachment).read())
             encoders.encode_base64(p)
-            p.add_header('Content-Disposition', "attachment; filename= %s" % zip_filename)
+            p.add_header('Content-Disposition', "attachment; filename= %s" % zip_basename)
             msg.attach(p)
     
     except Exception as e:
