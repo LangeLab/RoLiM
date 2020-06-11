@@ -84,6 +84,10 @@ def new_job(jobcode):
     msg['To'] = email
 
     output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
+    try:
+        os.makedirs(output_directory)
+    except:
+        pass
 
     # Generate log file.
     log_file_path = os.path.join(output_directory, 'summary', 'log.txt')

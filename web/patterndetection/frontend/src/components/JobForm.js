@@ -23,7 +23,7 @@ class JobForm extends Component {
     description: "",
     email: "",
     foreground_data: "",
-    foregroundformat: "1",
+    foregroundformat: 1,
     foreground_filename: "",
     context_data: "",
     contextformat: "",
@@ -40,7 +40,7 @@ class JobForm extends Component {
     compound_residues: true,
     compound_residue_decomposition: true,
     require_context_id: true,
-    extension_direction: "1"
+    extension_direction: 1,
   };
 
   handleChange = e => {
