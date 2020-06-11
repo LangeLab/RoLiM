@@ -125,7 +125,7 @@ def new_job(jobcode):
         log_file.write('Max depth:  {}\n'.format(max_depth))
         log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
         log_file.write('Extension direction:  {}\n'.format(extension_direction))
-        log_file.write('Require protein identifiers:  {}\n').format(require_context_id)
+        log_file.write('Require protein identifiers:  {}\n'.format(require_context_id))
         log_file.write('Width:  {}\n'.format(width))
         log_file.write('Centered sequences:  {}\n'.format(center_sequences))
         log_file.write(
@@ -134,7 +134,7 @@ def new_job(jobcode):
         log_file.write(
             'Positional weighting:  {}\n'.format(positional_weighting)
         )
-        log_file.write('Position specific background:  {}\n').format(position_specific)
+        log_file.write('Position specific background:  {}\n'.format(position_specific))
         log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
         log_file.write(
             'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
