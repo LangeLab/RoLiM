@@ -710,7 +710,7 @@ class JobForm extends Component {
                       id="sequence"
                       onChange={this.handleChange}
                       value="3"
-                      checked={tihs.state.redundancylevel == 3}
+                      checked={this.state.redundancylevel == 3}
                     />
                     Sequence
                   </label>
