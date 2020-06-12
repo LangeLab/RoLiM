@@ -23,7 +23,7 @@ class JobForm extends Component {
     description: "",
     email: "",
     foreground_data: "",
-    foregroundformat: 1,
+    foregroundformat: "",
     foreground_filename: "",
     contextformat: 2,
     context_data: "",
@@ -186,7 +186,7 @@ class JobForm extends Component {
     this.setState({ ['email']: "" });
     this.setState({ ['description']: "" });
     this.setState({ ['foreground_data']: "" });
-    this.setState({ ['foregroundformat']: 1 });
+    this.setState({ ['foregroundformat']: "" });
     this.setState({ ['foreground_filename']: "" });
     this.setState({ ['contextformat']: 2 });
     this.setState({ ['context_data']: "" });
@@ -251,7 +251,7 @@ class JobForm extends Component {
             <div className="control">
               <input
                 className="input"
-                type="text"
+                type="email"
                 name="email"
                 onChange={this.handleChange}
                 value={email}
@@ -318,6 +318,7 @@ class JobForm extends Component {
                   id="prealigned"
                   onChange={this.handleChange}
                   value="1"
+                  checked={foregroundformat == 1}
                   required
                 />
                 Prealigned text file (<a href='/patterndetection/textfile' download>Example</a>)
@@ -331,6 +332,7 @@ class JobForm extends Component {
                   id="peptidelist"
                   onChange={this.handleChange}
                   value="3"
+                  checked={foregroundformat == 3}
                 />
                 Text file peptide list (<a href='/patterndetection/peptidelist' download>Example</a>)
               </label>
@@ -347,7 +349,7 @@ class JobForm extends Component {
                   id="swissprot-human"
                   onChange={this.handleChange}
                   value="2"
-                  checked="checked"
+                  checked={contextformat == 2}
                   required
                 />
                 Swiss-Prot Human
@@ -361,6 +363,7 @@ class JobForm extends Component {
                   id="swissprot-mouse"
                   onChange={this.handleChange}
                   value="3"
+                  checked={contextformat == 3}
                 />
                 Swiss-Prot Mouse
               </label>
@@ -373,6 +376,7 @@ class JobForm extends Component {
                   id="fasta"
                   onChange={this.handleChange}
                   value="1"
+                  checked={contextformat == 1}
                 />
                 Other (uploaded FASTA file)
               </label>
@@ -413,10 +417,11 @@ class JobForm extends Component {
               <div className="control">
                 <input
                   className="input"
-                  type="text"
+                  type="number"
                   name="width"
                   onChange={this.handleChange}
                   value={width}
+                  min="1"
                 />
               </div>
           </div>
@@ -566,7 +571,7 @@ class JobForm extends Component {
                     id="nextension"
                     onChange={this.handleChange}
                     value="1"
-                    checked="checked"
+                    checked={extension_direction == 1}
                     required
                   />
                   N-terminal
@@ -580,6 +585,7 @@ class JobForm extends Component {
                     id="cextension"
                     onChange={this.handleChange}
                     value="2"
+                    checked={extension_direction == 2}
                   />
                   C-terminal
                 </label>
@@ -592,6 +598,7 @@ class JobForm extends Component {
                     id="bothextension"
                     onChange={this.handleChange}
                     value="3"
+                    checked={extension_direction == 3}
                   />
                   Both
                 </label>
@@ -608,10 +615,12 @@ class JobForm extends Component {
             <div className="control">
               <input
                 className="input"
-                type="text"
+                type="number"
                 name="p_value_cutoff"
                 onChange={this.handleChange}
                 value={p_value_cutoff}
+                min="0"
+                max="1"
               />
             </div>
           </div>
@@ -625,10 +634,11 @@ class JobForm extends Component {
             <div className="control">
               <input
                 className="input"
-                type="text"
+                type="number"
                 name="minimum_occurrences"
                 onChange={this.handleChange}
                 value={minimum_occurrences}
+                min=1
               />
             </div>
           </div>
@@ -642,7 +652,7 @@ class JobForm extends Component {
               <div className="control">
                 <input
                   className="input"
-                  type="text"
+                  type="number"
                   name="fold_change_cutoff"
                   onChange={this.handleChange}
                   value={fold_change_cutoff}
@@ -683,7 +693,7 @@ class JobForm extends Component {
                       id="none"
                       onChange={this.handleChange}
                       value="1"
-                      checked={this.state.redundancylevel == 1}
+                      checked={redundancylevel == 1}
                       required
                     />
                     None
@@ -697,7 +707,7 @@ class JobForm extends Component {
                       id="protein"
                       onChange={this.handleChange}
                       value="2"
-                      checked={this.state.redundancylevel == 2}
+                      checked={redundancylevel == 2}
                     />
                     Protein
                   </label>
@@ -710,7 +720,7 @@ class JobForm extends Component {
                       id="sequence"
                       onChange={this.handleChange}
                       value="3"
-                      checked={this.state.redundancylevel == 3}
+                      checked={redundancylevel == 3}
                     />
                     Sequence
                   </label>
@@ -732,7 +742,7 @@ class JobForm extends Component {
                       id="none"
                       onChange={this.handleChange}
                       value="1"
-                      checked={this.state.originalrowmerge == 1}
+                      checked={originalrowmerge == 1}
                       required
                     />
                     None
@@ -746,7 +756,7 @@ class JobForm extends Component {
                       id="protein"
                       onChange={this.handleChange}
                       value="2"
-                      checked={this.state.originalrowmerge == 2}
+                      checked={originalrowmerge == 2}
                     />
                     Protein
                   </label>
@@ -759,7 +769,7 @@ class JobForm extends Component {
                       id="all"
                       onChange={this.handleChange}
                       value="3"
-                      checked={this.state.originalrowmerge == 3}
+                      checked={originalrowmerge == 3}
                     />
                     All
                   </label>
