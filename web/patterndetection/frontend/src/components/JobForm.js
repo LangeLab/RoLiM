@@ -672,9 +672,9 @@ class JobForm extends Component {
                 <label className="label">Select sequence redundancy elimination level.</label>
                 <HelpText text={
                     "This tool supports mulitple levels of sequence redundancy elimination.\n\n"
-                    + "none: No sequence redundancy elimination will be performed (default for pre-aligned foreground data sets).\n"
-                    + "protein: Redundant sequences from the same protein position will be eliminated (default for unaligned foreground data sets).\n"
-                    + "sequence: All redundant sequences will be eliminated.\n"} />
+                    + "None: No sequence redundancy elimination will be performed (default for pre-aligned foreground data sets).\n"
+                    + "Protein: Redundant sequences from the same protein position will be eliminated (default for unaligned foreground data sets).\n"
+                    + "Sequence: All redundant sequences will be eliminated.\n"} />
                 <div>
                   <label>
                     <input
@@ -686,7 +686,7 @@ class JobForm extends Component {
                       checked="checked"
                       required
                     />
-                    N-terminal
+                    None
                   </label>
                 </div>
                 <div>
@@ -698,7 +698,7 @@ class JobForm extends Component {
                       onChange={this.handleChange}
                       value="2"
                     />
-                    C-terminal
+                    Protein
                   </label>
                 </div>
                 <div>
@@ -710,7 +710,7 @@ class JobForm extends Component {
                       onChange={this.handleChange}
                       value="3"
                     />
-                    Both
+                    Sequence
                   </label>
               </div>
             </div>
@@ -719,9 +719,9 @@ class JobForm extends Component {
                 <label className="label">Select level at which to merge multiple peptide alignments.</label>
                 <HelpText text={
                     "Peptides may match more than one position in the context proteome. This setting species how to handle those multiple matches.\n\n"
-                    + "none: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set.\n"
-                    + "protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X.\n"
-                    + "all: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
+                    + "None: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set.\n"
+                    + "Protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X.\n"
+                    + "All: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
                 <div>
                   <label>
                     <input
@@ -731,7 +731,7 @@ class JobForm extends Component {
                       onChange={this.handleChange}
                       value="1"
                     />
-                    N-terminal
+                    None
                   </label>
                 </div>
                 <div>
@@ -743,7 +743,7 @@ class JobForm extends Component {
                       onChange={this.handleChange}
                       value="2"
                     />
-                    C-terminal
+                    Protein
                   </label>
                 </div>
                 <div>
@@ -757,7 +757,7 @@ class JobForm extends Component {
                       checked="checked"
                       required
                     />
-                    Both
+                    All
                   </label>
               </div>
             </div>
