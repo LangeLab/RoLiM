@@ -17,13 +17,16 @@ DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
 
 
-class ContextException(Exception): pass
+class SpeciesError(Exception): pass
 
 
-class ForegroundException(Exception): pass
+class ContextError(Exception): pass
 
 
-class ParameterException(Exception): pass
+class ForegroundError(Exception): pass
+
+
+class ParameterError(Exception): pass
 
 
 def new_job(jobcode):
@@ -173,24 +176,31 @@ def new_job(jobcode):
                     )
             else:
                 # Load context from default Swiss-Prot copy.
-                context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
+                if context_format == 2:
+                    context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot.fasta'))
+                elif context_format == 3:
+                    context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot_Mus_musculus.fasta'))
+
                 # Generate new Background instance.
                 try:
-                    if compound_residues:
-                        background = sequences.Background(
-                            context['sequence'].tolist(),
-                            width=width,
-                            position_specific=position_specific,
-                            precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                    if context_format == 2:
+                        if compound_residues:
+                            background = sequences.Background(
+                                context['sequence'].tolist(),
+                                width=width,
+                                position_specific=position_specific,
+                                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                            )
+                        else:
+                            background = sequences.Background(
+                                context['sequence'].tolist(),
+                                width=width,
+                                position_specific=position_specific,
+                                compound_residues=None,
+                                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
                         )
                     else:
-                        background = sequences.Background(
-                            context['sequence'].tolist(),
-                            width=width,
-                            position_specific=position_specific,
-                            compound_residues=None,
-                            precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
-                    )
+                        raise SpeciesError()
                 except:
                     if compound_residues:
                         background = sequences.Background(
@@ -206,7 +216,7 @@ def new_job(jobcode):
                             compound_residues=None
                     )
         except Exception as e:
-            raise ContextException() from e
+            raise ContextError() from e
 
         try:
             # Load sequences from Job submission data set.
@@ -262,7 +272,7 @@ def new_job(jobcode):
                     width=width
                 )
         except Exception as e:
-            raise ForegroundException() from e
+            raise ForegroundError() from e
 
         try:
             # Run pattern extraction analysis and generate outputs.
@@ -309,21 +319,21 @@ def new_job(jobcode):
                 p.add_header('Content-Disposition', "attachment; filename= %s" % zip_basename)
                 msg.attach(p)
         except Exception as e:
-            raise ParameterException() from e
+            raise ParameterError() from e
     except Exception as e:
         exception_type = type(e).__name__
-        if exception_type == 'ContextException':
-            exception_message = 'check the format and contents of the context file you selected'
-        elif exception_type == 'ForegroundException':
-            exception_message = 'check the format and contents of the foreground file you provided'
-        elif exception_message == 'ParameterException':
-            exception_message = 'ensure that the options you selected are consistent with your data'
+        if exception_type == 'ContextError':
+            error_message = 'check the format and contents of the context file you selected'
+        elif exception_type == 'ForegroundError':
+            error_message = 'check the format and contents of the foreground file you provided'
+        elif exception_type == 'ParameterError':
+            error_message = 'ensure that the options you selected are consistent with your data'
         else:
-            exception_message = 'review your submission and try again'
+            error_message = 'review your submission and try again'
 
         html = (
             'Something went wrong with your analysis. Please {}:<br /><br />{}'.format(
-                exception_message,
+                error_message,
                 traceback.format_exc()
             )
             + '<br /><br />Please check that the options you selected match the'

@@ -25,8 +25,8 @@ class JobForm extends Component {
     foreground_data: "",
     foregroundformat: 1,
     foreground_filename: "",
+    contextformat: 2,
     context_data: "",
-    contextformat: "",
     context_filename: "",
     p_value_cutoff: 0.001,
     position_specific: true,
@@ -76,6 +76,7 @@ class JobForm extends Component {
     formData.append('foreground_data', this.state.foreground_data);
     formData.append('foregroundformat', this.state.foregroundformat);
     formData.append('foreground_filename', this.state.foreground_filename);
+    formData.append('contextformat', this.state.contextformat);
     formData.append('context_data', this.state.context_data);
     formData.append('context_filename', this.state.context_filename);
     formData.append('title', this.state.title);
@@ -101,6 +102,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       foreground_filename,
+      contextformat,
       context_data,
       context_filename,
       p_value_cutoff,
@@ -123,6 +125,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       foreground_filename,
+      contextformat,
       context_data,
       context_filename,
       p_value_cutoff,
@@ -165,6 +168,7 @@ class JobForm extends Component {
     this.setState({ ['foreground_data']: "" });
     this.setState({ ['foregroundformat']: 1 });
     this.setState({ ['foreground_filename']: "" });
+    this.setState({ ['contextformat']: 2 });
     this.setState({ ['context_data']: "" });
     this.setState({ ['context_filename']: "" });
     this.setState({ ['p_value_cutoff']: 0.001 });
@@ -196,6 +200,7 @@ class JobForm extends Component {
       foreground_data,
       foregroundformat,
       foreground_filename,
+      contextformat,
       context_data,
       context_filename,
       p_value_cutoff,
@@ -302,6 +307,48 @@ class JobForm extends Component {
                   value="3"
                 />
                 Text file peptide list (<a href='/patterndetection/peptidelist' download>Example</a>)
+              </label>
+            </div>
+          </div>
+          <br />
+          <div>
+            <label className="label">Select context data set format.</label>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="contextformat"
+                  id="swissprot-human"
+                  onChange={this.handleChange}
+                  value="2"
+                  checked="checked"
+                  required
+                />
+                Swiss-Prot Human
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="contextformat"
+                  id="swissprot-mouse"
+                  onChange={this.handleChange}
+                  value="3"
+                />
+                Swiss-Prot Mouse
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="contextformat"
+                  id="fasta"
+                  onChange={this.handleChange}
+                  value="1"
+                />
+                Other (uploaded FASTA file)
               </label>
             </div>
           </div>
