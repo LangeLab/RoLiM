@@ -72,12 +72,12 @@ class Job(models.Model):
 	position_specific = models.BooleanField(blank=True, default=True)
 	require_context_id = models.BooleanField(blank=True, default=True)
 	#redundancylevel = models.ForeignKey('RedundancyLevel',
-										on_delete=models.CASCADE,
-										default=DEFAULT_REDUNDANCYLEVEL)
+										#on_delete=models.CASCADE,
+										#default=DEFAULT_REDUNDANCYLEVEL)
 	first_protein_only = models.BooleanField(blank=True, default=True)
 	#originalrowmerge = models.ForeignKey('OriginalRowMerge',
-											on_delete=models.CASCADE,
-											default=DEFAULT_ORIGINALROWMERGE)
+											#on_delete=models.CASCADE,
+											#default=DEFAULT_ORIGINALROWMERGE)
 
 class ForegroundFormat(models.Model):
 	"""Supported foreground data set format options."""
