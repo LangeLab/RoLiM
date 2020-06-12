@@ -70,7 +70,7 @@ class Job(models.Model):
 	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
 	position_specific = models.BooleanField(blank=True, default=True)
 	require_context_id = models.BooleanField(blank=True, default=True)
-	redundancylevel = models.FoerignKey('RedundancyLevel',
+	redundancylevel = models.ForeignKey('RedundancyLevel',
 										on_delete=models.CASCADE,
 										default=DEFAULT_REDUNDANCYLEVEL)
 	first_protein_only = models.BooleanField(blank=True, default=True)
