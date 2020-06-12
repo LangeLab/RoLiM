@@ -621,6 +621,7 @@ class JobForm extends Component {
                 value={p_value_cutoff}
                 min="0"
                 max="1"
+                step="any"
               />
             </div>
           </div>
@@ -657,6 +658,7 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value={fold_change_cutoff}
                   min="1"
+                  step="any"
                 />
               </div>
             </div>
