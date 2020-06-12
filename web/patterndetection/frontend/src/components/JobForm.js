@@ -638,7 +638,7 @@ class JobForm extends Component {
                 name="minimum_occurrences"
                 onChange={this.handleChange}
                 value={minimum_occurrences}
-                min=1
+                min="1"
               />
             </div>
           </div>
