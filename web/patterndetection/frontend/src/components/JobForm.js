@@ -43,7 +43,7 @@ class JobForm extends Component {
     extension_direction: 1,
     redundancylevel: 1,
     first_protein_only: true,
-    originalrowmerge: 1
+    originalrowmerge: 3
   };
 
   handleChange = e => {
@@ -732,6 +732,8 @@ class JobForm extends Component {
                       id="none"
                       onChange={this.handleChange}
                       value="1"
+                      checked={this.state.originalrowmerge == 1}
+                      required
                     />
                     None
                   </label>
@@ -744,6 +746,7 @@ class JobForm extends Component {
                       id="protein"
                       onChange={this.handleChange}
                       value="2"
+                      checked={this.state.originalrowmerge == 2}
                     />
                     Protein
                   </label>
@@ -756,8 +759,7 @@ class JobForm extends Component {
                       id="all"
                       onChange={this.handleChange}
                       value="3"
-                      checked="checked"
-                      required
+                      checked={this.state.originalrowmerge == 3}
                     />
                     All
                   </label>
