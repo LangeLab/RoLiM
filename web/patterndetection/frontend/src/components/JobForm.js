@@ -25,7 +25,7 @@ class JobForm extends Component {
     foreground_data: "",
     foregroundformat: "",
     foreground_filename: "",
-    contextformat: 2,
+    contextformat: "2",
     context_data: "",
     context_filename: "",
     p_value_cutoff: 0.001,
@@ -40,10 +40,10 @@ class JobForm extends Component {
     compound_residues: true,
     compound_residue_decomposition: true,
     require_context_id: true,
-    extension_direction: 1,
-    redundancylevel: 1,
+    extension_direction: "1",
+    redundancylevel: "1",
     first_protein_only: true,
-    originalrowmerge: 3
+    originalrowmerge: "3"
   };
 
   handleChange = e => {
@@ -188,7 +188,7 @@ class JobForm extends Component {
     this.setState({ ['foreground_data']: "" });
     this.setState({ ['foregroundformat']: "" });
     this.setState({ ['foreground_filename']: "" });
-    this.setState({ ['contextformat']: 2 });
+    this.setState({ ['contextformat']: "2" });
     this.setState({ ['context_data']: "" });
     this.setState({ ['context_filename']: "" });
     this.setState({ ['p_value_cutoff']: 0.001 });
@@ -204,10 +204,10 @@ class JobForm extends Component {
     this.setState({ ['compound_residues']: true });
     this.setState({ ['compound_residue_decomposition']: true });
     this.setState({ ['require_context_id']: true });
-    this.setState({ ['extension_direction']: 1 });
-    this.setState({ ['redundancylevel']: 1 });
+    this.setState({ ['extension_direction']: "1" });
+    this.setState({ ['redundancylevel']: "1" });
     this.setState({ ['first_protein_only']: true });
-    this.setState({ ['originalrowmerge']: 1 });
+    this.setState({ ['originalrowmerge']: "1" });
 
     document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
     advancedOptions.style.display = "none";

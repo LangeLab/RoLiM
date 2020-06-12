@@ -72,6 +72,7 @@ def new_job(jobcode):
     compound_residue_decomposition = job.compound_residue_decomposition
     position_specific = job.position_specific
     require_context_id = job.require_context_id
+    first_protein_only = job.first_protein_only
 
     # Set terminal based on sequence extension direction.
     if extension_direction == 1:
@@ -227,14 +228,16 @@ def new_job(jobcode):
                 sample = sequences.load_prealigned_file(
                     foreground_path,
                     background,
-                    center=center_sequences
+                    center=center_sequences,
+                    redundancy_level=redundancy_level
                 )
             elif foreground_format == 2:
                 # Load input sequences from prealigned FASTA file.
                 sample = sequences.load_prealigned_fasta(
                     foreground_path,
                     background,
-                    center=center_sequences
+                    center=center_sequences,
+                    redundancy_level=redundancy_level
                 )
             elif foreground_format == 3:
                 # Load input sequences from txt peptide list.
@@ -245,7 +248,10 @@ def new_job(jobcode):
                     center=center_sequences,
                     width=width,
                     terminal=terminal,
-                    require_context_id=require_context_id
+                    require_context_id=require_context_id,
+                    redundancy_level=redundancy_level,
+                    first_protein_only=first_protein_only,
+                    original_row_merge=original_row_merge
                 )
             elif foreground_format == 5:
                 # Load input sequences from FASTA peptide list.
@@ -256,14 +262,18 @@ def new_job(jobcode):
                     center=center_sequences,
                     width=width,
                     terminal=terminal,
-                    require_context_id=require_context_id
+                    require_context_id=require_context_id,
+                    redundancy_level=redundancy_level,
+                    first_protein_only=first_protein_only,
+                    original_row_merge=original_row_merge
                 )
             elif foreground_format == 6:
                 # Load input sequences from text field.
                 sample = sequences.load_prealigned_field(
                     foreground_path,
                     background,
-                    center=center_sequences
+                    center=center_sequences,
+                    redundancy_level=redundancy_level
                 )
             elif foreground_format == 7:
                 # Load input sequences from MaxQuant evidence.txt.

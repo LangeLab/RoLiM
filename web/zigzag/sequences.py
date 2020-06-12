@@ -1099,7 +1099,9 @@ def load_prealigned_file(prealigned_file_path,
     return sample
 
 
-def load_prealigned_field(prealigned_field, background):
+def load_prealigned_field(prealigned_field,
+                            background,
+                            redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
     """
     Top-level helper function to load pre-aligned sequences from text
         field.
@@ -1110,7 +1112,9 @@ def load_prealigned_field(prealigned_field, background):
     pass
 
 
-def load_prealigned_fasta(prealigned_fasta_path, background):
+def load_prealigned_fasta(prealigned_fasta_path,
+                            background,
+                            redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
     """
     Top-level helper function to load pre-aligned sequences from FASTA
         file.
