@@ -638,7 +638,7 @@ def remove_genomic_n_termini(aligned_sequences):
     pass
 
 
-def generate_positions(center=DEFAULT_CENTER, num_positions):
+def generate_positions(center, num_positions):
     """
     Generate position labels for sequence dataframe columns or series
         indexes.
