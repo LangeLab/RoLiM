@@ -799,7 +799,6 @@ def import_peptide_list(peptide_list_file,
     return peptide_list
 
 
-'''
 def select_maxquant_evidence_experiments(evidence, experiments):
     """Select experiments from evidence file."""
     experiments = set(experiments.replace(' ', '').split(','))
@@ -895,7 +894,7 @@ def expand_maxquant_evidence_sequences(evidence_df,
     sequence_df = sequences_to_df(expanded_sequences)
     
     return sequence_df
-'''
+
 
 def fasta_to_sequences(fasta_df,
                         center=DEFAULT_CENTER,
@@ -934,7 +933,7 @@ def peptides_to_sample(peptides,
                         redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
                         first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
                         original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
-                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID
+                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID):
     """
     Align peptides and return data frame of positional residues.
 
@@ -1099,7 +1098,7 @@ def load_prealigned_file(prealigned_file_path,
 
     return sample
 
-'''
+
 def load_prealigned_field(prealigned_field, background):
     """
     Top-level helper function to load pre-aligned sequences from text
@@ -1154,7 +1153,7 @@ def load_maxquant_evidence_file(maxquant_evidence_path,
     samples = {}
 
     return samples
-'''
+
 
 class Background:
     """
