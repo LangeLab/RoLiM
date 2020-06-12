@@ -934,7 +934,7 @@ def peptides_to_sample(peptides,
                         redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
                         first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
                         original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
-                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID:
+                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID
     """
     Align peptides and return data frame of positional residues.
 
