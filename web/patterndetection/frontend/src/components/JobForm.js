@@ -554,8 +554,8 @@ class JobForm extends Component {
               <label className="label">Select sequence extension direction.</label>
               <HelpText text={
                   "This tool supports alignment and extension of unaligned foreground data sets using the selected context data set.\n\n"
-                  + "N-terminal: Supplied sequences will be extended in the N-terminal direction up to the specified aligned sequence width (default)."
-                  + "C-terminal: Supplied sequences will be extended in the C-terminal direction up to the specified aligned sequence width."
+                  + "N-terminal: Supplied sequences will be extended in the N-terminal direction up to the specified aligned sequence width (default).\n"
+                  + "C-terminal: Supplied sequences will be extended in the C-terminal direction up to the specified aligned sequence width.\n"
                   + "Both: Supplied sequences will be extended in both the N-terminal and C-terminal directions up to the specified aligned sequence width,"
                   + " producing a separate sequence for each extension direction.\n"} />
               <div>
@@ -650,116 +650,116 @@ class JobForm extends Component {
                 />
               </div>
             </div>
-          </div>
-          <div className="field">
-            <div className="control">
-              <label className="checkbox">
-                <input
-                  type="checkbox"
-                  name="first_protein_only"
-                  onChange={this.handleCheckboxChange}
-                  value={first_protein_only}
-                  checked={first_protein_only}
-                />
-                Only use first protein identifier provided for each peptide?
-              </label>
-              <HelpText text={
-                  "If selected, only the first protein identifer for each row in the foreground"
-                  + " data set will be used for alignment and extenson. Otherwise, all provided"
-                  + " protein identifiers for each row will be used.\n"} />
+            <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="first_protein_only"
+                    onChange={this.handleCheckboxChange}
+                    value={first_protein_only}
+                    checked={first_protein_only}
+                  />
+                  Only use first protein identifier provided for each peptide?
+                </label>
+                <HelpText text={
+                    "If selected, only the first protein identifer for each row in the foreground"
+                    + " data set will be used for alignment and extenson. Otherwise, all provided"
+                    + " protein identifiers for each row will be used.\n"} />
+              </div>
             </div>
-          </div>
-          <div>
-              <label className="label">Select sequence redundancy elimination level.</label>
-              <HelpText text={
-                  "This tool supports mulitple levels of sequence redundancy elimination.\n\n"
-                  + "none: No sequence redundancy elimination will be performed (default for pre-aligned foreground data sets)."
-                  + "protein: Redundant sequences from the same protein position will be eliminated (default for unaligned foreground data sets)."
-                  + "sequence: All redundant sequences will be eliminated.\n"} />
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="redundancylevel"
-                    id="none"
-                    onChange={this.handleChange}
-                    value="1"
-                    checked="checked"
-                    required
-                  />
-                  N-terminal
-                </label>
+            <div>
+                <label className="label">Select sequence redundancy elimination level.</label>
+                <HelpText text={
+                    "This tool supports mulitple levels of sequence redundancy elimination.\n\n"
+                    + "none: No sequence redundancy elimination will be performed (default for pre-aligned foreground data sets).\n"
+                    + "protein: Redundant sequences from the same protein position will be eliminated (default for unaligned foreground data sets).\n"
+                    + "sequence: All redundant sequences will be eliminated.\n"} />
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="redundancylevel"
+                      id="none"
+                      onChange={this.handleChange}
+                      value="1"
+                      checked="checked"
+                      required
+                    />
+                    N-terminal
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="redundancylevel"
+                      id="protein"
+                      onChange={this.handleChange}
+                      value="2"
+                    />
+                    C-terminal
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="redundancylevel"
+                      id="sequence"
+                      onChange={this.handleChange}
+                      value="3"
+                    />
+                    Both
+                  </label>
               </div>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="redundancylevel"
-                    id="protein"
-                    onChange={this.handleChange}
-                    value="2"
-                  />
-                  C-terminal
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="redundancylevel"
-                    id="sequence"
-                    onChange={this.handleChange}
-                    value="3"
-                  />
-                  Both
-                </label>
             </div>
-          </div>
-          <br />
-          <div>
-              <label className="label">Select level at which to merge multiple peptide alignments.</label>
-              <HelpText text={
-                  "Peptides may match more than one position in the context proteome. This setting species how to handle those multiple matches.\n\n"
-                  + "none: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set."
-                  + "protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X."
-                  + "all: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="originalrowmerge"
-                    id="none"
-                    onChange={this.handleChange}
-                    value="1"
-                  />
-                  N-terminal
-                </label>
+            <br />
+            <div>
+                <label className="label">Select level at which to merge multiple peptide alignments.</label>
+                <HelpText text={
+                    "Peptides may match more than one position in the context proteome. This setting species how to handle those multiple matches.\n\n"
+                    + "none: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set.\n"
+                    + "protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X.\n"
+                    + "all: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="originalrowmerge"
+                      id="none"
+                      onChange={this.handleChange}
+                      value="1"
+                    />
+                    N-terminal
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="originalrowmerge"
+                      id="protein"
+                      onChange={this.handleChange}
+                      value="2"
+                    />
+                    C-terminal
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                      type="radio"
+                      name="originalrowmerge"
+                      id="all"
+                      onChange={this.handleChange}
+                      value="3"
+                      checked="checked"
+                      required
+                    />
+                    Both
+                  </label>
               </div>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="originalrowmerge"
-                    id="protein"
-                    onChange={this.handleChange}
-                    value="2"
-                  />
-                  C-terminal
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="originalrowmerge"
-                    id="all"
-                    onChange={this.handleChange}
-                    value="3"
-                    checked="checked"
-                    required
-                  />
-                  Both
-                </label>
             </div>
           </div>
           <br />
