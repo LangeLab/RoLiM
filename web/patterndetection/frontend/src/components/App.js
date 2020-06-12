@@ -5,17 +5,17 @@ import Table from "./Table";
 import JobForm from "./JobForm";
 
 const App = () => (
-  <div className="container">
+  <div className="outer">
   	<header>
-  		<div class="labtitle">
-  			<div class="labtitle-inner">
-  				<h1><a class="lablink" href="https://langelab.med.ubc.ca/">The Lange Lab - for Translational Proteomics in Childhood Cancer</a></h1>
+  		<div className="labtitle">
+  			<div className="labtitle-inner">
+  				<h1><a className="lablink" href="https://langelab.med.ubc.ca/">The Lange Lab - for Translational Proteomics in Childhood Cancer</a></h1>
   			</div>
   		</div>
-  		<div class="tooltitle">
-  			<div class="tooltitle-inner">
-  				<h2 class="title">RoLiM</h2>
-  				<h3 class="subtitle">Robust detection of linear motifs in sequence data.</h3>
+  		<div className="tooltitle">
+  			<div className="tooltitle-inner">
+  				<h2 className="title">RoLiM</h2>
+  				<h3 className="subtitle">Robust detection of linear motifs in sequence data.</h3>
   			</div>
   		</div>
   	</header>
