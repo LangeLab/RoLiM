@@ -20,7 +20,9 @@ const App = () => (
   		</div>
   	</header>
   	<br />
-  	<JobForm endpoint="/api/job/" />
+  	<main>
+  		<JobForm endpoint="/api/job/" />
+  	</main>
   </div>
 );
 const wrapper = document.getElementById("app");

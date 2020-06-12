@@ -8,14 +8,20 @@
 
 body, html {
 	height: 100vh;
+	margin: 0;
+	padding: 0;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
 }
 
 p, a {
   font-family: 'Source Sans Pro', sans-serif;
+}
+
+header {
+	width: 100%;
 }
 
 .labtitle {
@@ -37,5 +43,9 @@ p, a {
 }
 
 .tooltitle-inner {
+	width: 1024px;
+}
+
+main {
 	width: 1024px;
 }
