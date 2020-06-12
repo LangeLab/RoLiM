@@ -11,6 +11,16 @@ import pandas as pd
 # Ensure that Pandas always loads full sequence.
 pd.set_option('max_colwidth', 1000000)
 
+# Set defaults and constants.
+DEFAULT_CENTER = True
+DEFAULT_WIDTH = 15
+DEFAULT_EXTENSION_DIRECTION = 'n'
+DEFAULT_REQUIRE_CONTEXT_ID = True
+DEFAULT_PREALIGNED_REDUNDANCY_LEVEL = 'none'
+DEFAULT_PEPTIDE_REDUNDANCY_LEVEL = 'protein'
+DEFAULT_FIRST_PROTEIN_ONLY = True
+DEFAULT_ORIGINAL_ROW_MERGE = 'all'
+
 RANDOM_STATE = np.random.RandomState(seed=777)
 
 PRECOMPUTED_FILES = {
@@ -30,91 +40,6 @@ ExtendedSequences = namedtuple(
     'ExtendedSequences',
     ['n_term', 'c_term']
 )
-
-"""
-compound_residues = {
-    '1': CompoundResidue(
-        description='helix breaker',
-        residues=[
-            'G',
-            'P',
-        ]
-    ),
-    '2': CompoundResidue(
-        description='aliphatic',
-        residues=[
-            'P',
-            'A',
-            'L',
-            'V',
-            'I',
-        ]
-    ),
-    '3': CompoundResidue(
-        description='beta-branched (rigid)',
-        residues=[
-            'V',
-            'I',
-            'T',
-        ]
-    ),
-    '4': CompoundResidue(
-        description='hydrophobic',
-        residues=[
-            'M',
-            'F',
-            'W',
-            'P', 
-            'A',
-            'L',
-            'V',
-            'I',
-        ]
-    ),
-    '5': CompoundResidue(
-        description='transitional polarity',
-        residues=[
-            'C',
-            'Y',
-            'T',
-        ]
-    ),
-    '6': CompoundResidue(
-        description='polar',
-        residues=[
-            'N',
-            'Q',
-            'S',
-            'H',
-        ]
-    ),
-    '7': CompoundResidue(
-        description='aromatic',
-        residues=[
-            'F',
-            'W',
-            'Y',
-            'H',
-        ]
-        
-    ),
-    '8': CompoundResidue(
-        description='base, DNA, RNA binder',
-        residues=[
-            'R',
-            'K',
-        ]
-    ),
-    '9': CompoundResidue(
-        description='acid, Ca2+, Mg2+ binder',
-        residues=[
-            'D',
-            'E',
-        ]
-
-    )
-}
-"""
 
 COMPOUND_RESIDUES = {
     '1': CompoundResidue(
@@ -417,13 +342,13 @@ def get_all_ids_from_context(context, precomputed):
 
 def align_sequences(context,
                     sequences,
-                    width=15,
-                    terminal='n',
-                    redundancy_level='protein',
-                    first_protein_only=True,
-                    original_row_merge='all',
+                    width=DEFAULT_WIDTH,
+                    terminal=DEFAULT_EXTENSION_DIRECTION,
+                    redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
+                    first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
+                    original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
                     original_sequences=None,
-                    require_context_id=True,
+                    require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
                     precomputed=None):
     """
     Take unaligned sequences and context. Map unaligned sequences to
@@ -713,7 +638,7 @@ def remove_genomic_n_termini(aligned_sequences):
     pass
 
 
-def generate_positions(center, num_positions):
+def generate_positions(center=DEFAULT_CENTER, num_positions):
     """
     Generate position labels for sequence dataframe columns or series
         indexes.
@@ -747,7 +672,9 @@ def generate_positions(center, num_positions):
     return positions
 
 
-def sequences_to_df(sequences, center=False, redundancy_level='none'):
+def sequences_to_df(sequences,
+                    center=DEFAULT_CENTER,
+                    redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
     """
     Split sequence strings to Pandas DataFrame with one column per
         position.
@@ -841,8 +768,8 @@ def import_fasta(fasta_path, swissprot=True):
 
 def import_peptide_list(peptide_list_file,
                         delimiter='\t',
-                        require_context_id=True,
-                        redundancy_level='protein'):
+                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
+                        redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL):
     """
     Import peptide list and row-matched protein IDs from text file.
 
@@ -872,6 +799,7 @@ def import_peptide_list(peptide_list_file,
     return peptide_list
 
 
+'''
 def select_maxquant_evidence_experiments(evidence, experiments):
     """Select experiments from evidence file."""
     experiments = set(experiments.replace(' ', '').split(','))
@@ -913,7 +841,7 @@ def import_maxquant_evidence(evidence_path,
     # Load all experiments to Pandas Data Frame.
     evidence_df = pd.read_csv(
         evidence_path,
-        sep='\t',
+        sep="\t",
         low_memory=False,
         error_bad_lines=False
     )
@@ -967,9 +895,11 @@ def expand_maxquant_evidence_sequences(evidence_df,
     sequence_df = sequences_to_df(expanded_sequences)
     
     return sequence_df
+'''
 
-
-def fasta_to_sequences(fasta_df, center=False, redundancy_level='none'):
+def fasta_to_sequences(fasta_df,
+                        center=DEFAULT_CENTER,
+                        redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
     """
     Convenience function to convert FASTA dataframe to dataframe
         containing one column per sequence position.
@@ -998,13 +928,13 @@ def fasta_to_sequences(fasta_df, center=False, redundancy_level='none'):
 def peptides_to_sample(peptides,
                         context,
                         background,
-                        center=False,
-                        width=15,
-                        terminal='n',
-                        redundancy_level='protein',
-                        first_protein_only=True,
-                        original_row_merge='all',
-                        require_context_id=True):
+                        center=DEFAULT_CENTER,
+                        width=DEFAULT_WIDTH,
+                        terminal=DEFAULT_EXTENSION_DIRECTION,
+                        redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
+                        first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
+                        original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
+                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID:
     """
     Align peptides and return data frame of positional residues.
 
@@ -1055,13 +985,13 @@ def peptides_to_sample(peptides,
 def load_fasta_peptides(peptide_fasta_path,
                         context,
                         background,
-                        center=False,
-                        width=15,
-                        terminal='n',
-                        require_context_id=True,
-                        redundancy_level='protein',
-                        first_protein_only=True,
-                        original_row_merge='all'):
+                        center=DEFAULT_CENTER,
+                        width=DEFAULT_WIDTH,
+                        terminal=DEFAULT_EXTENSION_DIRECTION,
+                        require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
+                        redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
+                        first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
+                        original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE):
     """
     Top-level helper function to load and extend peptides from FASTA
         file.
@@ -1072,13 +1002,13 @@ def load_fasta_peptides(peptide_fasta_path,
 def load_peptide_list_file(peptide_list_path,
                             context,
                             background,
-                            center=False,
-                            width=15,
-                            terminal='n',
-                            require_context_id=True,
-                            redundancy_level='protein',
-                            first_protein_only=True,
-                            original_row_merge='all'):
+                            center=DEFAULT_CENTER,
+                            width=DEFAULT_WIDTH,
+                            terminal=DEFAULT_EXTENSION_DIRECTION,
+                            require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
+                            redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
+                            first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
+                            original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE):
     """
     Top-level helper function to load and extend peptides from text
         file.
@@ -1151,8 +1081,8 @@ def load_peptide_list_field(peptide_list_field,
 
 def load_prealigned_file(prealigned_file_path,
                             background,
-                            center=False,
-                            redundancy_level='none'):
+                            center=DEFAULT_CENTER,
+                            redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
     """
     Top-level helper function to load pre-aligned sequences from text
         file.
@@ -1169,7 +1099,7 @@ def load_prealigned_file(prealigned_file_path,
 
     return sample
 
-
+'''
 def load_prealigned_field(prealigned_field, background):
     """
     Top-level helper function to load pre-aligned sequences from text
@@ -1191,7 +1121,6 @@ def load_prealigned_fasta(prealigned_fasta_path, background):
     # call sequences_to_df
     # return df
     pass
-
 
 def load_maxquant_evidence_file(maxquant_evidence_path,
                                 context,
@@ -1225,7 +1154,7 @@ def load_maxquant_evidence_file(maxquant_evidence_path,
     samples = {}
 
     return samples
-
+'''
 
 class Background:
     """

@@ -313,15 +313,19 @@ def new_job(jobcode):
     except Exception as e:
         exception_type = type(e).__name__
         if exception_type == 'ContextException':
-            exception_message = 'the format and contents of the context file you selected'
+            exception_message = 'check the format and contents of the context file you selected'
         elif exception_type == 'ForegroundException':
-            exception_message = 'the format and contents of the foreground file you provided'
+            exception_message = 'check the format and contents of the foreground file you provided'
         elif exception_message == 'ParameterException':
-            exception_message = 'that the parameters you provided are consistent with your data'
+            exception_message = 'ensure that the options you selected are consistent with your data'
+        else:
+            exception_message = 'review your submission and try again'
 
         html = (
-            'Something went wrong with your analysis. Please check {}:<br /><br />{}'.format(
-                traceback.format_exc())
+            'Something went wrong with your analysis. Please {}:<br /><br />{}'.format(
+                exception_message,
+                traceback.format_exc()
+            )
             + '<br /><br />Please check that the options you selected match the'
             + ' format of your data, and that the format of your data matches a'
             + ' format supported by our tool.<br /><br />Thank you!'
