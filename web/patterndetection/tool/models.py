@@ -25,6 +25,7 @@ class Job(models.Model):
 	DEFAULT_CONTEXTFORMAT = 1
 	DEFAULT_EXTENSION_DIRECTION = 1
 	DEFAULT_REDUNDANCYLEVEL = 1
+	DEFAULT_ORIGINALROWMERGE = 1
 
 	jobcode = models.CharField(max_length=32, primary_key=True)
 	session = models.ForeignKey(Session, on_delete=models.CASCADE)
