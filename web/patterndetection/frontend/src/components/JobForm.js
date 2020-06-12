@@ -41,10 +41,21 @@ class JobForm extends Component {
     compound_residue_decomposition: true,
     require_context_id: true,
     extension_direction: 1,
+    redundancylevel: 1,
+    first_protein_only: true,
+    originalrowmerge: 1
   };
 
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
+    if (e.target.name == "foregroundformat") {
+      if (e.target.value == 1) {
+        this.setState({ "redundancylevel": 1 });
+      }
+      else if (e.target.value == 3) {
+        this.setState({ "redundancylevel": 2 });
+      }
+    }
   };
 
   handleCheckboxChange = e => {
@@ -94,6 +105,9 @@ class JobForm extends Component {
     formData.append('compound_residue_decomposition', this.state.compound_residue_decomposition);
     formData.append('require_context_id', this.state.require_context_id);
     formData.append('extension_direction', this.state.extension_direction);
+    formData.append('redundancylevel', this.state.redundancylevel);
+    formData.append('first_protein_only', this.state.first_protein_only);
+    formData.append('originalrowmerge', this.state.originalrowmerge);
 
     const {
       title,
@@ -116,7 +130,10 @@ class JobForm extends Component {
       compound_residues,
       compound_residue_decomposition,
       require_context_id,
-      extension_direction
+      extension_direction,
+      redundancylevel,
+      first_protein_only,
+      originalrowmerge
     } = this.state;
     const job = {
       title,
@@ -139,7 +156,10 @@ class JobForm extends Component {
       compound_residues,
       compound_residue_decomposition,
       require_context_id,
-      extension_direction
+      extension_direction,
+      redundancylevel,
+      first_protein_only,
+      originalrowmerge
     };
     const csrftoken = getCookie('csrftoken');
     const conf = {
@@ -185,6 +205,9 @@ class JobForm extends Component {
     this.setState({ ['compound_residue_decomposition']: true });
     this.setState({ ['require_context_id']: true });
     this.setState({ ['extension_direction']: 1 });
+    this.setState({ ['redundancylevel']: 1 });
+    this.setState({ ['first_protein_only']: true });
+    this.setState({ ['originalrowmerge']: 1 });
 
     document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
     advancedOptions.style.display = "none";
@@ -214,7 +237,10 @@ class JobForm extends Component {
       compound_residues,
       compound_residue_decomposition,
       require_context_id,
-      extension_direction
+      extension_direction,
+      redundancylevel,
+      first_protein_only,
+      originalrowmerge
     } = this.state;
     return (
       <div className="column">
@@ -525,81 +551,87 @@ class JobForm extends Component {
               </div>
             </div>
             <div>
-            <label className="label">Select sequence extension direction.</label>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="extension_direction"
-                  id="nextension"
-                  onChange={this.handleChange}
-                  value="1"
-                  checked="checked"
-                  required
-                />
-                N-terminal
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="extension_direction"
-                  id="cextension"
-                  onChange={this.handleChange}
-                  value="2"
-                />
-                C-terminal
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  name="extension_direction"
-                  id="bothextension"
-                  onChange={this.handleChange}
-                  value="3"
-                />
-                Both
-              </label>
+              <label className="label">Select sequence extension direction.</label>
+              <HelpText text={
+                  "This tool supports alignment and extension of unaligned foreground data sets using the selected context data set.\n\n"
+                  + "N-terminal: Supplied sequences will be extended in the N-terminal direction up to the specified aligned sequence width (default)."
+                  + "C-terminal: Supplied sequences will be extended in the C-terminal direction up to the specified aligned sequence width."
+                  + "Both: Supplied sequences will be extended in both the N-terminal and C-terminal directions up to the specified aligned sequence width,"
+                  + " producing a separate sequence for each extension direction.\n"} />
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="extension_direction"
+                    id="nextension"
+                    onChange={this.handleChange}
+                    value="1"
+                    checked="checked"
+                    required
+                  />
+                  N-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="extension_direction"
+                    id="cextension"
+                    onChange={this.handleChange}
+                    value="2"
+                  />
+                  C-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="extension_direction"
+                    id="bothextension"
+                    onChange={this.handleChange}
+                    value="3"
+                  />
+                  Both
+                </label>
             </div>
           </div>
-            <br />
-            <div className="field">
-              <label className="checkbox">
-                P-value threshold.
-              </label>
-              <HelpText text={
-                  "The p-value corresponding to the frequency of a position/residue pair must be below this threshold"
-                  + " in order to be considered significantly enriched.\n"} />
-              <div className="control">
-                <input
-                  className="input"
-                  type="text"
-                  name="p_value_cutoff"
-                  onChange={this.handleChange}
-                  value={p_value_cutoff}
-                />
-              </div>
+          <br />
+          <div className="field">
+            <label className="checkbox">
+              P-value threshold.
+            </label>
+            <HelpText text={
+                "The p-value corresponding to the frequency of a position/residue pair must be below this threshold"
+                + " in order to be considered significantly enriched.\n"} />
+            <div className="control">
+              <input
+                className="input"
+                type="text"
+                name="p_value_cutoff"
+                onChange={this.handleChange}
+                value={p_value_cutoff}
+              />
             </div>
-            <div className="field">
-              <label className="checkbox">
-                Minimum occurrences
-              </label>
-              <HelpText text={
-                  "The minimum frequency of a position/residue pair in the foreground data set"
-                  + " required for the pair to be considered enriched.\n"} />
-              <div className="control">
-                <input
-                  className="input"
-                  type="text"
-                  name="minimum_occurrences"
-                  onChange={this.handleChange}
-                  value={minimum_occurrences}
-                />
-              </div>
+          </div>
+          <div className="field">
+            <label className="checkbox">
+              Minimum occurrences
+            </label>
+            <HelpText text={
+                "The minimum frequency of a position/residue pair in the foreground data set"
+                + " required for the pair to be considered enriched.\n"} />
+            <div className="control">
+              <input
+                className="input"
+                type="text"
+                name="minimum_occurrences"
+                onChange={this.handleChange}
+                value={minimum_occurrences}
+              />
             </div>
+          </div>
             <div className="field">
               <label className="checkbox">
                 Fold difference cutoff
@@ -617,6 +649,117 @@ class JobForm extends Component {
                   min="1"
                 />
               </div>
+            </div>
+          </div>
+          <div className="field">
+            <div className="control">
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  name="first_protein_only"
+                  onChange={this.handleCheckboxChange}
+                  value={first_protein_only}
+                  checked={first_protein_only}
+                />
+                Only use first protein identifier provided for each peptide?
+              </label>
+              <HelpText text={
+                  "If selected, only the first protein identifer for each row in the foreground"
+                  + " data set will be used for alignment and extenson. Otherwise, all provided"
+                  + " protein identifiers for each row will be used.\n"} />
+            </div>
+          </div>
+          <div>
+              <label className="label">Select sequence redundancy elimination level.</label>
+              <HelpText text={
+                  "This tool supports mulitple levels of sequence redundancy elimination.\n\n"
+                  + "none: No sequence redundancy elimination will be performed (default for pre-aligned foreground data sets)."
+                  + "protein: Redundant sequences from the same protein position will be eliminated (default for unaligned foreground data sets)."
+                  + "sequence: All redundant sequences will be eliminated.\n"} />
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="redundancylevel"
+                    id="none"
+                    onChange={this.handleChange}
+                    value="1"
+                    checked="checked"
+                    required
+                  />
+                  N-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="redundancylevel"
+                    id="protein"
+                    onChange={this.handleChange}
+                    value="2"
+                  />
+                  C-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="redundancylevel"
+                    id="sequence"
+                    onChange={this.handleChange}
+                    value="3"
+                  />
+                  Both
+                </label>
+            </div>
+          </div>
+          <br />
+          <div>
+              <label className="label">Select level at which to merge multiple peptide alignments.</label>
+              <HelpText text={
+                  "Peptides may match more than one position in the context proteome. This setting species how to handle those multiple matches.\n\n"
+                  + "none: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set."
+                  + "protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X."
+                  + "all: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="originalrowmerge"
+                    id="none"
+                    onChange={this.handleChange}
+                    value="1"
+                  />
+                  N-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="originalrowmerge"
+                    id="protein"
+                    onChange={this.handleChange}
+                    value="2"
+                  />
+                  C-terminal
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input
+                    type="radio"
+                    name="originalrowmerge"
+                    id="all"
+                    onChange={this.handleChange}
+                    value="3"
+                    checked="checked"
+                    required
+                  />
+                  Both
+                </label>
             </div>
           </div>
           <br />

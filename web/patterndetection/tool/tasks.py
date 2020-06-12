@@ -123,7 +123,9 @@ def new_job(jobcode):
         log_file.write(
             'Context file:  {}\n'.format(
                 context_filename if context_filename
-                else "Swiss-Prot human proteome"
+                else "Swiss-Prot {} proteome".format(
+                    'human' if context_format == 2 else 'mouse'
+                )
             )
         )
         log_file.write(

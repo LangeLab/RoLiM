@@ -24,6 +24,7 @@ class Job(models.Model):
 	DEFAULT_DATAFORMAT = 1
 	DEFAULT_CONTEXTFORMAT = 1
 	DEFAULT_EXTENSION_DIRECTION = 1
+	DEFAULT_REDUNDANCYLEVEL = 1
 
 	jobcode = models.CharField(max_length=32, primary_key=True)
 	session = models.ForeignKey(Session, on_delete=models.CASCADE)
@@ -69,6 +70,13 @@ class Job(models.Model):
 	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
 	position_specific = models.BooleanField(blank=True, default=True)
 	require_context_id = models.BooleanField(blank=True, default=True)
+	redundancylevel = models.FoerignKey('RedundancyLevel',
+										on_delete=models.CASCADE,
+										default=DEFAULT_REDUNDANCYLEVEL)
+	first_protein_only = models.BooleanField(blank=True, default=True)
+	originalrowmerge = models.ForeignKey('OriginalRowMerge',
+											on_delete=models.CASCADE,
+											default=DEFAULT_ORIGINALROWMERGE)
 
 class ForegroundFormat(models.Model):
 	"""Supported foreground data set format options."""
@@ -83,6 +91,14 @@ class ContextFormat(models.Model):
 class ExtensionDirection(models.Model):
 	"""Supported sequence extension directions."""
 	direction = models.CharField(max_length=120)
+
+
+class RedundancyLevel(models.Model):
+	redundancy_level = models.CharField(max_length=120)
+
+
+class OriginalRowMerge(models.Model):
+	original_row_merge = models.CharField(max_length=120)
 
 
 @receiver(models.signals.post_delete, sender=Job)
