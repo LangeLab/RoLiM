@@ -1,3 +1,41 @@
+/* Typography imported from Google Fonts */
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display|Source+Sans+Pro:200,400');
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body, html {
+	height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+p, a {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.labtitle {
+	width: 100%;
+	background-color: #2f5d7c;
+}
+
+.labtitle-inner {
+	width: 1024px;
+}
+
 .lablink {
-	color: black;
+	color: white;
+}
+
+.tooltitle {
+	width: 100%;
+	background-color: #e6e6e6;
+}
+
+.tooltitle-inner {
+	width: 1024px;
 }

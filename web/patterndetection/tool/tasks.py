@@ -10,7 +10,9 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-from patterndetection.tool.models import Job, ForegroundFormat, ContextFormat
+from patterndetection.tool.models import (
+    Job, ForegroundFormat, ContextFormat, RedundancyLevel, OriginalRowMerge
+)
 from zigzag import sequences, pattern_extraction
 
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
@@ -73,6 +75,8 @@ def new_job(jobcode):
     position_specific = job.position_specific
     require_context_id = job.require_context_id
     first_protein_only = job.first_protein_only
+    redundancy_level = RedundancyLevel.objects.get(id=job.redundancylevel_id).redundancy_level
+    original_row_merge = OriginalRowMerge.objects.get(id=job.originalrowmerge_id).original_row_merge
 
     # Set terminal based on sequence extension direction.
     if extension_direction == 1:
