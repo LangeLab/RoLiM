@@ -8,13 +8,16 @@ from redis import Redis
 import django_rq
 
 from patterndetection.tool.models import (
-	Job, ForegroundFormat, ContextFormat, ExtensionDirection
+	Job, ForegroundFormat, ContextFormat, ExtensionDirection,
+	RedundancyLevel, OriginalRowMerge
 )
 from patterndetection.tool.serializers import (
 	JobSerializer,
 	ForegroundFormatSerializer,
 	ContextFormatSerializer,
-	ExtensionDirectionSerializer
+	ExtensionDirectionSerializer,
+	RedundancyLevelSerializer,
+	OriginalRowMergeSerializer,
 )
 from patterndetection.tool.tasks import new_job
 
@@ -67,3 +70,15 @@ class ExtensionDirectionViewSet(viewsets.ModelViewSet):
 	"""Views for ExtensionDirection model REST endpoints."""
 	queryset = ExtensionDirection.objects.all()
 	serializer_class = ExtensionDirectionSerializer
+
+
+class RedundancyLevelViewSet(viewsets.ModelViewSet):
+	"""Views for ExtensionDirection model REST endpoints."""
+	queryset = RedundancyLevel.objects.all()
+	serializer_class = RedundancyLevelSerializer
+
+
+class OriginalRowMergeViewSet(viewsets.ModelViewSet):
+	"""Views for ExtensionDirection model REST endpoints."""
+	queryset = OriginalRowMerge.objects.all()
+	serializer_class = OriginalRowMergeSerializer

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from patterndetection.tool.models import (
-	Job, ForegroundFormat, ContextFormat, ExtensionDirection
+	Job, ForegroundFormat, ContextFormat, ExtensionDirection,
+	RedundancyLevel, OriginalRowMerge,
 )
 
 class JobSerializer(serializers.ModelSerializer):
@@ -30,6 +31,9 @@ class JobSerializer(serializers.ModelSerializer):
 			'compound_residues',
 			'compound_residue_decomposition',
 			'require_context_id',
+			'redundancylevel_id',
+			'originalrowmerge_id',
+			'first_protein_only',
 		)
 		read_only_fields = ('submitted', 'completed',)
 		extra_kwargs = {
@@ -59,4 +63,15 @@ class ContextFormatSerializer(serializers.ModelSerializer):
 class ExtensionDirectionSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = ExtensionDirection
+		fields = '__all__'
+
+class RedundancyLevelSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = RedundancyLevel
+		fields = '__all__'
+
+
+class OriginalRowMergeSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = OriginalRowMerge
 		fields = '__all__'
