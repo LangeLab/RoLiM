@@ -683,7 +683,7 @@ class JobForm extends Component {
                       id="none"
                       onChange={this.handleChange}
                       value="1"
-                      checked="checked"
+                      checked={this.state.redundancylevel == 1}
                       required
                     />
                     None
@@ -697,6 +697,7 @@ class JobForm extends Component {
                       id="protein"
                       onChange={this.handleChange}
                       value="2"
+                      checked={this.state.redundancylevel == 2}
                     />
                     Protein
                   </label>
@@ -709,6 +710,7 @@ class JobForm extends Component {
                       id="sequence"
                       onChange={this.handleChange}
                       value="3"
+                      checked={tihs.state.redundancylevel == 3}
                     />
                     Sequence
                   </label>
