@@ -21,8 +21,15 @@ const App = () => (
   	</header>
   	<br />
   	<main>
+  		<section>
+  			<h4 className="description-header">Description</h4>
+  			<p>RoLiM iteratively detects over-represented linear motifs in sequence data sets.</p>
+  		</section>
   		<JobForm endpoint="/api/job/" />
   	</main>
+  	<footer>
+  		<p>Copyright &copy; 2020 Theodore G. Smith</p>
+  	</footer>
   </div>
 );
 const wrapper = document.getElementById("app");

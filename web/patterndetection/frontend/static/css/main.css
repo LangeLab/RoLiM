@@ -27,6 +27,11 @@ main {
 	margin: 0 auto;
 }
 
+footer {
+	width: 100%;
+	background-color: #e6e6e6;
+}
+
 .section {
 	margin: 0;
 	padding: 0;
