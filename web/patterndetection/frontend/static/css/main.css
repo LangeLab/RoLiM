@@ -22,6 +22,16 @@ header {
 	width: 100%;
 }
 
+main {
+	width: 1024px;
+	margin: 0 auto;
+}
+
+.section {
+	margin: 0;
+	padding: 0;
+}
+
 .labtitle {
 	width: 100%;
 	background-color: #2f5d7c;
@@ -47,7 +57,3 @@ header {
 	margin: 0 auto;
 }
 
-main {
-	width: 1024px;
-	margin: 0 auto;
-}
