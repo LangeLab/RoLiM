@@ -19,6 +19,7 @@ p, a {
 }
 
 header {
+	min-width: 1024px;
 	width: 100%;
 }
 
@@ -28,6 +29,7 @@ main {
 }
 
 footer {
+	min-width: 1024px;
 	width: 100%;
 	background-color: #e6e6e6;
 }
@@ -42,10 +44,11 @@ footer {
 }
 
 .description-header {
-	
+
 }
 
 .labtitle {
+	min-width: 1024px;
 	width: 100%;
 	background-color: #2f5d7c;
 }
@@ -61,6 +64,7 @@ footer {
 }
 
 .tooltitle {
+	min-width: 1024px;
 	width: 100%;
 	background-color: #e6e6e6;
 }
