@@ -8,6 +8,7 @@ body, html, header, div, section, main {
 
 body, html {
 	height: 100vh;
+	overflow: visible;
 }
 
 h1, h2, h3, h4 {
