@@ -31,6 +31,7 @@ header {
 
 .labtitle-inner {
 	width: 1024px;
+	margin: 0 auto;
 }
 
 .lablink {
@@ -44,6 +45,7 @@ header {
 
 .tooltitle-inner {
 	width: 1024px;
+	margin: 0 auto;
 }
 
 main {
