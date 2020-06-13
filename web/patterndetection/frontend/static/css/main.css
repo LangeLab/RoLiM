@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display|Source+Sans+Pro:200,400');
 
 * {
-	margin: 0 !important;
-	padding: 0 !important;
+	margin: 0;
+	padding: 0;
 }
 
-body, html {
+body, html, header, div {
 	height: 100vh;
 	margin: 0;
 	padding: 0;
@@ -36,7 +36,7 @@ header {
 
 .lablink {
 	color: white;
-	font-size: 4rem;
+	font-size: 2rem;
 }
 
 .tooltitle {
