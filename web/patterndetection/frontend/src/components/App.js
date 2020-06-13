@@ -28,7 +28,9 @@ const App = () => (
   		<JobForm endpoint="/api/job/" />
   	</main>
   	<footer>
-  		<div className="footer-inner"><p>Copyright &copy; 2020 Theodore G. Smith</p>
+  		<div className="footer-inner">
+  			<p>Copyright &copy; 2020 Theodore G. Smith</p>
+  		</div>
   	</footer>
   </div>
 );
