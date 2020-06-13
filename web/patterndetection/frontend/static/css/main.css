@@ -1,15 +1,13 @@
 /* Typography imported from Google Fonts */
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display|Source+Sans+Pro:200,400');
 
-* {
+body, html, header, div {
 	margin: 0;
 	padding: 0;
 }
 
-body, html, header, div {
+body, html {
 	height: 100vh;
-	margin: 0;
-	padding: 0;
 }
 
 h1, h2, h3, h4 {
