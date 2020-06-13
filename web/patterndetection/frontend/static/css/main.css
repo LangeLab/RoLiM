@@ -37,6 +37,14 @@ footer {
 	padding: 0;
 }
 
+.description {
+
+}
+
+.description-header {
+	
+}
+
 .labtitle {
 	width: 100%;
 	background-color: #2f5d7c;
@@ -64,5 +72,9 @@ footer {
 
 .footer-inner {
 	width: 1024px;
+	margin: 0 auto;
+}
+
+.copyright {
 	margin: 0 auto;
 }

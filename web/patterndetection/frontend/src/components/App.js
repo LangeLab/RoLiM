@@ -22,14 +22,14 @@ const App = () => (
   	<br />
   	<main>
   		<section>
-  			<h4 className="title description-header">Description</h4>
-  			<p>RoLiM iteratively detects over-represented linear motifs in sequence data sets.</p>
+  			<h4 className="title is-4 description-header">Description</h4>
+  			<p className="description">RoLiM iteratively detects over-represented linear motifs in sequence data sets.</p>
   		</section>
   		<JobForm endpoint="/api/job/" />
   	</main>
   	<footer>
   		<div className="footer-inner">
-  			<p>Copyright &copy; 2020 Theodore G. Smith</p>
+  			<p className="copyright">Copyright &copy; 2020 Theodore G. Smith</p>
   		</div>
   	</footer>
   </div>
