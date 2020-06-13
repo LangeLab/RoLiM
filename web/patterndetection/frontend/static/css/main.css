@@ -1,7 +1,7 @@
 /* Typography imported from Google Fonts */
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display|Source+Sans+Pro:200,400');
 
-body, html, header, div {
+body, html, header, div, section, main {
 	margin: 0;
 	padding: 0;
 }
