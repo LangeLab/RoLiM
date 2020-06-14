@@ -91,7 +91,7 @@ def new_job(jobcode):
     foreground_path = os.path.join(settings.MEDIA_ROOT, foreground_data.name)
     
     # Set email login parameters.
-    username = 'lange.lab.ubc@gmail.com'
+    username = 'tsmithdmr@gmail.com'
     with open('gmail_app_password') as app_password:
         password = app_password.read().strip()
     
