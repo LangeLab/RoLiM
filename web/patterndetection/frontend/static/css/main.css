@@ -77,7 +77,13 @@ footer {
 }
 
 .jobformcontainer {
+	position: relative;
 	width: 1024px;
+}
+
+.jobform {
+	width: 80%;
+	margin: 0 auto;
 }
 
 .footer-inner {

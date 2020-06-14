@@ -245,7 +245,7 @@ class JobForm extends Component {
     return (
       <section className="jobformcontainer">
         <h4 className="title is-4">Submit a new job for analysis.</h4>
-        <form onSubmit={this.handleSubmit} encType="multipart/form-data">
+        <form className="jobform" onSubmit={this.handleSubmit} encType="multipart/form-data">
           <div className="field">
             <label className="label">Email</label>
             <div className="control">
