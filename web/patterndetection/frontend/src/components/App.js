@@ -25,10 +25,12 @@ const App = () => (
   			<h4 className="title is-4 description-header">Description</h4>
   			<p className="description">RoLiM iteratively detects over-represented linear motifs in sequence data sets.</p>
   		</section>
+  		<br />
   		<section>
   			<h4 className="title is-4 description-header">Citing RoLiM</h4>
   			<p className="description">Please visit our <a href="https://langelab.med.ubc.ca">main lab website</a> for more information about citing RoLiM.</p>
   		</section>
+  		<br />
   		<JobForm endpoint="/api/job/" />
   	</main>
   	<footer>

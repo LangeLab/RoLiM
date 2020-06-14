@@ -243,7 +243,7 @@ class JobForm extends Component {
       originalrowmerge
     } = this.state;
     return (
-      <div className="column">
+      <section className="jobformcontainer">
         <h4 className="title is-4">Submit a new job for analysis.</h4>
         <form onSubmit={this.handleSubmit} encType="multipart/form-data">
           <div className="field">
@@ -785,7 +785,7 @@ class JobForm extends Component {
             </button>
           </div>
         </form>
-      </div>
+      </section>
     );
   }
 }
