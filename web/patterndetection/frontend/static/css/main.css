@@ -32,6 +32,7 @@ main {
 footer {
 	min-width: 1024px;
 	width: 100%;
+	margin-top: 2em;
 	background-color: #e6e6e6;
 }
 
