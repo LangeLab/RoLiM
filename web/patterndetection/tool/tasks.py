@@ -144,7 +144,7 @@ def new_job(jobcode):
         log_file.write('Fold difference cutoff:  {}\n'.format(fold_change_cutoff))
         log_file.write('Max depth:  {}\n'.format(max_depth))
         log_file.write('Sequence extension:  {}\n'.format(extend_sequences))
-        log_file.write('Extension direction:  {}\n'.format(extension_direction))
+        log_file.write('Extension direction:  {}\n'.format(terminal))
         log_file.write('Require protein identifiers:  {}\n'.format(require_context_id))
         log_file.write('Width:  {}\n'.format(width))
         log_file.write('Centered sequences:  {}\n'.format(center_sequences))
@@ -318,7 +318,7 @@ def new_job(jobcode):
                 zip_path,
                 'zip',
                 os.path.join(settings.MEDIA_ROOT, jobcode),
-                'results'
+                output_title
             )
 
             # Prepare email.
