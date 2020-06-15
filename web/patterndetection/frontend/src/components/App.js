@@ -35,7 +35,7 @@ const App = () => (
   	</main>
   	<footer>
   		<div className="footer-inner">
-  			<p className="copyright">Copyright &copy; 2020 Theodore G. Smith</p>
+  			<p className="copyright">Copyright &copy; 2020 Theodore Gray Smith</p>
   		</div>
   	</footer>
   </div>
