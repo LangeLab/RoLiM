@@ -28,7 +28,7 @@ const App = () => (
   		<br />
   		<section>
   			<h4 className="title is-4 description-header">Citing RoLiM</h4>
-  			<p className="description">Please visit our <a href="https://langelab.med.ubc.ca">main lab website</a> for more information about citing RoLiM.</p>
+  			<p className="description">Please visit our <a href="https://langelab.med.ubc.ca/resources/#rolim">main lab website</a> for more information about citing RoLiM.</p>
   		</section>
   		<br />
   		<JobForm endpoint="/api/job/" />
