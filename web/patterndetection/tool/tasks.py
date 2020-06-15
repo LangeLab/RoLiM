@@ -101,7 +101,8 @@ def new_job(jobcode):
     msg['From'] = username
     msg['To'] = email
 
-    output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, 'results')
+    output_title = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
+    output_directory = os.path.join(settings.MEDIA_ROOT, jobcode, output_title)
     try:
         os.makedirs(output_directory)
     except:

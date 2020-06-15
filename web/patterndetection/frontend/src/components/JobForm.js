@@ -321,7 +321,7 @@ class JobForm extends Component {
                   checked={foregroundformat == 1}
                   required
                 />
-                Prealigned text file (<a href='/patterndetection/textfile' download>Example</a>)
+                Prealigned text file (<a href='/rolim/textfile' download>Example</a>)
               </label>
             </div>
             <div>
@@ -334,7 +334,7 @@ class JobForm extends Component {
                   value="3"
                   checked={foregroundformat == 3}
                 />
-                Text file peptide list (<a href='/patterndetection/peptidelist' download>Example</a>)
+                Text file peptide list (<a href='/rolim/peptidelist' download>Example</a>)
               </label>
             </div>
           </div>
@@ -732,7 +732,7 @@ class JobForm extends Component {
             <div>
                 <label className="label">Select level at which to merge multiple peptide alignments.</label>
                 <HelpText text={
-                    "Peptides may match more than one position in the context proteome. This setting species how to handle those multiple matches.\n\n"
+                    "Peptides may match more than one position in the context proteome. This setting specifies how to handle those multiple matches.\n\n"
                     + "None: Multiple matches will not be merged. Each unique match will be included as a separate sequence in the aligned foreground data set.\n"
                     + "Protein: Multiple matches mapping to the same protein will be merged, replacing positions in the extended region of the sequence which disagree with an X.\n"
                     + "All: All multiple matches will be merged resulting in one aligned sequence, possibly containing Xs in the extended region of the aligned sequence (default for unaligned foreground data sets).\n"} />
