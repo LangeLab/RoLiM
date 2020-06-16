@@ -27,26 +27,20 @@ header {
 main {
 	width: 1024px;
 	margin: 0 auto;
+	padding: 0 1em;
 }
 
 footer {
 	min-width: 1024px;
 	width: 100%;
 	margin-top: 2em;
+	padding: 1em;
 	background-color: #e6e6e6;
 }
 
 .section {
 	margin: 0;
 	padding: 0;
-}
-
-.description {
-
-}
-
-.description-header {
-
 }
 
 .labtitle {
@@ -58,6 +52,7 @@ footer {
 .labtitle-inner {
 	width: 1024px;
 	margin: 0 auto;
+	padding: 0 1em;
 }
 
 .lablink {
@@ -74,6 +69,7 @@ footer {
 .tooltitle-inner {
 	width: 1024px;
 	margin: 0 auto;
+	padding: 0 1em;
 }
 
 .jobformcontainer {
