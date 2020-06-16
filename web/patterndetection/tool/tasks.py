@@ -353,9 +353,7 @@ def new_job(jobcode):
                 error_message,
                 traceback.format_exc()
             )
-            + '<br /><br />Please check that the options you selected match the'
-            + ' format of your data, and that the format of your data matches a'
-            + ' format supported by our tool.<br /><br />Thank you!'
+            + '<br /><br />Thank you!'
         )
         msg_body = MIMEText(html, 'html')
         msg.attach(msg_body)
