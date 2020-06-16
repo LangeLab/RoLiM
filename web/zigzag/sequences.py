@@ -468,7 +468,7 @@ def align_sequences(context,
                 for n_term_match in sorted(list(matches.n_term)):
                     extended_sequences[context_id].n_term.add(n_term_match)
                 for c_term_match in sorted(list(matches.c_term)):
-                    extended_sequences.c_term.add(c_term_match)
+                    extended_sequences[context_id].c_term.add(c_term_match)
 
         # Add all aligned instances of peptide if redundancy_level is 'none'.
         if original_row_merge == 'none':
@@ -480,10 +480,14 @@ def align_sequences(context,
         # Merge aligned instances of peptide at protein level otherwise.
         elif original_row_merge == 'protein':
             for context_id, context_element_matches in extended_sequences.items():
-                if extended_sequences.n_term:
-                    aligned_sequences.append([i, merge_sequences(context_element_matches.n_term), context_id])
-                if extended_sequences.c_term:
-                    aligned_sequences.append([i, merge_sequences(context_element_matches.c_term), context_id])
+                if context_element_matches.n_term:
+                    aligned_sequences.append(
+                        [i, merge_sequences(context_element_matches.n_term), context_id]
+                    )
+                if context_element_matches.c_term:
+                    aligned_sequences.append(
+                        [i, merge_sequences(context_element_matches.c_term), context_id]
+                    )
         elif original_row_merge == 'all':
             context_ids = []
             all_extended_sequences = ExtendedSequences(
@@ -498,9 +502,13 @@ def align_sequences(context,
                 context_ids.append(context_id)
             context_id = '; '.join(context_ids)
             if all_extended_sequences.n_term:
-                aligned_sequences.append([i, merge_sequences(all_extended_sequences.n_term), context_id])
+                aligned_sequences.append(
+                    [i, merge_sequences(all_extended_sequences.n_term), context_id]
+                )
             if all_extended_sequences.c_term:
-                aligned_sequences.append([i, merge_sequences(all_extended_sequences.c_term), context_id])
+                aligned_sequences.append(
+                    [i, merge_sequences(all_extended_sequences.c_term), context_id]
+                )
 
 
     # Generate aligned sequence data frame for redundancy processing.
