@@ -322,7 +322,7 @@ def new_job(jobcode):
             )
 
             # Prepare email.
-            html = 'Please find attached, the results of your pattern detection analysis.'
+            html = 'Please find attached, the results of your pattern detection analysis.<br />'
             msg_body = MIMEText(html, 'html')
             msg.attach(msg_body)
             
@@ -353,7 +353,7 @@ def new_job(jobcode):
                 error_message,
                 traceback.format_exc()
             )
-            + '<br /><br />Thank you!'
+            + '<br /><br />Thank you!<br />'
         )
         msg_body = MIMEText(html, 'html')
         msg.attach(msg_body)
