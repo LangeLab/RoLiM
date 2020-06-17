@@ -21,7 +21,8 @@ const App = () => (
   	</header>
   	<br />
   	<main>
-  		<span className="compatibility">Browser compatibility notice: RoLiM works best when used with Firefox, Chrome, or Internet Explorer.</span>
+  		<span className="compatibility">*Browser compatibility notice: RoLiM works best when used with Firefox, Chrome, or Internet Explorer.</span>
+  		<br />
   		<section>
   			<h4 className="title is-4 description-header">Description</h4>
   			<p className="description">RoLiM iteratively detects over-represented linear motifs in sequence data sets.</p>
