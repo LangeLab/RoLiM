@@ -72,6 +72,11 @@ footer {
 	padding: 0 1em;
 }
 
+.compatibility {
+	font-size: 0.8em;
+	color: #dbdbdb;
+}
+
 .jobformcontainer {
 	position: relative;
 	width: 1024px;
