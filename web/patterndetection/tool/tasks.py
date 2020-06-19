@@ -96,7 +96,7 @@ def new_job(jobcode):
         password = app_password.read().strip()
     
     # Generate new email message and specify details.
-    msg = MIMEMultipart('alternative')
+    msg = MIMEMultipart('mixed')
     msg['Subject'] = 'RoLiM Results: {}'.format(title)
     msg['From'] = username
     msg['To'] = email
@@ -320,11 +320,6 @@ def new_job(jobcode):
                 os.path.join(settings.MEDIA_ROOT, jobcode),
                 output_title
             )
-
-            # Prepare email.
-            html = 'Please find attached, the results of your pattern detection analysis.\r\n'
-            msg_body = MIMEText(html, 'html')
-            msg.attach(msg_body)
             
             # Attach results archive to email message.
             zip_filename = zip_path + '.zip'
@@ -335,6 +330,12 @@ def new_job(jobcode):
                 encoders.encode_base64(p)
                 p.add_header('Content-Disposition', "attachment; filename= %s" % zip_basename)
                 msg.attach(p)
+
+            # Prepare email.
+            html = 'Please find attached, the results of your pattern detection analysis.\r\n'
+            msg_body = MIMEText(html, 'html')
+            msg.attach(msg_body)
+            
         except Exception as e:
             raise ParameterError() from e
     except Exception as e:
@@ -348,15 +349,6 @@ def new_job(jobcode):
         else:
             error_message = 'review your submission and try again'
 
-        html = (
-            'Something went wrong with your analysis. Please {}:<br /><br />{}'.format(
-                error_message,
-                traceback.format_exc()
-            )
-            + '<br /><br />Thank you!\r\n'
-        )
-        msg_body = MIMEText(html, 'html')
-        msg.attach(msg_body)
         with open(log_file_path, 'rb') as attachment:
             p = MIMEBase('application', 'octet-stream')
             p.set_payload((attachment).read())
@@ -366,6 +358,16 @@ def new_job(jobcode):
                 "attachment; filename= %s" % os.path.basename(log_file_path)
             )
             msg.attach(p)
+
+        html = (
+            'Something went wrong with your analysis. Please {}:<br /><br />{}'.format(
+                error_message,
+                traceback.format_exc()
+            )
+            + '<br /><br />Thank you!\r\n'
+        )
+        msg_body = MIMEText(html, 'html')
+        msg.attach(msg_body)
 
     # Start SMTP session using TLS security and login to Gmail
     server = smtplib.SMTP('smtp.gmail.com', 587)
