@@ -7,12 +7,12 @@ The local sequence context is the most fundamental feature determining the post 
 
 
 ## How to use?
-For convenient use we provide a web frontend accessible at `http://langelab.org/rolim`
+For convenient use we provide a web frontend accessible at http://langelab.org/rolim
 If preferred RoLiM can also be installed locally but the software has not been designed for ease of local installation and use. 
 
 The webfrontent includes detailed explanations for all options and parameters as well as example datasets for download.
 
-`Example data 1:` prealigned sequence list
+`Example data 1:` prealigned sequence list (http://langelab.org/rolim/textfile)
 ```splus
 HPKPKQFSSFEKRAK
 DVATSPISPTENNTT
@@ -66,7 +66,7 @@ PFAFNLNSDTDVEEG
 QIRLRRDSKEANARR
 ```
 
-`Example Data 2:` peptide list with optional protein identifiers
+`Example Data 2:` peptide list with optional protein identifiers (http://langelab.org/rolim/peptidelist)
 ```
 VLYDVQELR	P09525
 SLVINYDLPTNR	Q14240
