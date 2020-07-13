@@ -355,6 +355,7 @@ class JobForm extends Component {
                 Swiss-Prot Human
               </label>
             </div>
+            {/*
             <div>
               <label>
                 <input
@@ -368,6 +369,7 @@ class JobForm extends Component {
                 Swiss-Prot Mouse
               </label>
             </div>
+            */}
             <div>
               <label>
                 <input
