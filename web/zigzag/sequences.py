@@ -349,7 +349,7 @@ def align_sequences(context,
                     original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
                     original_sequences=None,
                     require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
-                    precomputed=None):
+                    precomputed=''):
     """
     Take unaligned sequences and context. Map unaligned sequences to
         context. Truncated prime segment to half width. Extend sequence
@@ -1190,7 +1190,7 @@ class Background:
                     initial_background_size_limit=None,
                     fast=False,
                     center=False,
-                    precomputed=None):
+                    precomputed=''):
         """
         Default background mode. Initialize from list of sequences.
 
@@ -1230,7 +1230,7 @@ class Background:
         self._background_vector = self._vectorize_background()
 
         # Generate positional background tensor.
-        if  self.precomputed is not None:
+        if  self.precomputed != '':
             self._background_df = pd.read_csv(
                 self.precomputed,
                 sep=',',
