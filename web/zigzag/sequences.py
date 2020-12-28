@@ -390,7 +390,7 @@ def align_sequences(context,
     for i, sequence in sequences.iterrows():
         # Select pre-mapped context elements if available.
         try:
-            context_ids = sequence['context_id'].replace(' ', '').split(';')  
+            context_ids = sequence['context_id'].replace(' ', '').split(';')
         except:
             if require_context_id:
                 continue
@@ -433,7 +433,7 @@ def align_sequences(context,
                                 )
                     else:
                         context_sequences = context[
-                            context['id'] == context_id
+                            context['swissprot_id'] == context_id
                         ]['sequence'].tolist()
                         num_sequences = len(context_sequences)
                         if num_sequences == 1:
