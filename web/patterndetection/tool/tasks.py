@@ -230,15 +230,17 @@ def new_job(jobcode):
             # Load sequences from Job submission data set.
             if foreground_format == 1:
                 # Load input sequences from prealigned txt file.
-                sample = sequences.load_prealigned_file(
+                samples = sequences.load_prealigned_file(
                     foreground_path,
                     background,
                     center=center_sequences,
-                    redundancy_level=redundancy_level
+                    redundancy_level=redundancy_level,
+                    title=title
                 )
+            ### NOT ENABLED ###
             elif foreground_format == 2:
                 # Load input sequences from prealigned FASTA file.
-                sample = sequences.load_prealigned_fasta(
+                samples = sequences.load_prealigned_fasta(
                     foreground_path,
                     background,
                     center=center_sequences,
@@ -246,7 +248,7 @@ def new_job(jobcode):
                 )
             elif foreground_format == 3:
                 # Load input sequences from txt peptide list.
-                sample = sequences.load_peptide_list_file(
+                samples = sequences.load_peptide_list_file(
                     foreground_path,
                     context,
                     background,
@@ -256,11 +258,13 @@ def new_job(jobcode):
                     require_context_id=require_context_id,
                     redundancy_level=redundancy_level,
                     first_protein_only=first_protein_only,
-                    original_row_merge=original_row_merge
+                    original_row_merge=original_row_merge,
+                    title=title
                 )
+            ### NOT ENABLED ###
             elif foreground_format == 5:
                 # Load input sequences from FASTA peptide list.
-                sample = sequences.load_fasta_peptides(
+                samples = sequences.load_fasta_peptides(
                     foreground_path,
                     context,
                     background,
@@ -272,17 +276,19 @@ def new_job(jobcode):
                     first_protein_only=first_protein_only,
                     original_row_merge=original_row_merge
                 )
+            ### NOT ENABLED ###
             elif foreground_format == 6:
                 # Load input sequences from text field.
-                sample = sequences.load_prealigned_field(
+                samples = sequences.load_prealigned_field(
                     foreground_path,
                     background,
                     center=center_sequences,
                     redundancy_level=redundancy_level
                 )
+            ### NOT ENABLED ###
             elif foreground_format == 7:
                 # Load input sequences from MaxQuant evidence.txt.
-                sample = sequences.load_maxquant_evidence_file(
+                samples = sequences.load_maxquant_evidence_file(
                     foreground_path,
                     context,
                     background,
@@ -292,24 +298,47 @@ def new_job(jobcode):
             raise ForegroundError() from e
 
         try:
-            # Run pattern extraction analysis and generate outputs.
-            patterns = pattern_extraction.PatternContainer(
-                sample,
-                background,
-                title,
-                output_directory,
-                max_depth=max_depth,
-                p_value_cutoff=p_value_cutoff,
-                minimum_occurrences=minimum_occurrences,
-                fold_change_cutoff=fold_change_cutoff,
-                multiple_testing_correction=multiple_testing_correction,
-                positional_weighting=positional_weighting,
-                allow_compound_residue_decomposition=compound_residue_decomposition
-            )
-            if width == 8:
-                patterns.post_processing()
+            sample_output_paths = []
+            if len(samples.keys()) > 1:
+                for sample_name in samples.keys():
+                    sample_directory = re.sub(r'\W+', ' ', sample_name).strip().replace(" ", "_")
+                    sample_output_path = os.path.join(output_directory, sample_directory)
+                    sample_output_paths.append((sample_name, sample_output_path))
             else:
-                patterns.post_processing(proteolysis_data=False)
+                sample_output_paths.append((list(samples.keys())[0], output_directory))
+            
+            # Run pattern extraction analysis and generate outputs.
+            summary_tables = []
+            for sample_name, sample_output_path in sample_output_paths:
+                patterns = pattern_extraction.PatternContainer(
+                    samples[sample_name],
+                    background,
+                    sample_name,
+                    sample_output_path,
+                    max_depth=max_depth,
+                    p_value_cutoff=p_value_cutoff,
+                    minimum_occurrences=minimum_occurrences,
+                    fold_change_cutoff=fold_change_cutoff,
+                    multiple_testing_correction=multiple_testing_correction,
+                    positional_weighting=positional_weighting,
+                    allow_compound_residue_decomposition=compound_residue_decomposition
+                )
+                if width == 8:
+                    summary_tables.append(patterns.post_processing())
+                else:
+                    summary_tables.append(patterns.post_processing(proteolysis_data=False))
+            
+            # Add sequence summary table to summary output directory.
+            summary_table = pd.concat(summary_tables)
+            pd.to_csv(
+                os.path.join(
+                    log_file_directory,
+                    '{}_sequence_summary_table.txt'.format(output_title)
+                ),
+                sep='\t',
+                header=True,
+                index=True
+            )
 
             # Compress outputs as zip archive.
             archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")

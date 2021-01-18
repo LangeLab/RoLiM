@@ -108,6 +108,16 @@ PYRO_GLU = [
 ]
 
 
+def detect_delimiter(file_path):
+    # Detect delimiter from file extension (supports comma or tab).
+    file_extension = file_path[-file_path[::-1].find('.'):].lower()
+    if file_extension == 'csv':
+        delimiter = ','
+    else:
+        delimiter = '\t'
+
+    return delimiter
+
 def get_residue_index(residue, residue_dict):
     """
 
@@ -688,7 +698,7 @@ def sequences_to_df(sequences,
         position.
 
     Parameters:
-        sequences -- File-like object. Contains one sequence per row.
+        sequences -- List-like object. Contains one sequence per row.
         center -- Boolean. If true, column labels will count away from
                         center (leftward direction = non-prime,
                         rightward direction = prime). If false, column
@@ -782,27 +792,24 @@ def import_peptide_list(peptide_list_file,
     Import peptide list and row-matched protein IDs from text file.
 
     Parameters:
-        peptide_list_file -- File-like object.
-        delimiter -- String.
+        peptide_list_file -- File-like object. Path to peptide list.
+        delimiter -- String. Peptide list file delimiter.
+        require_context_id -- Boolean. Discard rows without context ID.
 
     Returns:
         peptide_list -- Pandas DataFrame.
     """
 
-    peptide_list = []
+    # Import peptide list from file.
+    peptide_list = pd.read_csv(peptide_list_file, delimiter=delimiter, header=None)
 
-    # Parse peptides and accession numbers in input file.
-    peptide_reader = csv.reader(peptide_list_file, delimiter=delimiter)
-    for row in peptide_reader:    
-        try:
-            context_id = row[1]
-        except:
-            context_id = None
-        sequence = row[0].upper()
-        peptide_list.append([sequence, context_id])
-
-    cols = ['sequence', 'context_id']
-    peptide_list = pd.DataFrame(peptide_list, columns=cols)
+    # Assign proper headers based on assumed data format.
+    if len(peptide_list.columns) == 1:
+        peptide_list.columns = ['sequence']
+    elif len(peptide_list.columns) == 2:
+        peptide_list.columns = ['sequence', 'context_id']
+    elif len(peptide_list.columns) == 3:
+        peptide_list.columns = ['sample_name', 'sequence', 'context_id']
 
     return peptide_list
 
@@ -956,10 +963,21 @@ def peptides_to_sample(peptides,
     """
 
     original_sequences = peptides.copy()
-    original_sequences.columns = [
-        'input_sequence',
-        'input_context_id',
-    ]
+    if len(original_sequences.columns) == 1:
+        original_sequences.columns = [
+            'input_sequence',
+        ]
+    elif len(original_sequences.columns) == 2:
+        original_sequences.columns = [
+            'input_sequence',
+            'input_context_id',
+        ]
+    elif len(original_sequences.columns) == 3:
+        original_sequences.columns = [
+            'input_sample_name',
+            'input_sequence',
+            'input_context_id',
+        ]
 
     aligned_sequences = align_sequences(
         context,
@@ -1015,54 +1033,65 @@ def load_peptide_list_file(peptide_list_path,
                             require_context_id=DEFAULT_REQUIRE_CONTEXT_ID,
                             redundancy_level=DEFAULT_PEPTIDE_REDUNDANCY_LEVEL,
                             first_protein_only=DEFAULT_FIRST_PROTEIN_ONLY,
-                            original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE):
+                            original_row_merge=DEFAULT_ORIGINAL_ROW_MERGE,
+                            title=''):
     """
     Top-level helper function to load and extend peptides from text
         file.
 
     Parameters:
-        peptide_list_path -- String.
-        context -- Pandas DataFrame.
-        terminal -- String.
+        peptide_list_path -- String. Path to peptide list.
+        context -- Pandas DataFrame. Context proteome data frame.
+        terminal -- String. Defines extension direction.
         require_context_id -- Boolean.
-        redundancy_level -- String.
-        first_protein_only -- Boolean.
-        original_row_merge -- String.
+        redundancy_level -- String. Defines level of repeated sequence
+                                redundancy elimination.
+        first_protein_only -- Boolean. Only use the first context ID
+                                for each row in the foreground data set
+                                during alignment and extension.
+        original_row_merge -- String. Defines behavior for merging
+                                multiple proteome matches from each
+                                row in the foreground data set during 
+                                alignment and extension.
+        title -- String. Analysis title.
 
     Returns:
         sample -- Sample instance.
     """
 
     # Detect delimiter from file extension (supports comma or tab).
-    file_extension = peptide_list_path[-peptide_list_path[::-1].find('.'):].lower()
-    if file_extension == 'csv':
-        delimiter = ','
-    else:
-        delimiter = '\t'
+    delimiter = detect_delimiter(peptide_list_path)
 
     # open peptide list file
     with open(peptide_list_path, 'r') as peptide_list_file:
-        peptides = import_peptide_list(
+        peptide_list = import_peptide_list(
             peptide_list_file,
             delimiter=delimiter,
             require_context_id=require_context_id,
             redundancy_level=redundancy_level
         )
     
-    sample = peptides_to_sample(
-        peptides,
-        context,
-        background,
-        center=center,
-        width=width,
-        terminal=terminal,
-        redundancy_level=redundancy_level,
-        first_protein_only=first_protein_only,
-        original_row_merge=original_row_merge,
-        require_context_id=require_context_id
-    )
+    try:
+        sample_peptides = dict(tuple(peptide_list.groupby('sample_name')))
+    except:
+        sample_peptides = {title: peptide_list}
 
-    return sample
+    samples = {}
+    for sample_name, peptides in sample_peptides.items():
+        samples[sample_name] = peptides_to_sample(
+            peptides,
+            context,
+            background,
+            center=center,
+            width=width,
+            terminal=terminal,
+            redundancy_level=redundancy_level,
+            first_protein_only=first_protein_only,
+            original_row_merge=original_row_merge,
+            require_context_id=require_context_id
+        )
+
+    return samples
 
 
 def load_peptide_list_field(peptide_list_field,
@@ -1089,22 +1118,60 @@ def load_peptide_list_field(peptide_list_field,
 def load_prealigned_file(prealigned_file_path,
                             background,
                             center=DEFAULT_CENTER,
-                            redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL):
+                            redundancy_level=DEFAULT_PREALIGNED_REDUNDANCY_LEVEL,
+                            title=''):
     """
     Top-level helper function to load pre-aligned sequences from text
         file.
+    
+    Parameters:
+        prealigned_file_path -- String. Path to prealigned file.
+        background -- Background instance.
+        center -- Boolean. Count sequence positions away from center.
+
+    Returns:
+        sample -- Sample objects as values.
     """
     
-    with open(prealigned_file_path, 'r') as prealigned_file:
+    delimiter = detect_delimiter(prealigned_file_path)
+    prealigned_sequences = pd.read_csv(
+        prealigned_file_path,
+        delimiter=delimiter,
+        header=None
+    )
+
+    if len(prealigned_sequences.columns) == 1:
+        prealigned_sequences.columns = ['sequence']
         sequence_df = sequences_to_df(
-            prealigned_file,
+            prealigned_sequences['sequence'].tolist(),
             center=center,
             redundancy_level=redundancy_level
         )
-    sequence_tensor = vectorize_sequences(sequence_df, background)
-    sample = Sample(sequence_df=sequence_df, sequence_tensor=sequence_tensor)
-
-    return sample
+        sequence_tensor = vectorize_sequences(sequence_df, background)
+        samples = {
+            title: Sample(
+                sequence_df=sequence_df,
+                sequence_tensor=sequence_tensor
+            )
+        }
+    elif len(prealigned_sequences.columns) == 2:
+        prealigned_sequences.columns = ['sample_name', 'sequence']
+        prealigned_samples = dict(tuple(prealigned_sequences.groupby('sample_name')))
+        samples = {}
+        for sample_name, prealigned_sequences in prealigned_samples.items():
+            sequence_df = sequences_to_df(
+                prealigned_sequences['sequence'].tolist(),
+                center=center,
+                redundancy_level=redundancy_level
+            )
+            sequence_tensor = vectorize_sequences(sequence_df, background)
+            samples[sample_name] = Sample(
+                sequence_df=sequence_df,
+                sequence_tensor=sequence_tensor,
+                original_sequences=prealigned_sequences
+            )
+    
+    return samples
 
 
 def load_prealigned_field(prealigned_field,

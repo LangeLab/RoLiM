@@ -613,10 +613,7 @@ def generate_protease_pattern_heatmap(title,
     plt.savefig(output_path, dpi=300)
 
 
-def generate_figures(sequence_df,
-                        patterns,
-                        analysis_title,
-                        output_dir,
+def generate_figures(patterns,
                         proteolysis_data=True,
                         annotate_clustermap=False):
     """
@@ -633,6 +630,11 @@ def generate_figures(sequence_df,
         None
     """
     
+    # Convenience variables.
+    sequence_df = patterns.sample.sequence_df
+    analysis_title = patterns.title
+    output_dir = patterns.output_directory
+
     # Create output file name prefix from analysis title.
     output_prefix = analysis_title.replace(" ", "_")
 

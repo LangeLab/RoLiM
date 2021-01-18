@@ -1594,16 +1594,17 @@ class PatternContainer:
 
         # Generate heatmaps and clustermap.
         vis.generate_figures(
-            self.sample.sequence_df,
             self,
-            self.title,
-            self.output_directory,
             proteolysis_data=proteolysis_data,
             annotate_clustermap=False
         )
         
         # Generate tabular output.
         self.generate_summary_table()
+
+        return self.sequence_summary_table
+
+
 
     def generate_summary_table(self):
         """
