@@ -811,8 +811,9 @@ def import_peptide_list(peptide_list_file,
     elif len(peptide_list.columns) == 3:
         peptide_list.columns = ['sample_name', 'sequence', 'context_id']
     else:
-        peptide_list.columns = ['sample_name', 'sequence', 'context_id']
-            + ['Additional Data {}'.format(i) for i in range(len(peptide_list.columns) - 3)]
+        peptide_list.columns = ['sample_name', 'sequence', 'context_id'] + [
+            'additional_data_{}'.format(i) for i in range(len(peptide_list.columns) - 3)
+        ]
 
     return peptide_list
 
@@ -986,8 +987,10 @@ def peptides_to_sample(peptides,
             'input_sample_name',
             'input_sequence',
             'input_context_id',
-        ]+ ['additional_data_{}'.format(i)
-                for i in range(len(original_sequences.columns) - 3)]
+        ] + [
+            'additional_data_{}'.format(i)
+            for i in range(len(original_sequences.columns) - 3)
+        ]
 
     aligned_sequences = align_sequences(
         context,
@@ -1168,9 +1171,10 @@ def load_prealigned_file(prealigned_file_path,
         if len(prealigned_sequences.columns) == 2:
             prealigned_sequences.columns = ['input_sample_name', 'aligned_sequence']
         else:
-            prealigned_sequences.columns = ['input_sample_name', 'aligned_sequence']
-                + ['additional_data_{}'.format(i)
-                    for i in range(len(prealigned_sequences.columns) - 2)]
+            prealigned_sequences.columns = ['input_sample_name', 'aligned_sequence'] + [
+                'additional_data_{}'.format(i)
+                for i in range(len(prealigned_sequences.columns) - 2)
+            ]
         prealigned_samples = dict(tuple(prealigned_sequences.groupby('input_sample_name')))
         samples = {}
         for sample_name, prealigned_sequences in prealigned_samples.items():
