@@ -1164,7 +1164,8 @@ def load_prealigned_file(prealigned_file_path,
         samples = {
             title: Sample(
                 sequence_df=sequence_df,
-                sequence_tensor=sequence_tensor
+                sequence_tensor=sequence_tensor,
+                original_sequences=prealigned_sequences
             )
         }
     else:
