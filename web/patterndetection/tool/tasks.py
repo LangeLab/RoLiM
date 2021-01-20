@@ -332,7 +332,7 @@ def new_job(jobcode):
             
             # Add sequence summary table to summary output directory.
             summary_table = pd.concat(summary_tables)
-            pd.to_csv(
+            summary_table.to_csv(
                 os.path.join(
                     log_file_directory,
                     '{}_sequence_summary_table.txt'.format(output_title)
