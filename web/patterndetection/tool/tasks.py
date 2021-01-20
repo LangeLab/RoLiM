@@ -331,16 +331,17 @@ def new_job(jobcode):
                     summary_tables.append(patterns.post_processing(proteolysis_data=False))
             
             # Add sequence summary table to summary output directory.
-            summary_table = pd.concat(summary_tables)
-            summary_table.to_csv(
-                os.path.join(
-                    log_file_directory,
-                    '{}_sequence_summary_table.txt'.format(output_title)
-                ),
-                sep='\t',
-                header=True,
-                index=True
-            )
+            if len(summary_tables) > 1:
+                summary_table = pd.concat(summary_tables)
+                summary_table.to_csv(
+                    os.path.join(
+                        log_file_directory,
+                        '{}_sequence_summary_table.txt'.format(output_title)
+                    ),
+                    sep='\t',
+                    header=True,
+                    index=True
+                )
 
             # Compress outputs as zip archive.
             archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
