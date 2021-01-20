@@ -4,6 +4,8 @@ import re
 import shutil
 import smtplib
 
+import pandas as pd
+
 from django.conf import settings
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
