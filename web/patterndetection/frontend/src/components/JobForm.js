@@ -419,7 +419,8 @@ class JobForm extends Component {
               <HelpText text={
                   "The number of residues in each aligned sequence of the foreground data set. If peptides are"
                   + " supplied and extension/alignment is enabled, this is the final length of each extended and aligned sequence."
-                  + " If pre-aligned sequences are supplied, each supplied sequence MUST be of this length.\n"} />
+                  + " If pre-aligned sequences are supplied, each supplied sequence MUST be of this length.\n\n"
+                  + "*Width must be set to 8 to enable enhanced protease analysis.\n"} />
               <div className="control">
                 <input
                   className="input"
@@ -449,7 +450,8 @@ class JobForm extends Component {
                 </label>
                 <HelpText text={
                     "For example:\n\nCentered:"
-                    + "p4-p3-p2-p1-p1'-p2'-p3'-p4\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8-p9-p10-p11-p12-p13-p14-p15\n"} />
+                    + "p4-p3-p2-p1-p1'-p2'-p3'-p4\n\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8-p9-p10-p11-p12-p13-p14-p15\n\n"
+                    + "*Protease analysis only supported for centered sequences with a window width of 8.\n"} />
               </div>
             </div>
             <div className="field">
@@ -538,7 +540,7 @@ class JobForm extends Component {
                 <HelpText text={
                     "Enables background frequency calculation"
                     + " from a complete, position-specific background derived from the context data set used for"
-                    + " an analysis. When disabled, background frequency are averaged across all posiitons of the"
+                    + " an analysis. When disabled, background frequencies are averaged across all positions of the"
                     + " context data set and dynamically updated when position/residue pairs are eliminated from"
                     + " the foreground data set.\n"} />
               </div>
