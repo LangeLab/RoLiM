@@ -214,7 +214,7 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
-    this.resetForm();
+    {/* this.resetForm(); */}
 
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
