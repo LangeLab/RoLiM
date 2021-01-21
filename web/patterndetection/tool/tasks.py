@@ -330,7 +330,7 @@ def new_job(jobcode):
                     summary_tables.append(patterns.post_processing())
                 else:
                     summary_tables.append(patterns.post_processing(proteolysis_data=False))
-                all_patterns.append(patterns)
+                all_pattern_containers.append(patterns)
 
             # Add sequence summary table to summary output directory.
             if len(summary_tables) > 1:
