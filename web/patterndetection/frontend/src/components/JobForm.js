@@ -72,44 +72,44 @@ class JobForm extends Component {
     if (e.target.name == "foregroundformat") {
       if (e.target.value == 1) {
         this.setState({ redundancylevel: 1 });
-      };
+      }
       else if (e.target.value == 3) {
         this.setState({ redundancylevel: 2 });
-      };
-    };
+      }
+    }
     else if (e.target.id == "prealigned") {
       this.setState({
         prealignedChecked: true,
         peptideListChecked: false
       });
-    };
+    }
     else if (e.target.id == "peptidelist") {
       this.setState({
         prealignedChecked: false,
         peptideListChecked: true
       });
-    };
+    }
     else if (e.target.id == "swissprot-human") {
       this.setState({
         swissProtHumanChecked: true,
         swissProtMouseChecked: false,
         fastaChecked: false
       });
-    };
+    }
     else if (e.target.id == "fasta") {
       this.setState({
         swissProtHumanChecked: false,
         swissProtMouseChecked: true,
         fastaChecked: false
       });
-    };
+    }
     else if (e.target.id == "fasta") {
       this.setState({
         swissProtHumanChecked: false,
         swissProtMouseChecked: false,
         fastaChecked: true
       });
-    };
+    }
     else if (e.target.name == "width") {
       this.setState({ center_sequences: (width % 2 == 0) ? true : false });
     }
