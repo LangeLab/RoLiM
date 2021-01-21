@@ -18,43 +18,100 @@ class JobForm extends Component {
     endpoint: PropTypes.string.isRequired
   };
 
-  state = {
-    title: "",
-    description: "",
-    email: "",
-    foreground_data: "",
-    foregroundformat: "",
-    foreground_filename: "",
-    contextformat: "2",
-    context_data: "",
-    context_filename: "",
-    p_value_cutoff: 0.001,
-    position_specific: true,
-    minimum_occurrences: 20,
-    fold_change_cutoff: 1.0,
-    max_depth: "",
-    width: 15,
-    center_sequences: false,
-    multiple_testing_correction: true,
-    positional_weighting: true,
-    compound_residues: true,
-    compound_residue_decomposition: true,
-    require_context_id: true,
-    extension_direction: "1",
-    redundancylevel: "1",
-    first_protein_only: true,
-    originalrowmerge: "3"
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "",
+      description: "",
+      email: "",
+      foreground_data: "",
+      foregroundformat: "",
+      foreground_filename: "",
+      contextformat: "2",
+      context_data: "",
+      context_filename: "",
+      p_value_cutoff: 0.001,
+      position_specific: true,
+      minimum_occurrences: 20,
+      fold_change_cutoff: 1.0,
+      max_depth: "",
+      width: 15,
+      center_sequences: false,
+      multiple_testing_correction: true,
+      positional_weighting: true,
+      compound_residues: true,
+      compound_residue_decomposition: true,
+      require_context_id: true,
+      extension_direction: "1",
+      redundancylevel: "1",
+      first_protein_only: true,
+      originalrowmerge: "3",
+      prealignedChecked: false,
+      peptideListChecked: false,
+      swissProtHumanChecked: true,
+      swissProtMouseChecked: false,
+      fastaChecked: false,
+    };
+    this.toggleForegroundFormat = this.toggleForegroundFormat.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.toggleAdvancedOptions = this.toggleAdvancedOptions.bind(this);
+    this.handleUpload = this.handleUpload.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.resetForm = this.resetForm.bind(this);
+  }
+
+  toggleForegroundFormat = () => {
+    this.setState({
+
+    });
+  }
 
   handleChange = e => {
     this.setState({ [e.target.name]: e.target.value });
     if (e.target.name == "foregroundformat") {
       if (e.target.value == 1) {
-        this.setState({ "redundancylevel": 1 });
-      }
+        this.setState({ redundancylevel: 1 });
+      };
       else if (e.target.value == 3) {
-        this.setState({ "redundancylevel": 2 });
-      }
+        this.setState({ redundancylevel: 2 });
+      };
+    };
+    else if (e.target.id == "prealigned") {
+      this.setState({
+        prealignedChecked: true,
+        peptideListChecked: false
+      });
+    };
+    else if (e.target.id == "peptidelist") {
+      this.setState({
+        prealignedChecked: false,
+        peptideListChecked: true
+      });
+    };
+    else if (e.target.id == "swissprot-human") {
+      this.setState({
+        swissProtHumanChecked: true,
+        swissProtMouseChecked: false,
+        fastaChecked: false
+      });
+    };
+    else if (e.target.id == "fasta") {
+      this.setState({
+        swissProtHumanChecked: false,
+        swissProtMouseChecked: true,
+        fastaChecked: false
+      });
+    };
+    else if (e.target.id == "fasta") {
+      this.setState({
+        swissProtHumanChecked: false,
+        swissProtMouseChecked: false,
+        fastaChecked: true
+      });
+    };
+    else if (e.target.name == "width") {
+      this.setState({ center_sequences: (width % 2 == 0) ? true : false });
     }
   };
 
@@ -81,34 +138,56 @@ class JobForm extends Component {
     document.getElementById(e.target.name + "-text").textContent = e.target.files[0].name;
   };
   
+  resetForm = () => {
+    if (document.getElementById('peptidelist').checked) {
+      document.getElementById('peptidelist').checked = false;
+    }
+    if (document.getElementById('prealigned').checked) {
+      document.getElementById('prealigned').checked = false;
+    }
+
+    if (this.state.foreground_data != "") {
+      document.getElementById("foreground_data-text").textContent = 'Choose a file...';
+    }
+    if (this.state.foreground_data != "") {
+      document.getElementById("context_data-text").textContent = 'Choose a file...';
+    }
+    this.setState({
+      title: "",
+      email: "",
+      description: "",
+      foreground_data: "",
+      foregroundformat: "",
+      foreground_filename: "",
+      contextformat: "2",
+      context_data: "",
+      context_filename: "",
+      p_value_cutoff: 0.001,
+      contextformat: "",
+      position_specific: true,
+      minimum_occurrences: 20,
+      fold_change_cutoff: 1.0,
+      max_depth: "",
+      center_sequences: false,
+      center_sequences: false,
+      multiple_testing_correction: true,
+      positional_weighting: true,
+      compound_residues: true,
+      compound_residue_decomposition: true,
+      require_context_id: true,
+      extension_direction: "1",
+      redundancylevel: "1",
+      first_protein_only: true,
+      originalrowmerge: "1",
+    });
+
+    document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
+    advancedOptions.style.display = "none";
+  }
+
   handleSubmit = e => {
     e.preventDefault();
     let formData = new FormData();
-    formData.append('foreground_data', this.state.foreground_data);
-    formData.append('foregroundformat', this.state.foregroundformat);
-    formData.append('foreground_filename', this.state.foreground_filename);
-    formData.append('contextformat', this.state.contextformat);
-    formData.append('context_data', this.state.context_data);
-    formData.append('context_filename', this.state.context_filename);
-    formData.append('title', this.state.title);
-    formData.append('description', this.state.description);
-    formData.append('email', this.state.email);
-    formData.append('p_value_cutoff', this.state.p_value_cutoff);
-    formData.append('position_specific', this.state.position_specific);
-    formData.append('minimum_occurrences', this.state.minimum_occurrences);
-    formData.append('fold_change_cutoff', this.state.fold_change_cutoff);
-    formData.append('width', this.state.width);
-    formData.append('center_sequences', this.state.center_sequences);
-    formData.append('multiple_testing_correction', this.state.multiple_testing_correction);
-    formData.append('positional_weighting', this.state.positional_weighting);
-    formData.append('compound_residues', this.state.compound_residues);
-    formData.append('compound_residue_decomposition', this.state.compound_residue_decomposition);
-    formData.append('require_context_id', this.state.require_context_id);
-    formData.append('extension_direction', this.state.extension_direction);
-    formData.append('redundancylevel', this.state.redundancylevel);
-    formData.append('first_protein_only', this.state.first_protein_only);
-    formData.append('originalrowmerge', this.state.originalrowmerge);
-
     const {
       title,
       description,
@@ -135,32 +214,31 @@ class JobForm extends Component {
       first_protein_only,
       originalrowmerge
     } = this.state;
-    const job = {
-      title,
-      description,
-      email,
-      foreground_data,
-      foregroundformat,
-      foreground_filename,
-      contextformat,
-      context_data,
-      context_filename,
-      p_value_cutoff,
-      position_specific,
-      minimum_occurrences,
-      fold_change_cutoff,
-      width,
-      center_sequences,
-      multiple_testing_correction,
-      positional_weighting,
-      compound_residues,
-      compound_residue_decomposition,
-      require_context_id,
-      extension_direction,
-      redundancylevel,
-      first_protein_only,
-      originalrowmerge
-    };
+    formData.append('foreground_data', foreground_data);
+    formData.append('foregroundformat', foregroundformat);
+    formData.append('foreground_filename', foreground_filename);
+    formData.append('contextformat', contextformat);
+    formData.append('context_data', context_data);
+    formData.append('context_filename', context_filename);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('email', email);
+    formData.append('p_value_cutoff', p_value_cutoff);
+    formData.append('position_specific', position_specific);
+    formData.append('minimum_occurrences', minimum_occurrences);
+    formData.append('fold_change_cutoff', fold_change_cutoff);
+    formData.append('width', width);
+    formData.append('center_sequences', center_sequences);
+    formData.append('multiple_testing_correction', multiple_testing_correction);
+    formData.append('positional_weighting', positional_weighting);
+    formData.append('compound_residues', compound_residues);
+    formData.append('compound_residue_decomposition', compound_residue_decomposition);
+    formData.append('require_context_id', require_context_id);
+    formData.append('extension_direction', extension_direction);
+    formData.append('redundancylevel', redundancylevel);
+    formData.append('first_protein_only', first_protein_only);
+    formData.append('originalrowmerge', originalrowmerge);
+
     const csrftoken = getCookie('csrftoken');
     const conf = {
       method: "post",
@@ -170,47 +248,7 @@ class JobForm extends Component {
 
     fetch(this.props.endpoint, conf).then(response => console.log(response));
     
-    if (document.getElementById('peptidelist').checked) {
-      document.getElementById('peptidelist').checked = false;
-    }
-    if (document.getElementById('prealigned').checked) {
-      document.getElementById('prealigned').checked = false;
-    }
-    if (this.state.foreground_data != "") {
-      document.getElementById("foreground_data-text").textContent = 'Choose a file...';
-    }
-    if (this.state.foreground_data != "") {
-      document.getElementById("context_data-text").textContent = 'Choose a file...';
-    }
-    this.setState({ ['title']: "" });
-    this.setState({ ['email']: "" });
-    this.setState({ ['description']: "" });
-    this.setState({ ['foreground_data']: "" });
-    this.setState({ ['foregroundformat']: "" });
-    this.setState({ ['foreground_filename']: "" });
-    this.setState({ ['contextformat']: "2" });
-    this.setState({ ['context_data']: "" });
-    this.setState({ ['context_filename']: "" });
-    this.setState({ ['p_value_cutoff']: 0.001 });
-    this.setState({ ['contextformat']: "" });
-    this.setState({ ['position_specific']: true });
-    this.setState({ ['minimum_occurrences']: 20 });
-    this.setState({ ['fold_change_cutoff']: 1.0 });
-    this.setState({ ['max_depth']: "" });
-    this.setState({ ['width']: 15 });
-    this.setState({ ['center_sequences']: false });
-    this.setState({ ['multiple_testing_correction']: true });
-    this.setState({ ['positional_weighting']: true });
-    this.setState({ ['compound_residues']: true });
-    this.setState({ ['compound_residue_decomposition']: true });
-    this.setState({ ['require_context_id']: true });
-    this.setState({ ['extension_direction']: "1" });
-    this.setState({ ['redundancylevel']: "1" });
-    this.setState({ ['first_protein_only']: true });
-    this.setState({ ['originalrowmerge']: "1" });
-
-    document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
-    advancedOptions.style.display = "none";
+    this.resetForm();
 
     alert("Thank you for your submission. Your results will be emailed to you.");
   };
@@ -240,7 +278,12 @@ class JobForm extends Component {
       extension_direction,
       redundancylevel,
       first_protein_only,
-      originalrowmerge
+      originalrowmerge,
+      prealignedChecked,
+      peptideListChecked,
+      swissProtHumanChecked,
+      swissProtMouseChecked,
+      fastaChecked
     } = this.state;
     return (
       <section className="jobformcontainer">
@@ -318,7 +361,7 @@ class JobForm extends Component {
                   id="prealigned"
                   onChange={this.handleChange}
                   value="1"
-                  checked={foregroundformat == 1}
+                  checked={prealignedChecked}
                   required
                 />
                 Prealigned text file (<a href='/rolim/textfile' download>Example</a>)
@@ -332,7 +375,7 @@ class JobForm extends Component {
                   id="peptidelist"
                   onChange={this.handleChange}
                   value="3"
-                  checked={foregroundformat == 3}
+                  checked={peptideListChecked}
                 />
                 Text file peptide list (<a href='/rolim/peptidelist' download>Example</a>)
               </label>
@@ -349,7 +392,7 @@ class JobForm extends Component {
                   id="swissprot-human"
                   onChange={this.handleChange}
                   value="2"
-                  checked={contextformat == 2}
+                  checked={swissProtHumanChecked}
                   required
                 />
                 Swiss-Prot Human
@@ -364,7 +407,7 @@ class JobForm extends Component {
                   id="swissprot-mouse"
                   onChange={this.handleChange}
                   value="3"
-                  checked={contextformat == 3}
+                  checked={swissProtMouseChecked}
                 />
                 Swiss-Prot Mouse
               </label>
@@ -378,7 +421,7 @@ class JobForm extends Component {
                   id="fasta"
                   onChange={this.handleChange}
                   value="1"
-                  checked={contextformat == 1}
+                  checked={fastaChecked}
                 />
                 Other (uploaded FASTA file)
               </label>
