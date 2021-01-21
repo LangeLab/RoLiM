@@ -101,19 +101,25 @@ class JobForm extends Component {
   };
   
   resetForm = () => {
+    {/*
     if (document.getElementById('peptidelist').checked) {
       document.getElementById('peptidelist').checked = false;
     }
     if (document.getElementById('prealigned').checked) {
       document.getElementById('prealigned').checked = false;
     }
+    */}
+    
+    document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
+    advancedOptions.style.display = "none";
 
     if (this.state.foreground_data != "") {
       document.getElementById("foreground_data-text").textContent = 'Choose a file...';
     }
-    if (this.state.foreground_data != "") {
+    if (this.state.context_data != "") {
       document.getElementById("context_data-text").textContent = 'Choose a file...';
     }
+
     this.setState({
       title: "",
       email: "",
@@ -143,9 +149,6 @@ class JobForm extends Component {
       first_protein_only: true,
       originalrowmerge: "1",
     });
-
-    document.getElementById('advanced-options-header').innerHTML = 'Advanced options &#9650';
-    advancedOptions.style.display = "none";
   }
 
   handleSubmit = e => {
