@@ -326,7 +326,7 @@ def new_job(jobcode):
                     positional_weighting=positional_weighting,
                     allow_compound_residue_decomposition=compound_residue_decomposition
                 )
-                if width == 8:
+                if (width == 8) and center_sequences:
                     summary_tables.append(patterns.post_processing())
                 else:
                     summary_tables.append(patterns.post_processing(proteolysis_data=False))
