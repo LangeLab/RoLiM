@@ -785,7 +785,7 @@ def generate_figures(patterns,
     clustermap_output_path = os.path.join(
         output_dir,
         'summary',
-        output_prefix + 'sequence_clustermap.svg'
+        output_prefix + '_sequence_clustermap.svg'
     )
 
     # Pattern similarity clustermap.

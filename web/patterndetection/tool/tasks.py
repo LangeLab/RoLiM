@@ -310,6 +310,7 @@ def new_job(jobcode):
                 sample_output_paths.append((list(samples.keys())[0], output_directory))
             
             # Run pattern extraction analysis and generate outputs.
+            all_pattern_containers = []
             summary_tables = []
             for sample_name, sample_output_path in sample_output_paths:
                 patterns = pattern_extraction.PatternContainer(
@@ -329,10 +330,25 @@ def new_job(jobcode):
                     summary_tables.append(patterns.post_processing())
                 else:
                     summary_tables.append(patterns.post_processing(proteolysis_data=False))
-            
+                all_patterns.append(patterns)
+
             # Add sequence summary table to summary output directory.
             if len(summary_tables) > 1:
-                summary_table = pd.concat(summary_tables)
+                unique_pattern_strings = []
+                unique_pattern_list = []
+                for pattern_container in all_pattern_containers:
+                    for pattern in pattern_container.pattern_list:
+                        pattern_string = ''.join(pattern.character_pattern())
+                        if pattern_string not in unique_pattern_strings:
+                            unique_pattern_strings.append(pattern_string)
+                            unique_pattern_list.append(pattern)
+                all_original_sequences = pd.concat(
+                    [sample.original_sequences for sample in samples.items()]
+                )
+                summary_table = pattern_extraction.PatternContainer.generate_summary_table(
+                    all_original_sequences,
+                    unique_pattern_list
+                )
                 summary_table.to_csv(
                     os.path.join(
                         log_file_directory,

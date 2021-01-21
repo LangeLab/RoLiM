@@ -449,8 +449,10 @@ class JobForm extends Component {
                   Center sequence position numbers?
                 </label>
                 <HelpText text={
-                    "For example:\n\nCentered:"
-                    + "p4-p3-p2-p1-p1'-p2'-p3'-p4\n\nNon-centered: p1-p2-p3-p4-p5-p6-p7-p8-p9-p10-p11-p12-p13-p14-p15\n\n"
+                    "For example:\n\nCentered:\n\n"
+                    + "    p4-p3-p2-p1-p1'-p2'-p3'-p4\n\n"
+                    + "Non-centered:\n\n"
+                    + "    p1-p2-p3-p4-p5-p6-p7-p8-p9-p10-p11-p12-p13-p14-p15\n\n"
                     + "*Protease analysis only supported for centered sequences with a window width of 8.\n"} />
               </div>
             </div>

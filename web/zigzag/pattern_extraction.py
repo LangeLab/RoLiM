@@ -1600,13 +1600,68 @@ class PatternContainer:
         )
         
         # Generate tabular output.
-        self.generate_summary_table()
+        self.save_summary_table()
 
         return self.sequence_summary_table
 
+    @staticmethod
+    def generate_summary_table(original_sequences, pattern_list):
+        """
 
+        Parameters:
+            original_sequences -- Pandas DataFrame. Contains all rows
+                                    from the supplied foreground data
+                                    set in their original order, and
+                                    supplemental data from the alignment
+                                    and extension process if relevant.
+            pattern_list -- List. Contains a Pattern object for each
+                        unique pattern.
+        
+        Returns:
+            summary_table -- Pandas DataFrame. Cotains original_sequences
+                                columns, and an additional binary
+                                columns for each unique pattern based on
+                                sequence match.
+        """
 
-    def generate_summary_table(self):
+        # Match aligned sequences to detected patterns.
+        pattern_rows = []
+        for i, row in original_sequences.iterrows():
+            if not isinstance(row['aligned_sequence'], str):
+                pattern_rows.append([np.nan] * len(pattern_list))
+            else:
+                matching_patterns = []
+                for pattern in pattern_list:
+                    pattern_re = pattern_to_regular_expression(
+                        pattern.character_pattern(
+                            pattern_matrix=pattern.constituent_pattern
+                        )
+                    )
+                    pattern_match = 0
+                    for sequence in row['aligned_sequence'].split(';'):
+                        if re.match(pattern_re, sequence):
+                            pattern_match = 1
+                            break
+                    matching_patterns.append(pattern_match)
+                pattern_rows.append(matching_patterns)
+
+        # Generate tabular output DataFrame.
+        pattern_columns = [
+            ''.join(pattern.character_pattern()) for pattern in pattern_list
+        ]
+        summary_table = pd.DataFrame(
+            pattern_rows,
+            columns=pattern_columns,
+            index=original_sequences.index
+        )
+        summary_table = pd.concat(
+            [original_sequences, summary_table],
+            axis=1
+        )
+
+        return summary_table
+
+    def save_summary_table(self):
         """
         Output table conserving original input data set rows with
             addtional output columns.
@@ -1618,38 +1673,9 @@ class PatternContainer:
 
         if self.sample.original_sequences is not None:
             # Match aligned sequences to detected patterns.
-            pattern_rows = []
-            for i, row in self.sample.original_sequences.iterrows():
-                if not isinstance(row['aligned_sequence'], str):
-                    pattern_rows.append([np.nan] * len(self.pattern_list))
-                else:
-                    matching_patterns = []
-                    for pattern in self.pattern_list:
-                        pattern_re = pattern_to_regular_expression(
-                            pattern.character_pattern(
-                                pattern_matrix=pattern.constituent_pattern
-                            )
-                        )
-                        pattern_match = 0
-                        for sequence in row['aligned_sequence'].split(';'):
-                            if re.match(pattern_re, sequence):
-                                pattern_match = 1
-                                break
-                        matching_patterns.append(pattern_match)
-                    pattern_rows.append(matching_patterns)
-
-            # Generate tabular output DataFrame.
-            pattern_columns = [
-                ''.join(pattern.character_pattern()) for pattern in self.pattern_list
-            ]
-            summary_table = pd.DataFrame(
-                pattern_rows,
-                columns=pattern_columns,
-                index=self.sample.original_sequences.index
-            )
-            summary_table = pd.concat(
-                [self.sample.original_sequences, summary_table],
-                axis=1
+            summary_table = self.generate_summary_table(
+                self.sample.original_sequences,
+                self.pattern_list
             )
 
             # Save summary table to tab-delimited file.
@@ -1669,8 +1695,6 @@ class PatternContainer:
                 index=True
             )
             self.sequence_summary_table = summary_table
-
-
 
     def generate_pattern_outputs(self):
         """Last steps for retained patterns."""
@@ -1756,7 +1780,7 @@ class PatternContainer:
             }
         )
         self.pattern_summary_table.to_csv(
-            os.path.join(pattern_directory, 'pattern_summary_table.csv'),
+            os.path.join(pattern_directory, '_pattern_summary_table.csv'),
             sep=',',
             header=True,
             index=True
