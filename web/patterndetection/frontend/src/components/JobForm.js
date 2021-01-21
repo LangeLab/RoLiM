@@ -73,7 +73,7 @@ class JobForm extends Component {
       }
     }
     else if (e.target.name == "width") {
-      this.setState({ center_sequences: (width % 2 == 0) ? true : false });
+      this.setState({ center_sequences: (e.target.value % 2 == 0) ? true : false });
     }
   };
 
@@ -130,6 +130,7 @@ class JobForm extends Component {
       minimum_occurrences: 20,
       fold_change_cutoff: 1.0,
       max_depth: "",
+      width: 15,
       center_sequences: false,
       center_sequences: false,
       multiple_testing_correction: true,
