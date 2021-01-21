@@ -46,11 +46,6 @@ class JobForm extends Component {
       redundancylevel: "1",
       first_protein_only: true,
       originalrowmerge: "3",
-      prealignedChecked: false,
-      peptideListChecked: false,
-      swissProtHumanChecked: true,
-      swissProtMouseChecked: false,
-      fastaChecked: false,
     };
     this.toggleForegroundFormat = this.toggleForegroundFormat.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -76,39 +71,6 @@ class JobForm extends Component {
       else if (e.target.value == 3) {
         this.setState({ redundancylevel: 2 });
       }
-    }
-    else if (e.target.id == "prealigned") {
-      this.setState({
-        prealignedChecked: true,
-        peptideListChecked: false
-      });
-    }
-    else if (e.target.id == "peptidelist") {
-      this.setState({
-        prealignedChecked: false,
-        peptideListChecked: true
-      });
-    }
-    else if (e.target.id == "swissprot-human") {
-      this.setState({
-        swissProtHumanChecked: true,
-        swissProtMouseChecked: false,
-        fastaChecked: false
-      });
-    }
-    else if (e.target.id == "fasta") {
-      this.setState({
-        swissProtHumanChecked: false,
-        swissProtMouseChecked: true,
-        fastaChecked: false
-      });
-    }
-    else if (e.target.id == "fasta") {
-      this.setState({
-        swissProtHumanChecked: false,
-        swissProtMouseChecked: false,
-        fastaChecked: true
-      });
     }
     else if (e.target.name == "width") {
       this.setState({ center_sequences: (width % 2 == 0) ? true : false });
@@ -212,7 +174,7 @@ class JobForm extends Component {
       extension_direction,
       redundancylevel,
       first_protein_only,
-      originalrowmerge
+      originalrowmerge,
     } = this.state;
     formData.append('foreground_data', foreground_data);
     formData.append('foregroundformat', foregroundformat);
@@ -279,11 +241,6 @@ class JobForm extends Component {
       redundancylevel,
       first_protein_only,
       originalrowmerge,
-      prealignedChecked,
-      peptideListChecked,
-      swissProtHumanChecked,
-      swissProtMouseChecked,
-      fastaChecked
     } = this.state;
     return (
       <section className="jobformcontainer">
@@ -361,7 +318,7 @@ class JobForm extends Component {
                   id="prealigned"
                   onChange={this.handleChange}
                   value="1"
-                  checked={prealignedChecked}
+                  checked={foregroundformat == "1"}
                   required
                 />
                 Prealigned text file (<a href='/rolim/textfile' download>Example</a>)
@@ -375,7 +332,7 @@ class JobForm extends Component {
                   id="peptidelist"
                   onChange={this.handleChange}
                   value="3"
-                  checked={peptideListChecked}
+                  checked={foregroundformat == "3"}
                 />
                 Text file peptide list (<a href='/rolim/peptidelist' download>Example</a>)
               </label>
@@ -392,7 +349,7 @@ class JobForm extends Component {
                   id="swissprot-human"
                   onChange={this.handleChange}
                   value="2"
-                  checked={swissProtHumanChecked}
+                  checked={contextformat == "2"}
                   required
                 />
                 Swiss-Prot Human
@@ -407,7 +364,7 @@ class JobForm extends Component {
                   id="swissprot-mouse"
                   onChange={this.handleChange}
                   value="3"
-                  checked={swissProtMouseChecked}
+                  checked={contextformat == "3"}
                 />
                 Swiss-Prot Mouse
               </label>
@@ -421,7 +378,7 @@ class JobForm extends Component {
                   id="fasta"
                   onChange={this.handleChange}
                   value="1"
-                  checked={fastaChecked}
+                  checked={contextformat == 1}
                 />
                 Other (uploaded FASTA file)
               </label>
