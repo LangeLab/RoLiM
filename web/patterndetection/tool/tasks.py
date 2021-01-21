@@ -343,7 +343,7 @@ def new_job(jobcode):
                             unique_pattern_strings.append(pattern_string)
                             unique_pattern_list.append(pattern)
                 all_original_sequences = pd.concat(
-                    [sample.original_sequences for sample in samples.items()]
+                    [sample.original_sequences for sample in samples.values()]
                 )
                 summary_table = pattern_extraction.PatternContainer.generate_summary_table(
                     all_original_sequences,
