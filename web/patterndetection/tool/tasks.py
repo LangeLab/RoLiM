@@ -20,6 +20,8 @@ from zigzag import sequences, pattern_extraction
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
 
+MAX_MEMORY_ALLOWANCE = 7.0
+
 
 class SpeciesError(Exception): pass
 
@@ -31,6 +33,31 @@ class ForegroundError(Exception): pass
 
 
 class ParameterError(Exception): pass
+
+
+class MemoryLimitExceededError(Exception): pass
+
+
+def check_memory_limit(context, width):
+    """
+    Checks if job is likely to cause a memory error. Returns True if
+        esimtated peak memory load for an analysis is below max memory
+        allowance and False if it exceeds this limit.
+
+    Parameters:
+        context -- Pandas DataFrame.
+        width -- Int.
+
+    Returns:
+        below_memory_limit -- Boolean.
+    """
+
+    if sequences.estimate_peak_memory_load(context, width) < MAX_MEMORY_ALLOWANCE:
+        below_memory_limit = True
+    else:
+        below_memory_limit = False
+    
+    return below_memory_limit
 
 
 def new_job(jobcode):
@@ -170,6 +197,10 @@ def new_job(jobcode):
                 context = sequences.import_fasta(
                     os.path.join(settings.MEDIA_ROOT, context_data.name)
                 )
+
+                if check_memory_limit(context, width):
+                    raise MemoryLimitExceededError()
+
                 # Generate new Background instance.
                 if compound_residues:
                     background = sequences.Background(
@@ -191,6 +222,9 @@ def new_job(jobcode):
                 elif context_format == 3:
                     context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot_Mus_musculus.fasta'))
 
+                if check_memory_limit(context, width):
+                    raise MemoryLimitExceededError()
+                    
                 # Generate new Background instance.
                 try:
                     if context_format == 2:

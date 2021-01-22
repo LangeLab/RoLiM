@@ -108,6 +108,33 @@ PYRO_GLU = [
 ]
 
 
+def estimate_peak_memory_load(context, width):
+    """
+    Calculates a (very) rough estimate of peak memory usage for an
+        analysis.
+
+    Parameters:
+        context -- Pandas DataFrame.
+
+    Returns:
+        estimated_peak_memory_load -- Float. Rough estimate of peak memory
+                                usage in gigabytes.
+    """
+
+    # Compute terms.
+    context_size = context['sequence'].map(len).sum() * 8
+    num_sequences = context['sequence'].map(lambda x: (len(x) - width) + 1).sum()
+    max_background_df_instances = 5
+
+    # Calculate estimated  
+    estimated_peak_memory_load = (
+        (context_size + (8 * num_sequences * width * max_background_df_instances))
+        / (1024**3)
+    )
+
+    return estimated_peak_memory_load
+
+
 def detect_delimiter(file_path):
     # Detect delimiter from file extension (supports comma or tab).
     file_extension = file_path[-file_path[::-1].find('.'):].lower()
