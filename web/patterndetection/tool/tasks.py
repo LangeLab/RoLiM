@@ -423,11 +423,28 @@ def new_job(jobcode):
     except Exception as e:
         exception_type = type(e).__name__
         if exception_type == 'ContextError':
-            error_message = 'check the format and contents of the context file you selected'
+            error_message = (
+                'Please check the format and contents of the context'
+                + ' file you selected'
+            )
         elif exception_type == 'ForegroundError':
-            error_message = 'check the format and contents of the foreground file you provided'
+            error_message = (
+                'Please check the format and contents of the foreground'
+                + ' file you provided'
+            )
         elif exception_type == 'ParameterError':
-            error_message = 'ensure that the options you selected are consistent with your data'
+            error_message = (
+                'Please ensure that the options you selected are'
+                + ' consistent with your data'
+            )
+        elif exception_type == 'MemoryLimitExceededError':
+            error_message = (
+                'The combination of window width and context data set'
+                + ' you selected results in a background which exceeds'
+                + '  the total memory allowance for a single analysis.'
+                + ' Please reduce the size of one or both in order to'
+                + ' try again'
+            )
         else:
             error_message = 'review your submission and try again'
 
@@ -442,7 +459,7 @@ def new_job(jobcode):
             msg.attach(p)
 
         html = (
-            'Something went wrong with your analysis. Please {}:<br /><br />{}'.format(
+            'Something went wrong with your analysis. {}:<br /><br />{}'.format(
                 error_message,
                 traceback.format_exc()
             )
