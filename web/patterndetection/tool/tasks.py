@@ -198,7 +198,7 @@ def new_job(jobcode):
                     os.path.join(settings.MEDIA_ROOT, context_data.name)
                 )
 
-                if check_memory_limit(context, width):
+                if not check_memory_limit(context, width):
                     raise MemoryLimitExceededError()
 
                 # Generate new Background instance.
@@ -222,9 +222,9 @@ def new_job(jobcode):
                 elif context_format == 3:
                     context = sequences.import_fasta(os.path.join(DEFAULTS, 'uniprot_Mus_musculus.fasta'))
 
-                if check_memory_limit(context, width):
+                if not check_memory_limit(context, width):
                     raise MemoryLimitExceededError()
-                    
+
                 # Generate new Background instance.
                 try:
                     if context_format == 2:
