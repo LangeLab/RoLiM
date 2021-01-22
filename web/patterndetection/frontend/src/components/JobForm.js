@@ -429,6 +429,7 @@ class JobForm extends Component {
                   onChange={this.handleChange}
                   value={width}
                   min="1"
+                  max="25"
                 />
               </div>
           </div>
