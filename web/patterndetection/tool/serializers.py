@@ -30,6 +30,8 @@ class JobSerializer(serializers.ModelSerializer):
 			'positional_weighting',
 			'compound_residues',
 			'compound_residue_decomposition',
+			'compoundresidue_file',
+			'compoundresidue_filename',
 			'require_context_id',
 			'redundancylevel_id',
 			'originalrowmerge_id',

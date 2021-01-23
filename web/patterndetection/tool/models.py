@@ -69,6 +69,13 @@ class Job(models.Model):
 	positional_weighting = models.BooleanField(blank=True, default=True)
 	compound_residues = models.BooleanField(blank=True, default=True)
 	compound_residue_decomposition = models.BooleanField(blank=True, default=True)
+	compoundresidue_file = models.FileField('Uploaded File',
+												upload_to=unique_filename,
+												blank=True,
+												null=True)
+	compoundresidue_filename = models.CharField(max_length=260,
+											blank=True,
+											default="")
 	position_specific = models.BooleanField(blank=True, default=True)
 	require_context_id = models.BooleanField(blank=True, default=True)
 	redundancylevel = models.ForeignKey('RedundancyLevel',

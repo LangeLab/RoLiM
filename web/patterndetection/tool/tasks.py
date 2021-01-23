@@ -60,6 +60,21 @@ def check_memory_limit(context, width):
     return below_memory_limit
 
 
+def load_compound_residues(compound_residue_file):
+    if compound_residue_file:
+        compound_residue_path = os.path.join(
+            settings.MEDIA_ROOT,
+            compound_residue_file.name
+        )
+        compound_residues = sequences.load_compound_residue_file(
+            compound_residue_path
+        )
+    else:
+        compound_residues = sequences.COMPOUND_RESIDUES
+
+    return compound_residues
+
+
 def new_job(jobcode):
     """
     Process and run job from user submission.
@@ -79,6 +94,7 @@ def new_job(jobcode):
     # Get job data from Job submission row.
     foreground_data = job.foreground_data
     context_data = job.context_data
+    compound_residue_file = job.conmpoundresidue_file
 
     # Get job metadata from Job submission row.
     email = job.email
@@ -99,8 +115,9 @@ def new_job(jobcode):
     center_sequences = job.center_sequences
     multiple_testing_correction = job.multiple_testing_correction
     positional_weighting = job.positional_weighting
-    compound_residues = job.compound_residues
+    enable_compound_residues = job.compound_residues
     compound_residue_decomposition = job.compound_residue_decomposition
+    compound_residue_filename = job.compoundresidue_filename
     position_specific = job.position_specific
     require_context_id = job.require_context_id
     first_protein_only = job.first_protein_only
@@ -184,9 +201,14 @@ def new_job(jobcode):
             'Positional weighting:  {}\n'.format(positional_weighting)
         )
         log_file.write('Position specific background:  {}\n'.format(position_specific))
-        log_file.write('Compound residue detection:  {}\n'.format(compound_residues))
+        log_file.write('Compound residue detection:  {}\n'.format(enable_compound_residues))
         log_file.write(
             'Compound residue decomposition:  {}\n'.format(compound_residue_decomposition)
+        )
+        log_file.write(
+            'Compound residue file:  {}\n'.format(
+                compound_residue_filename if compound_residue_filename else ""
+            )
         )
 
     try:
@@ -202,11 +224,13 @@ def new_job(jobcode):
                     raise MemoryLimitExceededError()
 
                 # Generate new Background instance.
-                if compound_residues:
+                if enable_compound_residues:
+                    compound_residues = load_compound_residues(compound_residue_file)
                     background = sequences.Background(
                         context['sequence'].tolist(),
                         width=width,
-                        position_specific=position_specific
+                        position_specific=position_specific,
+                        compound_residues=compound_residues
                     )
                 else:
                     background = sequences.Background(
@@ -228,12 +252,14 @@ def new_job(jobcode):
                 # Generate new Background instance.
                 try:
                     if context_format == 2:
-                        if compound_residues:
+                        if enable_compound_residues:
+                            compound_residues = load_compound_residues(compound_residue_file)
                             background = sequences.Background(
                                 context['sequence'].tolist(),
                                 width=width,
                                 position_specific=position_specific,
-                                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width))
+                                precomputed=os.path.join(DEFAULTS, 'swissprot_human_background_{}.csv'.format(width)),
+                                compound_residues=compound_residues
                             )
                         else:
                             background = sequences.Background(
@@ -246,11 +272,13 @@ def new_job(jobcode):
                     else:
                         raise SpeciesError()
                 except:
-                    if compound_residues:
+                    if enable_compound_residues:
+                        compound_residues = load_compound_residues(compound_residue_file)
                         background = sequences.Background(
                             context['sequence'].tolist(),
                             width=width,
-                            position_specific=position_specific
+                            position_specific=position_specific,
+                            compound_residues=compound_residues
                         )
                     else:
                         background = sequences.Background(

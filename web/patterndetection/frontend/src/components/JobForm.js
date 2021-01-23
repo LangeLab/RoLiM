@@ -41,6 +41,8 @@ class JobForm extends Component {
       positional_weighting: true,
       compound_residues: true,
       compound_residue_decomposition: true,
+      compoundresidue_file: "",
+      compoundresidue_filename: "",
       require_context_id: true,
       extension_direction: "1",
       redundancylevel: "1",
@@ -143,6 +145,8 @@ class JobForm extends Component {
       positional_weighting: true,
       compound_residues: true,
       compound_residue_decomposition: true,
+      compoundresidue_file: "",
+      compoundresidue_filename: "",
       require_context_id: true,
       extension_direction: "1",
       redundancylevel: "1",
@@ -174,6 +178,8 @@ class JobForm extends Component {
       positional_weighting,
       compound_residues,
       compound_residue_decomposition,
+      compoundresidue_file,
+      compoundresidue_filename,
       require_context_id,
       extension_direction,
       redundancylevel,
@@ -199,6 +205,8 @@ class JobForm extends Component {
     formData.append('positional_weighting', positional_weighting);
     formData.append('compound_residues', compound_residues);
     formData.append('compound_residue_decomposition', compound_residue_decomposition);
+    formData.append('compoundresidue_file', compoundresidue_file);
+    formData.append('compoundresidue_filename', compoundresidue_filename);
     formData.append('require_context_id', require_context_id);
     formData.append('extension_direction', extension_direction);
     formData.append('redundancylevel', redundancylevel);
@@ -239,7 +247,8 @@ class JobForm extends Component {
       multiple_testing_correction,
       positional_weighting,
       compound_residues,
-      compound_residue_decomposition,
+      compoundresidue_file,
+      compoundresidue_filename,
       require_context_id,
       extension_direction,
       redundancylevel,
@@ -493,6 +502,29 @@ class JobForm extends Component {
                     + " residue group (e.g. [RK] -> [R, K])\n"} />
               </div>
             </div>
+            <div className="field">
+            <label className="label">Select custom compound residue file to upload.</label>
+            <label className="file-label">
+              <div className="control">
+                <input
+                  className="file-input"
+                  type="file"
+                  name="compoundresidue_file"
+                  onChange={this.handleUpload}
+                  autoComplete="off"
+                  required
+                />
+                <span className="file-cta">
+                  <span className="file-icon">
+                    <i className="fas fa-upload"></i>
+                  </span>
+                  <span className="file-label" id="compoundresidue_file-text">
+                    Choose a file…
+                  </span>
+                </span>
+              </div>
+            </label>
+          </div>
             <div className="field">
               <div className="control">
                 <label className="checkbox">  

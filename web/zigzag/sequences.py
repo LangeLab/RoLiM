@@ -108,6 +108,23 @@ PYRO_GLU = [
 ]
 
 
+def load_compound_residue_file(compound_residue_path):
+    compound_residue_df = pd.read_csv(
+        compound_residue_path,
+        delimiter='\t',
+        header=None
+    )
+    compound_residue_df.columns = ['description', 'residues']
+    compound_residues = {}
+    for i, row in compound_residue_df.iterrows():
+        compound_residues[str(i + 1)] = CompoundResidue(
+            description=row['description'],
+            residues=[residue.strip() for residue in row['residues'].split(';')]
+        )
+
+    return compound_residues
+
+
 def estimate_peak_memory_load(context, width):
     """
     Calculates a (very) rough estimate of peak memory usage for an
