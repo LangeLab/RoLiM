@@ -94,7 +94,7 @@ def new_job(jobcode):
     # Get job data from Job submission row.
     foreground_data = job.foreground_data
     context_data = job.context_data
-    compound_residue_file = job.conmpoundresidue_file
+    compound_residue_file = job.compoundresidue_file
 
     # Get job metadata from Job submission row.
     email = job.email
