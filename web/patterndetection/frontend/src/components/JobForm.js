@@ -513,7 +513,6 @@ class JobForm extends Component {
                   name="compoundresidue_file"
                   onChange={this.handleUpload}
                   autoComplete="off"
-                  required
                 />
                 <span className="file-cta">
                   <span className="file-icon">
