@@ -247,6 +247,7 @@ class JobForm extends Component {
       multiple_testing_correction,
       positional_weighting,
       compound_residues,
+      compound_residue_decomposition,
       compoundresidue_file,
       compoundresidue_filename,
       require_context_id,
