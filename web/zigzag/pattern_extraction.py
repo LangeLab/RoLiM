@@ -479,8 +479,8 @@ class Pattern:
                     positional_background_frequencies = (
                         self._adjust_positional_background_frequencies()
                     )
-                    positional_background_frequencies[
-                        positional_background_frequencies > 1.0] = 1.0
+                    #positional_background_frequencies[
+                    #    positional_background_frequencies > 1.0] = 1.0
 
                 # Calculate positional residue fold change.
                 positional_residue_fold_change = np.divide(
@@ -638,8 +638,10 @@ class Pattern:
                     # Add parent pattern residues to new pattern.
                     prior_positions = self.pattern_matrix.copy()
                     prior_positions[residue_coordinates[0]] = 0
-                    new_pattern = np.logical_or(prior_positions,
-                                                new_pattern).astype(np.int8)
+                    new_pattern = np.logical_or(
+                        prior_positions,
+                        new_pattern
+                    ).astype(np.int8)
 
                     try:
                         stats_bonferroni_m = bonferroni_m
@@ -901,15 +903,18 @@ class Pattern:
                                 1D NumPy Array. Dtype = float64.
         '''
 
+        # Get matrix of all removed simple residues.
         removed_simple_residues = self.removed_positional_residues[
             :,
             :len(self.background.alphabet)
         ]
+        
+        # Calculate simple residue percentage background frequencies.
         positional_background_frequencies = self._calculate_background_frequencies(
             removed_simple_residues
         )
 
-        # Mask removed positional simple residues.
+        # Replace removed positional simple residues frequencies with 0.
         positional_background_frequencies = (
             positional_background_frequencies
             * np.invert(
@@ -919,25 +924,31 @@ class Pattern:
                 ].astype(np.bool))
         )
 
-        # Mask fixed positions.
-        fixed_positions = self.pattern_matrix[
-            :,
-            :len(self.background.alphabet)
-        ].copy()
-        fixed_positions[np.any(fixed_positions, axis=1)] = 1
-        positional_background_frequencies = (positional_background_frequencies
-            * np.invert(fixed_positions.astype(np.bool)).astype(np.float64))
+        # Replace fixed position frequencies with 0.
+        # fixed_positions = self.pattern_matrix[
+        #     :,
+        #     :len(self.background.alphabet)
+        # ].copy()
+        # fixed_positions[np.any(fixed_positions, axis=1)] = 1
+        
+        # Set all frequencies to 0.0 in fixed positions.
+        fixed_positions = np.zeros_like(self.pattern_matrix)
+        fixed_positions[np.any(self.pattern_matrix, axis=1)] = 1
+        fixed_positions = fixed_positions[:, :len(self.background.alphabet)]
+        positional_background_frequencies = (
+            positional_background_frequencies
+            * np.invert(fixed_positions.astype(np.bool)).astype(np.float64)
+        )
 
-        # Broadcast positional simple residues to compound residues.
         try:
+            # Get compound residue matrix from background.
             compound_residue_matrix = self.background.compound_residue_matrix.to_numpy()
-        # Pass if compound residues are not enabled.
         except AttributeError:
+            # Fixed position background frequencies should be 1.0 for
+            # fixed residues and 0.0 elsewhere.
             fixed_position_background_frequencies = self.pattern_matrix.astype(np.float64)
-        # Merge simple and compound residue background frequencies.
         else:
-            
-            # Merge non-fixed position compound and simple residues.
+            # Merge compound and simple residue percentage frequencies.
             positional_background_frequencies = self._compound_residue_background_frequencies(
                 compound_residue_matrix,
                 positional_background_frequencies
@@ -946,46 +957,95 @@ class Pattern:
             ## Get all simple residues from pattern.
             # Extend compound residues with blank.
             constituents = np.concatenate(
-                (compound_residue_matrix, np.zeros(
-                    (1, compound_residue_matrix.shape[1]), dtype=np.int8)),
-                axis=0)
-            
+                (
+                    compound_residue_matrix,
+                    np.zeros((1, compound_residue_matrix.shape[1]), dtype=np.int8)
+                ),
+                axis=0
+            )
+
             # Generate index array from pattern matrix.
             compound_residue_index = np.argmax(
-                self.pattern_matrix, axis=1) - len(self.background.alphabet)
+                self.pattern_matrix,
+                axis=1
+            ) - len(self.background.alphabet)
             
             # Map simple positions to blank in compound residue matrix.
-            compound_residue_index[
-                compound_residue_index < 0] = len(compound_residue_matrix)
-            
+            compound_residue_index[compound_residue_index < 0] = len(compound_residue_matrix)
+
             # Get compound residue constituents using index array.
             positional_residue_constituents = constituents[compound_residue_index]
-        
-            # Combine constituents with simple fixed residues.
-            fixed_position_residues = np.logical_or(
-                self.pattern_matrix[:, :len(self.background.alphabet)],
-                positional_residue_constituents)
 
-            # Get complement of fixed residues.
-            removed_fixed_positon_residues = np.invert(
-                fixed_position_residues).astype(np.int8)
-
-            # Calculate fixed positional background frequencies.
-            fixed_simple_residue_background_frequencies = self._calculate_background_frequencies(
-                removed_fixed_positon_residues
+            # Drop removed constituents from previous decomposition.
+            postional_residue_constituents = (
+                positional_residue_constituents
+                - np.logical_and(
+                    positional_residue_constituents,
+                    self.removed_positional_residues[
+                        :,
+                        :len(self.background.alphabet)
+                    ]
+                ).astype(np.int8)
             )
-
-            # Concatenate fixed position compound residues.
-            fixed_position_background_frequencies = self._compound_residue_background_frequencies(
-                compound_residue_matrix,
-                fixed_simple_residue_background_frequencies
+            # Calculate background frequencies for constituents.
+            unadjusted_constituent_frequencies = (
+                positional_residue_constituents
+                * self.background.background_vector[:len(self.background.alphabet)]
             )
+            # Calculate total positional background frequencies.
+            total_positional_constituent_frequencies = np.sum(
+                unadjusted_constituent_frequencies,
+                axis=1
+            )[:, np.newaxis]
+            # Calculate weighted constituent background frequencies.
+            adjusted_constituent_frequencies = np.divide(
+                unadjusted_constituent_frequencies,
+                total_positional_constituent_frequencies,
+                out=np.zeros_like(unadjusted_constituent_frequencies),
+                where=total_positional_constituent_frequencies!=0
+            )
+            # Pad array with zeros in compound residue positions.
+            fixed_position_background_frequencies = np.zeros_like(positional_background_frequencies)
+            fixed_position_background_frequencies[
+                :,
+                :len(self.background.alphabet)
+            ] = adjusted_constituent_frequencies
 
-        # Merge adjusted fixed- and non-fixed position background frequencies.
+        # Merge fixed positions back into background frequencies.
         positional_background_frequencies = (
             positional_background_frequencies
             + fixed_position_background_frequencies
         )
+
+            # # Combine constiuents of fixed compounds with fixed simple.
+            # pattern_constituent_matrix = np.logical_or(
+            #     self.pattern_matrix[:, :len(self.background.alphabet)],
+            #     positional_residue_constituents
+            # )
+
+            # # Get complement of fixed residues.
+            # removed_fixed_position_residues = np.invert(
+            #     pattern_constituent_matrix
+            # ).astype(np.int8)
+
+            # Calculate fixed positional background frequencies.
+            # fixed_simple_residue_background_frequencies = self._calculate_background_frequencies(
+            #     removed_fixed_position_residues
+            # )
+
+            # # Concatenate fixed position compound residues.
+            # fixed_position_background_frequencies = self._compound_residue_background_frequencies(
+            #     compound_residue_matrix,
+            #     fixed_simple_residue_background_frequencies
+            # )
+
+        # # Merge adjusted fixed- and non-fixed position background frequencies.
+        # positional_background_frequencies = (
+        #     positional_background_frequencies
+        #     + fixed_position_background_frequencies
+        # )
+
+
 
         return positional_background_frequencies
 
