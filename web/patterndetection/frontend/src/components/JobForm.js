@@ -686,7 +686,7 @@ class JobForm extends Component {
               />
             </div>
           </div>
-            <div className="field">
+            {/* <div className="field">
               <label className="checkbox">
                 Fold difference cutoff
               </label>
@@ -704,7 +704,7 @@ class JobForm extends Component {
                   step="any"
                 />
               </div>
-            </div>
+            </div> */}
             <div className="field">
               <div className="control">
                 <label className="checkbox">
