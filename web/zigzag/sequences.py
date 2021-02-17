@@ -1723,3 +1723,7 @@ class Background:
             centered_sequences += re.findall(regular_expression, sequence)
         
         return centered_sequences
+
+    def to_csv(self, output_path):
+        """Save background_df to CSV."""
+        self._background_df.to_csv(output_path, header=True, index=False)
