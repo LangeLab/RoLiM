@@ -394,6 +394,38 @@ def get_all_ids_from_context(context, precomputed):
     return context_ids
 
 
+def check_context_id_types(context_id, context_id_types, context):
+    for context_id_type in context_id_types:
+        context_sequences = context[
+            context[context_id_type] == context_id
+        ].tolist()
+        num_sequences = len(context_sequences)
+        if num_sequences > 0:
+            break
+
+        return context_sequences, num_sequences
+
+
+def get_context_sequences(context_id, context):
+    parsed_id = parse_swissprot_accession_number(context_id)
+    if parsed_id:
+        context_id_types = ['swissprot_id', 'id']
+        context_sequences, num_sequences = check_context_id_types(
+            parsed_id,
+            context_id_types,
+            context
+        )    
+    else:
+        context_id_types = ['id']
+        context_sequences, num_sequences = check_context_id_types(
+            context_id,
+            context_id_types,
+            context
+        )
+
+    return context_sequences, num_sequences
+
+
 def align_sequences(context,
                     sequences,
                     width=DEFAULT_WIDTH,
@@ -446,27 +478,29 @@ def align_sequences(context,
         try:
             context_ids = sequence['context_id'].replace(' ', '').split(';')
         except:
+            # Exclude sequence if no IDs are required but not provided.
             if require_context_id:
                 continue
+            # Otherwise, try matching against all context sequences.
             else:
                 context_ids = get_all_ids_from_context(context, precomputed)
                 context_elements = context['sequence'].tolist()
                 first_protein_only = False
-        else:
-            # Currently only supporting protein accesssion ID lookup for
-            # Swiss-Prot. Any other IDs will fail and revert to default
-            # behavior of attempting to match sequence segment against
-            # all context sequences.
+        else:            
+            # Match against all context sequences if ID required and
+            # IDs column is present but blank.
             if (len(max(context_ids, key=len)) == 0) and not require_context_id:
                 context_ids = get_all_ids_from_context(context, precomputed)
                 context_elements = context['sequence'].tolist()
                 first_protein_only = False
+            # Otherwise exclude sequence.
             elif len(max(context_ids, key=len)) == 0:
                 continue
             else:
                 swissprot_ids = []
                 context_elements = []
                 for context_id in context_ids:
+                    # Special case for precoumpted human Swiss-Prot.
                     if os.path.basename(precomputed) in PRECOMPUTED_FILES['swissprot_human']:
                         parsed_id = parse_swissprot_accession_number(context_id)
                         if SWISSPROT_ACCESSION_PATTERN.match(parsed_id):
@@ -486,10 +520,8 @@ def align_sequences(context,
                                     )
                                 )
                     else:
-                        context_sequences = context[
-                            context['swissprot_id'] == context_id
-                        ]['sequence'].tolist()
-                        num_sequences = len(context_sequences)
+                        # Get context sequences using provided ID.
+                        context_sequences, num_sequences = get_context_sequences(context_id, context)
                         if num_sequences == 1:
                             context_elements += context_sequences
                             if first_protein_only:
@@ -774,13 +806,16 @@ def parse_swissprot_accession_number(identifier):
         swissprot_accession_number -- String.
     """
 
-    swissprot_accession_number = [
-        identifier[match.start():match.end()]
-        for match in re.finditer(
-            SWISSPROT_ACCESSION_PATTERN,
-            identifier
-        )
-    ][0]
+    try:
+        swissprot_accession_number = [
+            identifier[match.start():match.end()]
+            for match in re.finditer(
+                SWISSPROT_ACCESSION_PATTERN,
+                identifier
+            )
+        ][0]
+    except IndexError:
+        swissprot_accession_number = None
 
     return swissprot_accession_number
 
