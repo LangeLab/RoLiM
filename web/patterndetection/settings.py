@@ -29,6 +29,8 @@ ALLOWED_HOSTS = [
     'langelab.org',
     'www.langelab.org',
     '165.22.153.175',
+    '206.12.94.68',
+    '206.12.93.194',
     'localhost',
     '127.0.0.1',
     '0.0.0.0',

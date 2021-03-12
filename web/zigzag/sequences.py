@@ -880,19 +880,22 @@ def import_peptide_list(peptide_list_file,
     """
 
     # Import peptide list from file.
-    peptide_list = pd.read_csv(peptide_list_file, delimiter=delimiter, header=None)
+    peptide_list = pd.read_csv(peptide_list_file, delimiter=delimiter, header=0)
 
     # Assign proper headers based on assumed data format.
     if len(peptide_list.columns) == 1:
         peptide_list.columns = ['sequence']
     elif len(peptide_list.columns) == 2:
         peptide_list.columns = ['sequence', 'context_id']
-    elif len(peptide_list.columns) == 3:
-        peptide_list.columns = ['sample_name', 'sequence', 'context_id']
-    else:
-        peptide_list.columns = ['sample_name', 'sequence', 'context_id'] + [
-            'additional_data_{}'.format(i) for i in range(len(peptide_list.columns) - 3)
-        ]
+    else
+        peptide_list.rename(
+            columns={
+                peptide_list.columns[0]: 'sample_name',
+                peptide_list.columns[1]: 'sequence',
+                peptide_list.columns[2]: 'context_id'
+            },
+            inplace=True
+        )
 
     return peptide_list
 
@@ -1055,21 +1058,15 @@ def peptides_to_sample(peptides,
             'input_sequence',
             'input_context_id',
         ]
-    elif len(original_sequences.columns) == 3:
-        original_sequences.columns = [
-            'input_sample_name',
-            'input_sequence',
-            'input_context_id',
-        ]
     else:
-        original_sequences.columns = [
-            'input_sample_name',
-            'input_sequence',
-            'input_context_id',
-        ] + [
-            'additional_data_{}'.format(i)
-            for i in range(len(original_sequences.columns) - 3)
-        ]
+        original_sequences.rename(
+            columns={
+                original_sequences.columns[0]: 'input_sample_name',
+                original_sequences.columns[1]: 'input_sequence',
+                original_sequences.columns[2]: 'input_context_id',
+            },
+            inplace=True
+        )
 
     aligned_sequences = align_sequences(
         context,
@@ -1229,7 +1226,7 @@ def load_prealigned_file(prealigned_file_path,
     prealigned_sequences = pd.read_csv(
         prealigned_file_path,
         delimiter=delimiter,
-        header=None
+        header=0
     )
 
     if len(prealigned_sequences.columns) == 1:
@@ -1248,13 +1245,13 @@ def load_prealigned_file(prealigned_file_path,
             )
         }
     else:
-        if len(prealigned_sequences.columns) == 2:
-            prealigned_sequences.columns = ['input_sample_name', 'aligned_sequence']
-        else:
-            prealigned_sequences.columns = ['input_sample_name', 'aligned_sequence'] + [
-                'additional_data_{}'.format(i)
-                for i in range(len(prealigned_sequences.columns) - 2)
-            ]
+        prealigned_sequences.rename(
+            columns={
+                prealigned_sequences.columns[0]: 'input_sample_name',
+                prealigned_sequences.columns[1]: 'aligned_sequence'
+            },
+            inplace=True
+        )
         prealigned_samples = dict(tuple(prealigned_sequences.groupby('input_sample_name')))
         samples = {}
         for sample_name, prealigned_sequences in prealigned_samples.items():

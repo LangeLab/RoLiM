@@ -85,7 +85,8 @@ class Job(models.Model):
 	originalrowmerge = models.ForeignKey('OriginalRowMerge',
 											on_delete=models.CASCADE,
 											default=DEFAULT_ORIGINALROWMERGE)
-
+	cluster_sequences = models.BooleanField(blank=True, default=True)
+	
 class ForegroundFormat(models.Model):
 	"""Supported foreground data set format options."""
 	foreground_format = models.CharField(max_length=120)

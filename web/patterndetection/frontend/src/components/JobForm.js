@@ -48,6 +48,7 @@ class JobForm extends Component {
       redundancylevel: "1",
       first_protein_only: true,
       originalrowmerge: "3",
+      cluster_sequences: true,
     };
     this.toggleForegroundFormat = this.toggleForegroundFormat.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -152,6 +153,7 @@ class JobForm extends Component {
       redundancylevel: "1",
       first_protein_only: true,
       originalrowmerge: "1",
+      cluster_sequences: true,
     });
   }
 
@@ -185,6 +187,7 @@ class JobForm extends Component {
       redundancylevel,
       first_protein_only,
       originalrowmerge,
+      cluster_sequences
     } = this.state;
     formData.append('foreground_data', foreground_data);
     formData.append('foregroundformat', foregroundformat);
@@ -212,6 +215,7 @@ class JobForm extends Component {
     formData.append('redundancylevel', redundancylevel);
     formData.append('first_protein_only', first_protein_only);
     formData.append('originalrowmerge', originalrowmerge);
+    formData.append('cluster_sequences', cluster_sequences);
 
     const csrftoken = getCookie('csrftoken');
     const conf = {
@@ -255,6 +259,7 @@ class JobForm extends Component {
       redundancylevel,
       first_protein_only,
       originalrowmerge,
+      cluster_sequences
     } = this.state;
     return (
       <section className="jobformcontainer">
@@ -822,6 +827,24 @@ class JobForm extends Component {
             </div>
           </div>
           <br />
+          <div className="field">
+              <div className="control">
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    name="cluster_sequences"
+                    onChange={this.handleCheckboxChange}
+                    value={cluster_sequences}
+                    checked={cluster_sequences}
+                  />
+                  Enable hierarchical clustering of sequences and motifs?
+                </label>
+                <HelpText text={
+                    "Enables optional hierarchical clustering of sequences and motifs.\n\n"
+                    + " This is a time- and memory-intensive operation, and should\n"
+                    + " be disabled for very large foreground data sets.\n"} />
+              </div>
+            </div>
           <div className="control">
             <button type="submit" className="button is-info">
               Submit job

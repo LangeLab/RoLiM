@@ -123,7 +123,8 @@ def new_job(jobcode):
     first_protein_only = job.first_protein_only
     redundancy_level = RedundancyLevel.objects.get(id=job.redundancylevel_id).redundancy_level
     original_row_merge = OriginalRowMerge.objects.get(id=job.originalrowmerge_id).original_row_merge
-
+    cluster_sequences = job.cluster_sequences
+    
     # Set terminal based on sequence extension direction.
     if extension_direction == 1:
         terminal = 'n'
@@ -389,9 +390,16 @@ def new_job(jobcode):
                     allow_compound_residue_decomposition=compound_residue_decomposition
                 )
                 if (width == 8) and center_sequences:
-                    summary_tables.append(patterns.post_processing())
+                    summary_tables.append(
+                        patterns.post_processing(cluster_sequences=cluster_sequences)
+                    )
                 else:
-                    summary_tables.append(patterns.post_processing(proteolysis_data=False))
+                    summary_tables.append(
+                        patterns.post_processing(
+                            proteolysis_data=False,
+                            cluster_sequences=cluster_sequences
+                        )
+                    )
                 all_pattern_containers.append(patterns)
 
             # Add sequence summary table to summary output directory.
@@ -506,4 +514,4 @@ def new_job(jobcode):
     server.quit()
 
     # Remove completed job from Job table.
-    job.delete()
+    # job.delete()

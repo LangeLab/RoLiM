@@ -615,6 +615,7 @@ def generate_protease_pattern_heatmap(title,
 
 def generate_figures(patterns,
                         proteolysis_data=True,
+                        cluster_sequences=True,
                         annotate_clustermap=False):
     """
     Helper function used to generate all default output figures.
@@ -753,53 +754,54 @@ def generate_figures(patterns,
     )
     """
 
-    # Generate sequence-pattern similarity matrix.
-    pattern_labels = [
-        label[:(label.find('{') - 4)] for label in generate_pattern_labels(
-            position_labels,
-            patterns
-        )
-    ]
-    pattern_similarity_matrix = calculate_pattern_similarity_matrix(
-        sequence_df,
-        patterns.pattern_list,
-        pattern_labels,
-        SUBSTITUTION_MATRIX
-    )
-
-    # If clustermap annotations is enabled, generate row colors.
-    row_color_ratio = 2
-    if annotate_clustermap:
-        row_colors = generate_row_colors(absolute_frequency_matrix, protease_labels)
-        row_color_ratio = 2
-    else:
-        row_colors = None
-
-    # Set clustermap title.
-    clustermap_title = (
-        analysis_title
-        + ' - Mean Sequence-Pattern Positional Substitution Probability'
-    )
-
-    # Set clustermap output path.
-    clustermap_output_path = os.path.join(
-        output_dir,
-        'summary',
-        output_prefix + '_sequence_clustermap.svg'
-    )
-
-    # Pattern similarity clustermap.
-    if np.any(pattern_similarity_matrix.to_numpy().astype(np.bool)):
-        try:
-            generate_sequence_clustermap(
-                clustermap_title,
-                pattern_similarity_matrix,
-                clustermap_output_path,
-                row_colors=row_colors,
-                row_color_ratio=row_color_ratio,
-                annotate_rows=False
+    if cluster_sequences:
+        # Generate sequence-pattern similarity matrix.
+        pattern_labels = [
+            label[:(label.find('{') - 4)] for label in generate_pattern_labels(
+                position_labels,
+                patterns
             )
-        except ValueError as e:
-            print('Clustermap failed:\n')
-            print(e)
-            pass
+        ]
+        pattern_similarity_matrix = calculate_pattern_similarity_matrix(
+            sequence_df,
+            patterns.pattern_list,
+            pattern_labels,
+            SUBSTITUTION_MATRIX
+        )
+
+        # If clustermap annotations is enabled, generate row colors.
+        row_color_ratio = 2
+        if annotate_clustermap:
+            row_colors = generate_row_colors(absolute_frequency_matrix, protease_labels)
+            row_color_ratio = 2
+        else:
+            row_colors = None
+
+        # Set clustermap title.
+        clustermap_title = (
+            analysis_title
+            + ' - Mean Sequence-Pattern Positional Substitution Probability'
+        )
+
+        # Set clustermap output path.
+        clustermap_output_path = os.path.join(
+            output_dir,
+            'summary',
+            output_prefix + '_sequence_clustermap.svg'
+        )
+
+        # Pattern similarity clustermap.
+        if np.any(pattern_similarity_matrix.to_numpy().astype(np.bool)):
+            try:
+                generate_sequence_clustermap(
+                    clustermap_title,
+                    pattern_similarity_matrix,
+                    clustermap_output_path,
+                    row_colors=row_colors,
+                    row_color_ratio=row_color_ratio,
+                    annotate_rows=False
+                )
+            except ValueError as e:
+                print('Clustermap failed:\n')
+                print(e)
+                pass

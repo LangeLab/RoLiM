@@ -1634,7 +1634,7 @@ class PatternContainer:
             if pattern.pattern_id not in drop_patterns
         ]
 
-    def post_processing(self, proteolysis_data=True):
+    def post_processing(self, proteolysis_data=True, cluster_sequences=True):
         '''
         Removes patterns if their exclusive sequence subset is two
             sequences or less.
@@ -1656,6 +1656,7 @@ class PatternContainer:
         vis.generate_figures(
             self,
             proteolysis_data=proteolysis_data,
+            cluster_sequences=cluster_sequences,
             annotate_clustermap=False
         )
         

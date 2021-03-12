@@ -36,6 +36,7 @@ class JobSerializer(serializers.ModelSerializer):
 			'redundancylevel_id',
 			'originalrowmerge_id',
 			'first_protein_only',
+			'cluster_sequences',
 		)
 		read_only_fields = ('submitted', 'completed',)
 		extra_kwargs = {
@@ -47,6 +48,7 @@ class JobSerializer(serializers.ModelSerializer):
 			'compound_residues': {'default': True, 'initial': True},
 			'compound_residue_decomposition': {'default': True, 'initial': True},
 			'require_context_id': {'default': True, 'initial': True},
+			'cluster_sequences': {'default': True, 'initial': True},
 		}
 
 
