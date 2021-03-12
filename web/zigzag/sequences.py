@@ -887,7 +887,7 @@ def import_peptide_list(peptide_list_file,
         peptide_list.columns = ['sequence']
     elif len(peptide_list.columns) == 2:
         peptide_list.columns = ['sequence', 'context_id']
-    else
+    else:
         peptide_list.rename(
             columns={
                 peptide_list.columns[0]: 'sample_name',
