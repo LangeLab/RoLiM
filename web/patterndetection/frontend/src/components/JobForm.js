@@ -825,6 +825,7 @@ class JobForm extends Component {
                   </label>
               </div>
             </div>
+            <br />
             <div className="field">
               <div className="control">
                 <label className="checkbox">
