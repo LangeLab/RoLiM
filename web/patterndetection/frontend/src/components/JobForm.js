@@ -825,9 +825,7 @@ class JobForm extends Component {
                   </label>
               </div>
             </div>
-          </div>
-          <br />
-          <div className="field">
+            <div className="field">
               <div className="control">
                 <label className="checkbox">
                   <input
@@ -845,6 +843,8 @@ class JobForm extends Component {
                     + " be disabled for very large foreground data sets.\n"} />
               </div>
             </div>
+          </div>
+          <br />
           <div className="control">
             <button type="submit" className="button is-info">
               Submit job
