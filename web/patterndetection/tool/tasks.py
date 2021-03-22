@@ -391,13 +391,17 @@ def new_job(jobcode):
                 )
                 if (width == 8) and center_sequences:
                     summary_tables.append(
-                        patterns.post_processing(cluster_sequences=cluster_sequences)
+                        patterns.post_processing(
+                            cluster_sequences=cluster_sequences,
+                            logo_maps=False
+                        )
                     )
                 else:
                     summary_tables.append(
                         patterns.post_processing(
                             proteolysis_data=False,
-                            cluster_sequences=cluster_sequences
+                            cluster_sequences=cluster_sequences,
+                            logo_maps=False
                         )
                     )
                 all_pattern_containers.append(patterns)

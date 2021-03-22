@@ -1634,7 +1634,10 @@ class PatternContainer:
             if pattern.pattern_id not in drop_patterns
         ]
 
-    def post_processing(self, proteolysis_data=True, cluster_sequences=True):
+    def post_processing(self,
+                        proteolysis_data=True,
+                        cluster_sequences=True,
+                        logo_maps=True):
         '''
         Removes patterns if their exclusive sequence subset is two
             sequences or less.
@@ -1650,7 +1653,7 @@ class PatternContainer:
         self.prune_patterns()
 
         # Generate outputs for each pattern.
-        self.generate_pattern_outputs()
+        self.generate_pattern_outputs(logo_maps=logo_maps)
 
         # Generate heatmaps and clustermap.
         vis.generate_figures(
@@ -1757,7 +1760,7 @@ class PatternContainer:
             )
             self.sequence_summary_table = summary_table
 
-    def generate_pattern_outputs(self):
+    def generate_pattern_outputs(self, logo_maps=True):
         """Last steps for retained patterns."""
         
 
@@ -1783,7 +1786,8 @@ class PatternContainer:
             
             # Save logo map and seqeunce strings for each pattern.  
             pattern.generate_sequence_strings(pattern_directory)
-            pattern.generate_logo_map(pattern_directory)
+            if logo_maps:
+                pattern.generate_logo_map(pattern_directory)
             
             # Calculate pattern statistics.
             sample_matches = pattern_sequence_match(
