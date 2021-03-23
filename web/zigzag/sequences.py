@@ -398,7 +398,7 @@ def check_context_id_types(context_id, context_id_types, context):
     for context_id_type in context_id_types:
         context_sequences = context[
             context[context_id_type] == context_id
-        ].tolist()
+        ]['sequence'].tolist()
         num_sequences = len(context_sequences)
         if num_sequences > 0:
             break
