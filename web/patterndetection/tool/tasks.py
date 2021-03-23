@@ -379,7 +379,7 @@ def new_job(jobcode):
                 patterns = pattern_extraction.PatternContainer(
                     samples[sample_name],
                     background,
-                    sample_name,
+                    str(sample_name),
                     sample_output_path,
                     max_depth=max_depth,
                     p_value_cutoff=p_value_cutoff,
