@@ -402,8 +402,8 @@ def check_context_id_types(context_id, context_id_types, context):
         num_sequences = len(context_sequences)
         if num_sequences > 0:
             break
-
-        return context_sequences, num_sequences
+            
+    return context_sequences, num_sequences
 
 
 def get_context_sequences(context_id, context):
