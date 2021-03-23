@@ -20,7 +20,7 @@ from zigzag import sequences, pattern_extraction
 DEFAULTS = os.path.join(settings.MEDIA_ROOT, 'defaults')
 TEMP = os.path.join(settings.MEDIA_ROOT, 'temp')
 
-MAX_MEMORY_ALLOWANCE = 7.0
+MAX_MEMORY_ALLOWANCE = 24.0
 
 
 class SpeciesError(Exception): pass
