@@ -33,8 +33,8 @@ class JobSerializer(serializers.ModelSerializer):
 			'compoundresidue_file',
 			'compoundresidue_filename',
 			'require_context_id',
-			'redundancylevel_id',
-			'originalrowmerge_id',
+			'redundancylevel',
+			'originalrowmerge',
 			'first_protein_only',
 			'cluster_sequences',
 		)
