@@ -195,6 +195,12 @@ def new_job(jobcode):
         log_file.write('Require protein identifiers:  {}\n'.format(require_context_id))
         log_file.write('Width:  {}\n'.format(width))
         log_file.write('Centered sequences:  {}\n'.format(center_sequences))
+        log_file.write('Redundancy elimination level:  {}\n'.format(redundancy_level))
+        log_file.write(
+            'Merge multiple aligned peptides from same original row:  {}\n'.format(
+                original_row_merge
+            )
+        )
         log_file.write(
             'Multiple testing correction:  {}\n'.format(multiple_testing_correction)
         )
