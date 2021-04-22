@@ -75,6 +75,19 @@ def load_compound_residues(compound_residue_file):
     return compound_residues
 
 
+def save_compound_residue_table(compound_residues, output_path):
+    columns = ['Compound Residue Code', 'Description', 'Constituents']
+    compound_residue_table = []
+    for code, specifications in compound_residues.items():
+        compound_residue_table.append([
+            code,
+            specifications.description,
+            ';'.join(specifications.residues)
+        ])
+    compound_residue_df = pd.DataFrame(compound_residue_table, columns=columns)
+    compound_residue_df.to_csv(output_path, delimiter='\t', header=True, index=False)
+
+
 def new_job(jobcode):
     """
     Process and run job from user submission.
@@ -370,13 +383,10 @@ def new_job(jobcode):
 
         try:
             sample_output_paths = []
-            if len(samples.keys()) > 1:
-                for sample_name in samples.keys():
-                    sample_directory = re.sub(r'\W+', ' ', sample_name).strip().replace(" ", "_")
-                    sample_output_path = os.path.join(output_directory, sample_directory)
-                    sample_output_paths.append((sample_name, sample_output_path))
-            else:
-                sample_output_paths.append((list(samples.keys())[0], output_directory))
+            for sample_name in samples.keys():
+                sample_directory = re.sub(r'\W+', ' ', sample_name).strip().replace(" ", "_")
+                sample_output_path = os.path.join(output_directory, sample_directory)
+                sample_output_paths.append((sample_name, sample_output_path))
             
             # Run pattern extraction analysis and generate outputs.
             all_pattern_containers = []
@@ -439,6 +449,15 @@ def new_job(jobcode):
                     index=True
                 )
 
+            # Add compound residue table to output directory.
+            save_compound_residue_table(
+                compound_residues,
+                os.path.join(
+                    log_file_directory,
+                    f'{output_title}_compound_reisdues.txt'
+                )
+            )
+
             # Compress outputs as zip archive.
             archive_name = re.sub(r'\W+', ' ', title).strip().replace(" ", "_")
             zip_path = os.path.join(settings.MEDIA_ROOT, jobcode, archive_name)
@@ -460,7 +479,12 @@ def new_job(jobcode):
                 msg.attach(p)
 
             # Prepare email.
-            html = 'Please find attached, the results of your pattern detection analysis.\r\n'
+            html = (
+                'Please find attached, the results of your pattern detection analysis.\n\n'
+                + 'For additional visualization and analysis features, please visit: '
+                + f'http://206.12.93.194:3838/rolimviz/?jobID={jobcode}&title={output_title}'
+                + '\r\n'
+            )
             msg_body = MIMEText(html, 'html')
             msg.attach(msg_body)
             
