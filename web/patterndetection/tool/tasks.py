@@ -85,7 +85,7 @@ def save_compound_residue_table(compound_residues, output_path):
             ';'.join(specifications.residues)
         ])
     compound_residue_df = pd.DataFrame(compound_residue_table, columns=columns)
-    compound_residue_df.to_csv(output_path, delimiter='\t', header=True, index=False)
+    compound_residue_df.to_csv(output_path, sep='\t', header=True, index=False)
 
 
 def new_job(jobcode):
