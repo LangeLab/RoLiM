@@ -1845,7 +1845,7 @@ class PatternContainer:
             }
         )
         self.pattern_summary_table.to_csv(
-            os.path.join(pattern_directory, '_pattern_summary_table.csv'),
+            os.path.join(pattern_directory, f'{title}_pattern_summary_table.csv'),
             sep=',',
             header=True,
             index=True

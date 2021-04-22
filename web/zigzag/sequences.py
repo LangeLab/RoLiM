@@ -1167,7 +1167,7 @@ def load_peptide_list_file(peptide_list_path,
 
     samples = {}
     for sample_name, peptides in sample_peptides.items():
-        samples[sample_name] = peptides_to_sample(
+        samples[str(sample_name)] = peptides_to_sample(
             peptides,
             context,
             background,
@@ -1238,7 +1238,7 @@ def load_prealigned_file(prealigned_file_path,
         )
         sequence_tensor = vectorize_sequences(sequence_df, background)
         samples = {
-            title: Sample(
+            str(title): Sample(
                 sequence_df=sequence_df,
                 sequence_tensor=sequence_tensor,
                 original_sequences=prealigned_sequences
@@ -1261,7 +1261,7 @@ def load_prealigned_file(prealigned_file_path,
                 redundancy_level=redundancy_level
             )
             sequence_tensor = vectorize_sequences(sequence_df, background)
-            samples[sample_name] = Sample(
+            samples[str(sample_name)] = Sample(
                 sequence_df=sequence_df,
                 sequence_tensor=sequence_tensor,
                 original_sequences=prealigned_sequences
