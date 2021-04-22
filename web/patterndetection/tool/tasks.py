@@ -482,7 +482,7 @@ def new_job(jobcode):
             html = (
                 'Please find attached, the results of your pattern detection analysis.\n\n'
                 + 'For additional visualization and analysis features, please visit: '
-                + f'http://206.12.93.194:3838/rolimviz/?jobID={jobcode}&title={output_title}'
+                + f'http://langelab.org:3838/rolimviz/?jobID={jobcode}&title={output_title}'
                 + '\r\n'
             )
             msg_body = MIMEText(html, 'html')
