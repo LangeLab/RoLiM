@@ -326,6 +326,9 @@ class JobForm extends Component {
                 </span>
               </div>
             </label>
+            <HelpText text={
+                  "Column names may not contain special characters other than underscores.\n\n"
+                  + "Cell values of T and F in extra data columns will be interpreted as True and False respectively.\n"} />
           </div>
           <div>
             <label className="label">Select foreground data set format.</label>
@@ -527,6 +530,7 @@ class JobForm extends Component {
                     Choose a file…
                   </span>
                 </span>
+                <a href='/rolim/compoundresiduefile' download>Example</a>
               </div>
             </label>
           </div>

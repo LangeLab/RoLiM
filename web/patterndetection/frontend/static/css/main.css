@@ -81,11 +81,12 @@ footer {
 
 .jobformcontainer {
 	position: relative;
-	width: 1024px;
+	max-width: 1140px;
+	min-width: 350px;
+	width: 80%;
 }
 
 .jobform {
-	width: 90%;
 	margin: 0 auto;
 }
 

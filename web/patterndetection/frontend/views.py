@@ -34,3 +34,10 @@ def text_file_peptide_list(request):
     response = generate_example_file_response(path)
 
     return response
+
+
+def compound_residue_file(request):
+    path = 'examples/compound_residue_file_example.txt'
+    response = generate_example_file_response(path)
+
+    return response
