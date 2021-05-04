@@ -32,6 +32,10 @@ const App = () => (
   			<p className="description">Please visit our <a href="https://langelab.med.ubc.ca/resources/#rolim">main lab website</a> for more information about citing RoLiM.</p>
   		</section>
   		<br />
+      <section>
+        <h4 className="title is-4 description-header">RoLiMviz</h4>
+        <p className="description">For enhanced, interactive visualization and analysis capabilites, please visit RoLiMviz <a href="langelab.org:3838/rolimviz">here</a>.
+      </section>
   		<JobForm endpoint="/api/job/" />
   	</main>
   	<footer>
