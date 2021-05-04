@@ -667,9 +667,7 @@ class JobForm extends Component {
                 + " foreground/background context in which the pair is observed.\n\n"
                 + "Note that this is not the same as the p-value corresponding to the frequency of a motif in your foreground"
                 + " data set. RoLiM does not calculate the p-values of motif foreground frequencies, and the final motif list"
-                + " returned by RoLiM is not filtered based on motif-level significance."
-
-              } />
+                + " returned by RoLiM is not filtered based on motif-level significance.\n\n"} />
             <div className="control">
               <input
                 className="input"

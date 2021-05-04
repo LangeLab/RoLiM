@@ -34,8 +34,9 @@ const App = () => (
   		<br />
       <section>
         <h4 className="title is-4 description-header">RoLiMviz</h4>
-        <p className="description">For enhanced, interactive visualization and analysis capabilites, please visit RoLiMviz <a href="langelab.org:3838/rolimviz">here</a>.
+        <p className="description">For enhanced, interactive visualization and analysis capabilites, please visit RoLiMviz <a href="langelab.org:3838/rolimviz">here</a>.</p>
       </section>
+      <br />
   		<JobForm endpoint="/api/job/" />
   	</main>
   	<footer>
