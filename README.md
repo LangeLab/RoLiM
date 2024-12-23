@@ -1,14 +1,29 @@
 # RoLiM - Robust Linear Motif Deconvolution
 Detection of statistically enriched patterns in protein sequence data sets.
 
+## 🔔 Important Notice Regarding System Updates and Limitations
+
+Due to recent changes in our server infrastructure, we want to make you aware of some current limitations in our email notification system:
+
+- System memory constraints may occasionally prevent email notifications from being sent, even when your analysis is completed successfully
+- Results files exceeding 15MB cannot be sent via email, though they remain accessible through our platform
+
+We have identified additional issues with timeout and error processes when using non-human or isoform FASTA files. If your analysis requires custom FASTA files, this functionality is temporarily unavailable. 
+
+We understand these limitations may impact your workflow, and we're actively working on solutions. A new standalone version is being developed to address these constraints and provide more reliable notifications.
+
+Thank you for your patience and understanding as we improve our service.
+
+> **Lange Lab - Dec 2024**
 
 ## Introduction
-The local sequence context is the most fundamental feature determining the post translational modification (PTM) of proteins. Recent technological improvements allow for the detection of new and less prevalent modifications. We found that established state of the art algorithms for detection of PTM motifs in complex datasets failed to keep up with this technological development and are no longer robust. To overcome this limitation, we developed RoLiM, a new linear motif deconvolution algorithm and webserver, that enables robust and unbiased identification of local amino acid sequence determinants in complex biological systems.
+The local sequence context is the most fundamental feature determining proteins' post-translational modification (PTM). Recent technological improvements allow for the detection of new and less prevalent modifications. We found that established state-of-the-art algorithms for the detection of PTM motifs in complex datasets failed to keep up with this technological development and are no longer robust. To overcome this limitation, we developed RoLiM, a new linear motif deconvolution algorithm and a web server that enables robust and unbiased identification of local amino acid sequence determinants in complex biological systems.
 
 
 ## How to use?
-For convenient use we provide a web frontend accessible at http://langelab.org/rolim
-If preferred RoLiM can also be installed locally but the software has not been designed for ease of local installation and use. 
+For convenient use, we provide a web frontend accessible at http://langelab.org/rolim
+
+If preferred, RoLiM can also be installed locally, but the software has not been designed to ease local installation and use. 
 
 The webfrontent includes detailed explanations for all options and parameters as well as example datasets for download.
 
