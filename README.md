@@ -6,7 +6,7 @@ Detection of statistically enriched patterns in protein sequence data sets.
 Due to recent changes in our server infrastructure, we want to make you aware of some current limitations in our email notification system:
 
 - System memory constraints may occasionally prevent email notifications from being sent, even when your analysis is completed successfully
-- Results files exceeding 15MB cannot be sent via email, though they remain accessible through our platform
+- Result files exceeding 15MB cannot be sent via email, resulting in no email or notifications indicating this issue. 
 
 We have identified additional issues with timeout and error processes when using non-human or isoform FASTA files. If your analysis requires custom FASTA files, this functionality is temporarily unavailable. 
 
